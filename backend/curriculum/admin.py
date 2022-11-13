@@ -1,0 +1,110 @@
+from django.contrib import admin
+from import_export.admin import ImportExportModelAdmin
+from curriculum.models import SubjectGroupIB, ClassYear, SubjectGroupFGOS, Subject, AcademicPlan, Criterion, Strand, \
+    Level, Objective, AchievementLevel, KeyConcept, RecommendSubjectKC, SubjectDirectionRC, RelatedConcept, \
+    GlobalContext, ExplorationToDevelop, CategoryATL, ClusterATL, SubClusterATL, IndicatorATL, Reflection, \
+    InquiryQuestion, Aim, LearnerProfileIB, UnitPlannerMYP, UnitPlannerMYPID
+
+@admin.register(SubjectGroupIB)
+class SubjectGroupIBAdmin(ImportExportModelAdmin):
+    list_display = ("name_eng", "name_rus", "program")
+    
+@admin.register(ClassYear)
+class ClassYearAdmin(ImportExportModelAdmin):
+    list_display = ("year_rus", "year_ib", "program")
+    
+@admin.register(SubjectGroupFGOS)
+class SubjectGroupFGOSAdmin(ImportExportModelAdmin):
+    list_display = ("name_rus", "type_group", "level")
+    
+@admin.register(Subject)
+class SubjectAdmin(ImportExportModelAdmin):
+    list_display = ("name_rus", "group_ib", "group_fgos", "type_subject", "id_dnevnik")
+
+@admin.register(AcademicPlan)
+class AcademicPlanAdmin(ImportExportModelAdmin):
+    list_display = ("subject", "class_year", "study_year", "hours")
+    
+@admin.register(Criterion)
+class CriterionAdmin(ImportExportModelAdmin):
+    list_display = ("name_eng", "letter", "subject_group")
+
+@admin.register(Strand)
+class StrandAdmin(ImportExportModelAdmin):
+    list_display = ("name_eng", "letter", "number", "criterion")
+
+@admin.register(Level)
+class LevelAdmin(ImportExportModelAdmin):
+    list_display = ("name_eng", "name_rus")
+
+@admin.register(Objective)
+class ObjectiveAdmin(ImportExportModelAdmin):
+    list_display = ("name_eng", "strand", "level")
+
+@admin.register(AchievementLevel)
+class AchievementLevelAdmin(ImportExportModelAdmin):
+    list_display = ("name_eng", "point", "objective")
+
+@admin.register(KeyConcept)
+class KeyConceptAdmin(ImportExportModelAdmin):
+    list_display = ("name_eng", "description_eng")
+
+@admin.register(RecommendSubjectKC)
+class RecommendSubjectKCAdmin(ImportExportModelAdmin):
+    list_display = ("key_concept", "subject_group", "comment_eng")
+
+@admin.register(SubjectDirectionRC)
+class SubjectDirectionRCAdmin(ImportExportModelAdmin):
+    list_display = ("name_eng", "name_rus", "subject_group")
+
+@admin.register(RelatedConcept)
+class RelatedConceptAdmin(ImportExportModelAdmin):
+    list_display = ("name_eng", "description_eng")
+
+@admin.register(GlobalContext)
+class GlobalContextAdmin(ImportExportModelAdmin):
+    list_display = ("name_eng", "focus_questions_eng", "description_eng")
+
+@admin.register(ExplorationToDevelop)
+class ExplorationToDevelopAdmin(ImportExportModelAdmin):
+    list_display = ("name_eng", "name_rus", "gcontext")
+
+@admin.register(CategoryATL)
+class CategoryATLAdmin(ImportExportModelAdmin):
+    list_display = ("name_eng", "name_rus")
+
+@admin.register(ClusterATL)
+class ClusterATLAdmin(ImportExportModelAdmin):
+    list_display = ("name_eng", "name_rus", "category")
+
+@admin.register(SubClusterATL)
+class SubClusterATLAdmin(ImportExportModelAdmin):
+    list_display = ("name_eng", "name_rus", "cluster")
+
+@admin.register(IndicatorATL)
+class IndicatorATLAdmin(ImportExportModelAdmin):
+    list_display = ("name_eng", "name_rus", "subcluster")
+
+@admin.register(Aim)
+class AimAdmin(ImportExportModelAdmin):
+    list_display = ("name_eng", "name_rus", "subject_group")
+
+@admin.register(LearnerProfileIB)
+class LearnerProfileIBAdmin(ImportExportModelAdmin):
+    list_display = ("name_eng", "name_rus", "description_eng")
+
+@admin.register(UnitPlannerMYP)
+class UnitPlannerMYPAdmin(ImportExportModelAdmin):
+    list_display = ("title", "subject", "class_year")
+
+@admin.register(UnitPlannerMYPID)
+class UnitPlannerMYPIDAdmin(ImportExportModelAdmin):
+    list_display = ("unitplan_myp", "form_integration")
+    
+@admin.register(Reflection)
+class ReflectionAdmin(ImportExportModelAdmin):
+    list_display = ("planner", "type_post", "author")
+
+@admin.register(InquiryQuestion)
+class InquiryQuestionAdmin(ImportExportModelAdmin):
+    list_display = ("question", "type_inq", "planner")
