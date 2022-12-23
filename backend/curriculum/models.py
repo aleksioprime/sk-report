@@ -369,10 +369,10 @@ class UnitPlannerMYP(models.Model):
     # Информация по Inquiry (Исследовательские вопросы добавляются в связанных таблицах)
     key_concepts = models.ManyToManyField('curriculum.KeyConcept', verbose_name=_("Ключевые концепты"), blank=True, related_name="unitplan_myp")
     related_concepts = models.ManyToManyField('curriculum.RelatedConcept', verbose_name=_("Сопутствующие концепты"), blank=True, related_name="unitplan_myp")
-    conceptual_understanding = models.CharField(max_length=255, verbose_name=_("Концептуальное понимание"), null=True, blank=True)
+    conceptual_understanding = models.TextField(verbose_name=_("Концептуальное понимание"), null=True, blank=True)
     global_context = models.ForeignKey('curriculum.GlobalContext', verbose_name=_("Глобальный контекст"), on_delete=models.SET_NULL, null=True, blank=True, related_name="unitplan_myp")
     explorations = models.ManyToManyField('curriculum.ExplorationToDevelop', verbose_name=_("Линии исследования"), blank=True, related_name="unitplan_myp")
-    statement_inquiry = models.CharField(max_length=255, verbose_name=_("Формулировка исследования"), null=True, blank=True)
+    statement_inquiry = models.TextField(verbose_name=_("Формулировка исследования"), null=True, blank=True)
     # Образовательные цели   
     aims = models.ManyToManyField('curriculum.Aim', verbose_name=_("Цели"), blank=True, related_name="unitplan_myp")
     objectives = models.ManyToManyField('curriculum.Objective', verbose_name=_("Цели предметной группы"), blank=True, related_name="unitplan_myp")

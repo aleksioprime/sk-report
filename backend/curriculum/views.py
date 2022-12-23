@@ -1,8 +1,10 @@
 from django.shortcuts import render
-from curriculum.models import UnitPlannerMYP, ClassYear, Subject, Criterion
+from curriculum.models import UnitPlannerMYP, ClassYear, Subject, Criterion, LearnerProfileIB, IndicatorATL, Objective, Aim, GlobalContext, \
+    ExplorationToDevelop, KeyConcept, RelatedConcept
 from member.models import ProfileTeacher, Department
 from curriculum.serializers import UnitMYPSerializerViewEdit, UnitMYPSerializerListCreate, ProfileTeacherSerializer, ClassYearSerializer, \
-    SubjectSerializer, CriterionSerializer, DepartmentSerializer
+    SubjectSerializer, CriterionSerializer, DepartmentSerializer, LearnerProfileIBSerializer, IndicatorATLSerializer, ObjectiveSerializer, \
+    AimSerializer, GlobalContextSerializer, ExplorationToDevelopSerializer, KeyConceptSerializer, RelatedConceptSerializer
 from rest_framework import viewsets
 from rest_framework.response import Response
 
@@ -14,14 +16,11 @@ class UnitPlannerMYPViewEdit(viewsets.ModelViewSet):
     def retrieve(self, request, pk=None, *args, **kwargs):
         return super().retrieve(request, pk=None, *args, **kwargs)
     def update(self, request, pk=None, *args, **kwargs):
-        return super().update(request, pk=None, *args, **kwargs)
-    def destroy(self, request, *args, **kwargs):
         print(request.data)
-        unitplan_myp = request.data.get('select_unitplat_myp')
-        if len(unitplan_myp):
-            UnitPlannerMYP.objects.filter(id__in=unitplan_myp).delete()
-            return Response({'DELETE': "Success"})
-        return Response({'DELETE': "Error! Not found UnitPlan MYP"})
+        return super().update(request, pk=None, *args, **kwargs)
+    def destroy(self, request, pk=None, *args, **kwargs):
+        print(request.data)
+        return super().destroy(request, pk=None, *args, **kwargs)
 
 # Набор методов для просмотра списка записей и добавления новой записи UnitPlannerMYP
 class UnitPlannerMYPListCreate(viewsets.ModelViewSet):
@@ -63,7 +62,7 @@ class SubjectViewSet(viewsets.ModelViewSet):
         if level:
             subjects = subjects.filter(type_subject=type_subject)
         return subjects
-    
+
 class CriterionViewSet(viewsets.ModelViewSet):
     queryset = Criterion.objects.all()
     serializer_class = CriterionSerializer
@@ -72,3 +71,60 @@ class CriterionViewSet(viewsets.ModelViewSet):
         if not subject:
             return Criterion.objects.all()
         return Criterion.objects.filter(subject_group__subject=subject)
+    
+class LearnerProfileIBViewSet(viewsets.ModelViewSet):
+    queryset = LearnerProfileIB.objects.all()
+    serializer_class = LearnerProfileIBSerializer
+    
+class IndicatorATLViewSet(viewsets.ModelViewSet):
+    queryset = IndicatorATL.objects.all()
+    serializer_class = IndicatorATLSerializer
+    
+class ObjectiveViewSet(viewsets.ModelViewSet):
+    queryset = Objective.objects.all()
+    serializer_class = ObjectiveSerializer
+    def get_queryset(self):
+        subject = self.request.query_params.get("subject", None)
+        class_year = self.request.query_params.get("class_year", None)
+        criteria = self.request.query_params.get("criteria", None).split(',')
+        print(criteria)
+        if not subject or not class_year:
+            return Objective.objects.all()
+        return Objective.objects.filter(strand__criterion__subject_group__subject=subject,
+                                        level__years__in=class_year,
+                                        strand__criterion__in=criteria)
+    
+class AimViewSet(viewsets.ModelViewSet):
+    queryset = Aim.objects.all()
+    serializer_class = AimSerializer
+    def get_queryset(self):
+        subject = self.request.query_params.get("subject", None)
+        if not subject:
+            return Aim.objects.all()
+        return Aim.objects.filter(subject_group__subject=subject)
+    
+class GlobalContextViewSet(viewsets.ModelViewSet):
+    queryset = GlobalContext.objects.all()
+    serializer_class = GlobalContextSerializer
+
+class ExplorationToDevelopViewSet(viewsets.ModelViewSet):
+    queryset = ExplorationToDevelop.objects.all()
+    serializer_class = ExplorationToDevelopSerializer
+    def get_queryset(self):
+        gcontext = self.request.query_params.get("gcontext", None)
+        if not gcontext:
+            return ExplorationToDevelop.objects.all()
+        return ExplorationToDevelop.objects.filter(gcontext=gcontext)
+    
+class KeyConceptViewSet(viewsets.ModelViewSet):
+    queryset = KeyConcept.objects.all()
+    serializer_class = KeyConceptSerializer
+    
+class RelatedConceptViewSet(viewsets.ModelViewSet):
+    queryset = RelatedConcept.objects.all()
+    serializer_class = RelatedConceptSerializer
+    def get_queryset(self):
+        subject = self.request.query_params.get("subject", None)
+        if not subject:
+            return RelatedConcept.objects.all()
+        return RelatedConcept.objects.filter(subdirections__subject_group__subject=subject)

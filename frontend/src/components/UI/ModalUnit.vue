@@ -13,7 +13,8 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" @click="$emit('cancel')">Отмена</button>
-            <button type="button" class="btn btn-primary" @click="$emit('create')">Добавить</button>
+            <button v-if="del" type="button" class="btn btn-danger" @click="$emit('delete')">Удалить</button>
+            <button v-else type="button" class="btn btn-primary" @click="$emit('create')">Добавить</button>
           </div>
         </div>
       </div>
@@ -27,6 +28,10 @@
       modalTitle: {
         type: String,
         default: 'Заголовок окна'
+      },
+      del: {
+        type: Boolean,
+        default: false
       },
     },
     data() {

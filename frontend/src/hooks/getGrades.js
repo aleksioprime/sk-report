@@ -3,23 +3,24 @@ import axios from 'axios';
 
 export function getGrades(program) {
 	const BASE_API_URL = 'http://localhost:8000/api/v1';
-	const grades = ref([]);
+	const gradesMYP = ref([]);
+	const gradesDP = ref([]);
 	// const jwt = this.cookies.get('jwt_token');
 	const config = {
 		// headers: {
 		//   Authorization: `Bearer ${jwt}`,
 		// },
-		params: {
-			program: program,
-		},
 	};
 	const getGradesData = async () => {
-		await axios.get(`${BASE_API_URL}/grades`, config).then((response) => {
-			grades.value = response.data;
+		await axios.get(`${BASE_API_URL}/grades`, {params: {program: 'MYP'}}).then((response) => {
+			gradesMYP.value = response.data;
+		});
+		await axios.get(`${BASE_API_URL}/grades`, {params: {program: 'DP'}}).then((response) => {
+			gradesDP.value = response.data;
 		});
 	};
 	onMounted(getGradesData);
 	return {
-		grades
+		gradesMYP, gradesDP
 	}
 }

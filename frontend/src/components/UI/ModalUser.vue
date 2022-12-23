@@ -9,13 +9,10 @@
           <button type="button" class="btn-close" @click="$emit('cancel')" aria-label="Закрыть"></button>
         </div>
         <div class="modal-body">
-          <slot></slot>
+          <slot name="body"></slot>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" @click="$emit('cancel')">Отмена</button>
-          <button v-if="flagUser.addUser" type="button" class="btn btn-primary">Добавить</button>
-          <button v-if="flagUser.editUser" type="button" class="btn btn-primary">Сохранить</button>
-          <button v-if="flagUser.deleteUser" type="button" class="btn btn-primary">Удалить</button>
+          <slot name="footer"></slot>
         </div>
       </div>
     </div>

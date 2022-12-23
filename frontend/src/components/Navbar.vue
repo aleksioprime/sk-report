@@ -1,7 +1,8 @@
 <template>
   <nav class="navbar navbar-expand-md bg-light mb-4">
     <div class="container">
-      <a class="navbar-brand d-flex align-items-center" href @click="$router.push('/')"><img src="@/assets/img/logo.png" alt="" width="35" class="logo-rotate">SKReport</a>
+      <a class="navbar-brand d-flex align-items-center" href @click="$router.push('/')"><img src="@/assets/img/logo.png"
+          alt="" width="35" class="logo-rotate">SKReport</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
         aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -26,22 +27,44 @@
         </ul>
       </div>
       <span class="navbar-text ms-3">
-        Здравствуйте, пользователь.
+        Здравствуйте, {{ $store.state.auth.authUser.first_name }} {{ $store.state.auth.authUser.last_name.slice(0, 1) }}.
       </span>
-      <ul class="navbar-nav ms-auto mb-2 mb-md-0">
-        <li class="nav-item">
-          <a class="nav-link" href aria-current="page" @click="$router.push('/')">
+      <span class="ms-2">
+        <a class="nav-link" href="#" aria-current="page" @click="logout">
             Выход
           </a>
-        </li>
-      </ul>
+      </span>
+          
     </div>
   </nav>
 </template>
 
 <script>
-export default {
+import { mapMutations } from 'vuex'
 
+export default {
+  data() {
+    return {
+    };
+  },
+  methods: {
+    ...mapMutations({
+      setAuth: 'auth/setAuth',
+      setUser: 'auth/setUser'
+    }),
+    logout() {
+      this.axios.post('http://localhost:8080/api/v1/logout')
+        .then(() => {
+          this.setAuth(false);
+          this.setUser({});
+        })
+        .catch(() => {
+          console.log(error);
+        });
+    },
+  },
+  mounted() {
+  }
 }
 </script>
 
@@ -55,11 +78,11 @@ export default {
   margin-right: 10px;
   overflow: hidden;
   -webkit-transition: all 0.5s ease;
-          transition: all 0.5s ease;
-} 
+  transition: all 0.5s ease;
+}
 
 .logo-rotate:hover {
   -webkit-transform: rotate(360deg);
-          transform: rotate(360deg);
+  transform: rotate(360deg);
 }
 </style>

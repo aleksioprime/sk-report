@@ -6,7 +6,7 @@ export function filterUnitsByYear(units) {
         if (!filterQueryYear.value) {
             return units.value
         } else {
-            return units.value.filter(unit => filterQueryYear.value.includes(unit.class_year.id));
+            return units.value.filter(unit => filterQueryYear.value.map(item => item.id).includes(unit.class_year.id));
         }   
     });
     return {

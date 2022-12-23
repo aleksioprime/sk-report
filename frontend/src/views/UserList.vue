@@ -1,6 +1,7 @@
 <template>
   <div>
     <h1 class="mb-2">Cписок пользователей</h1>
+    <!-- Поля сортировки и фильтрации пользователей -->
     <div class="row">
       <div class="col d-flex align-items-end">
         <input class="form-control me-2" type="text" name="search" id="search" placeholder="Найти по фамилии..."
@@ -14,6 +15,7 @@
         </select>
       </div>
     </div>
+    <!-- Кнопки добавления/редактирования/удаления пользователя -->
     <div class="d-flex flex-wrap" ref="tools">
       <button type="button" class="btn btn-primary my-3" @click="showModalUserAdd">
         Добавить пользователя
@@ -27,10 +29,20 @@
         Удалить
       </button>
     </div>
+    <!-- Модальное окно добавления/редактирования/удаления пользователя -->
     <modal-user :modalTitle="modalTitle" :flagUser="flagUser" @cancel="hideModalUser">
-      <user-form v-if="flagUser.addUser || flagUser.editUser" :user="currentUser" />
-      <user-delete v-if="flagUser.deleteUser" :user="currentUser" />
+      <template v-slot:body>
+        <user-form v-if="flagUser.addUser || flagUser.editUser" :user="currentUser" />
+        <user-delete v-if="flagUser.deleteUser" :user="currentUser" />
+      </template>
+      <template v-slot:footer>
+        <button type="button" class="btn btn-secondary" @click="hideModalUser()">Отмена</button>
+        <button v-if="flagUser.addUser" type="button" class="btn btn-primary">Добавить</button>
+        <button v-if="flagUser.editUser" type="button" class="btn btn-primary">Сохранить</button>
+        <button v-if="flagUser.deleteUser" type="button" class="btn btn-primary">Удалить</button>
+      </template>
     </modal-user>
+    <!-- Список пользователей -->
     <div v-if="displayUsers.length > 0" ref="userlist">
       <transition-group name="user-list">
         <user-item v-for="user in displayUsers" :key="user.id" :user="user" @select="selectUser"
@@ -188,9 +200,9 @@ export default {
   margin-right: 10px;
 }
 
-/* .user-list-enter-active, .user-list-leave-active {
+.user-list-enter-active, .user-list-leave-active {
   transition: all 0.4s ease;
-} */
+}
 
 .user-list-enter-from, .user-list-leave-to {
   opacity: 0;

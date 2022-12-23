@@ -4,7 +4,7 @@
       {{ unitplan.order }}
     </td>
     <td>
-      <a class="title" href @click="$router.push(`/unitplans/${unitplan.id}`)">{{ unitplan.title }}</a> ({{
+      <a class="title" href="#" @click="$router.push(`/unitplans/${unitplan.id}`)">{{ unitplan.title }}</a> ({{
           unitplan.hours
       }} часов)
     </td>

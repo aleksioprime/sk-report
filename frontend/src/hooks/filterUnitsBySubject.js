@@ -6,7 +6,7 @@ export function filterUnitsBySubject(units) {
         if (!filterQuerySubject.value) {
             return units.value
         } else {
-            return units.value.filter(unit => unit.subject.id == filterQuerySubject.value);
+            return units.value.filter(unit => unit.subject.id == filterQuerySubject.value.id);
         }   
     });
     return {

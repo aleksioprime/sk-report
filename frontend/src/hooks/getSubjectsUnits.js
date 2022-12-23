@@ -1,19 +1,34 @@
 import {ref, computed} from 'vue'
 
-export function getSubjectsUnits(units, filterQueryDepartments) {
+// составление списка предметов из имеющихся юнитов в выбранном отделе
+export function getSubjectsUnits(units) {
     const subjectsUnits = computed(() => {
-        if (!filterQueryDepartments.value) {
-            return units.value.map((unit) => {return unit.subject.id;})
-        } else {
-            return units.value.map((unit) => {
-                if (unit.subject.department.id == filterQueryDepartments.value) {
-                    return unit.subject.id;
-                }
-			});
-        }
+        let objArray = units.value.map((unit) => {return unit.subject})
+        return [...new Map(objArray.map((item) => [item["id"], item])).values()]
     })
         
     return {
         subjectsUnits
     }
 };
+
+
+// export function getSubjectsUnits(units, filterQueryDepartments) {
+//     const subjectsUnits = computed(() => {
+//         let objArray = []
+//         if (!filterQueryDepartments.value) {
+//             objArray = units.value.map((unit) => {return unit.subject})
+//         } else {
+//             objArray =  units.value.map((unit) => {
+//                 if (unit.subject.department.id == filterQueryDepartments.value) {
+//                     return unit.subject;
+//                 }
+// 			});
+//         }
+//         return [...new Map(objArray.map((item) => [item["id"], item])).values()]
+//     })
+        
+//     return {
+//         subjectsUnits
+//     }
+// };
