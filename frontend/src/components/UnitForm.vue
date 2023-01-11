@@ -1,10 +1,6 @@
 <template>
   <form id="unit-form">
     <div class="row mt-2">
-      <div class="col-3">
-        <label for="order" class="form-label">Номер:</label>
-        <input id="order" class="form-control" type="number" v-model="unit.order">
-      </div>
       <div class="col">
         <label for="title" class="form-label">Название:</label>
         <input id="title" class="form-control" type="text" v-model="unit.title">
@@ -37,7 +33,7 @@
       </div>
       <div class="col">
         <label for="subject" class="form-label">Предмет:</label>
-        <select id="subject" class="form-select" v-model="unit.subject_id" @change="getCriteriaData(unit.subject_id)">
+        <select id="subject" class="form-select" v-model="unit.subject_id" @change="setQuerySubject(unit.subject_id)">
           <option v-for="(sb, i) in subjects" :key="i" :value="sb.id">
             {{ sb.name_rus }}
           </option>
@@ -51,8 +47,8 @@
     <div class="row mt-2">
       <div class="col">
         <div class="mb-2 js-criteria-label">Критерии оценки: </div>
-        <div v-if="criteria.length > 0 ">
-          <div v-for="cr in criteria" :key="cr.id">
+        <div v-if="filteredCriteriaBySubject.length > 0 ">
+          <div v-for="cr in filteredCriteriaBySubject" :key="cr.id">
             <div class="form-check">
               <input class="form-check-input js-criteria" type="checkbox" :value="cr.id" :id="'criterion-' + cr.id" v-model="unit.criteria_ids">
               <label class="form-check-label" :for="'criterion-' + cr.id">
@@ -68,20 +64,23 @@
 </template>
   
 <script>
-import { getCriteria } from "@/hooks/getCriteria";
+import { filterCriteriaBySubject } from "@/hooks/unit/myp/filterCriteriaBySubject";
+import { toRefs } from 'vue'
 
 export default {
-  setup(props) {
-    const { criteria, getCriteriaData } = getCriteria();
-    return {
-      criteria, getCriteriaData
-    }
-  },
   props: {
     unit: { type: Object },
     grades: { type: Array },
     teachers: { type: Array },
     subjects: { type: Array },
+    criteria: { type: Array },
+  },
+  setup(props) {
+    const { criteria } = toRefs(props)
+    const { filteredCriteriaBySubject, querySubject} = filterCriteriaBySubject(criteria);
+    return {
+      filteredCriteriaBySubject, querySubject
+    }
   },
   data() {
     return {
@@ -89,8 +88,14 @@ export default {
     }
   },
   methods: {
+    // Получение предметной группы выбранного предмета и запись в переменную для фильтрации критерниев
+    setQuerySubject(id) {
+      let subject = this.subjects.find((sb) => sb.id == id)
+      this.querySubject = subject.group_ib.id;
+    }
   },
   computed: {
+    // фильтрация чекбоксов с учителями (searchTeachers) по значению поля ввода (searchAuthors)
     searchTeachers () {
       if (this.searchAuthors == '') {
         return this.teachers.filter(teacher => this.unit.authors_ids.includes(teacher.id))
@@ -101,10 +106,11 @@ export default {
   mounted() {
   },
   watch: {
+    // удаление выбранного предмета для фильтрации критериев оценки
+    // за этим следует очищение критериев оценки в модульном окне
     unit() {
-      if (!this.unit.subject) {
-        this.criteria = [];
-        this.searchAuthors = '';
+      if (!this.unit.subject_id) {
+        this.querySubject = '';
       }
     }
   }

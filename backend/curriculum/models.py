@@ -424,8 +424,8 @@ class UnitPlannerMYPID(models.Model):
     def __str__(self):
         return "{}".format(self.unitplan_myp)
     
-class InquiryQuestion(models.Model):
-    """ Исследовательские вопросы планеров """
+class InquiryQuestionMYP(models.Model):
+    """ Исследовательские вопросы планеров MYP """
     QUESTION_TYPE = [
         ('Factual', 'Фактический'),
         ('Conceptual', 'Концептуальный'),
@@ -437,14 +437,14 @@ class InquiryQuestion(models.Model):
     planner = models.ForeignKey('curriculum.UnitPlannerMYP', verbose_name=_("Планнер MYP"), on_delete=models.CASCADE,
                                 related_name="inquestions")
     class Meta:
-        verbose_name = 'Исследовательский вопрос'
-        verbose_name_plural = 'Исследовательские вопросы'
+        verbose_name = 'Исследовательский вопрос MYP'
+        verbose_name_plural = 'Исследовательские вопросы MYP'
         ordering = ['type_inq', 'question']
     def __str__(self):
         return "{} ({})".format(self.question, self.type_inq)
 
-class Reflection(models.Model):
-    """ Посты рефлексии по планеру """
+class ReflectionMYP(models.Model):
+    """ Посты рефлексии по планеру MYP """
     POST_TYPE = [
         ('Prior', 'Перед началом юнита'),
         ('During', 'Во время юнита'),
@@ -454,10 +454,107 @@ class Reflection(models.Model):
     post = models.TextField(verbose_name=_("Содержание рефлексии"), null=True, blank=True)
     planner = models.ForeignKey('curriculum.UnitPlannerMYP', verbose_name=_("Планнер MYP"), on_delete=models.CASCADE, related_name="reflections")
     author = models.ForeignKey('member.ProfileTeacher', verbose_name=_("Автор поста"), on_delete=models.SET_NULL,
-                               null=True, related_name="reflection")
+                               null=True, related_name="reflection_myp")
     class Meta:
-        verbose_name = 'Пост рефлексии'
-        verbose_name_plural = 'Посты рефлексии'
+        verbose_name = 'Пост рефлексии MYP'
+        verbose_name_plural = 'Посты рефлексии MYP'
+        ordering = ['planner', 'type_post']
+    def __str__(self):
+        return "{}: {}".format(self.type_post, self.planner, self.post[:15])
+
+class UnitPlannerDP(models.Model):
+    """ ЮнитПланеры DP """
+    LEVEL_TYPE = [
+        ('SL', 'Standart Level'),
+        ('HL', 'High Level'),
+        ('SL+HL', 'Standart + High Level'),
+    ]
+    # Основная информация о юните
+    order = models.PositiveSmallIntegerField(verbose_name=_("Order"), default=0)
+    title = models.CharField(max_length=255, verbose_name=_("Title"))
+    subject = models.ForeignKey('curriculum.Subject', verbose_name=_("Subject"), on_delete=models.SET_NULL, null=True, blank=False, related_name="unitplan_dp")
+    class_year = models.ForeignKey('curriculum.ClassYear', verbose_name=_("Grade"), on_delete=models.SET_NULL, null=True, blank=False, related_name="unitplan_dp")
+    levels = models.CharField(choices=LEVEL_TYPE, verbose_name=_("Levels"), default='SL+HL', max_length=5)
+    hours = models.PositiveSmallIntegerField(verbose_name=_("Hours"), default=0)
+    course_part = models.CharField(max_length=255, verbose_name=_("Course Part"))
+    description = models.TextField(verbose_name=_("Description"), null=True, blank=True)
+    # Информация по Inquiry (+ Guiding questions)
+    transfer_goals = models.TextField(verbose_name=_("Transfer goals"), null=True, blank=True)
+    essen_understand = models.TextField(verbose_name=_("Essential Understandings"), null=True, blank=True)
+    misunderstand = models.TextField(verbose_name=_("Missed concepts/misunderstandings"), null=True, blank=True)
+    # >>> aims >> DataBase
+    # >>> objectives >> DataBase
+    # >>> syllabus content >> DataBase
+    content = models.TextField(verbose_name=_("Content"), null=True, blank=True)
+    skills = models.TextField(verbose_name=_("Skills"), null=True, blank=True)
+    concepts = models.TextField(verbose_name=_("Concepts"), null=True, blank=True)
+    # >>> metacognition >> MultipleChoice + Text
+    international_mindedness = models.TextField(verbose_name=_("International Mindedness"), null=True, blank=True)
+    academic_integrity = models.TextField(verbose_name=_("Academic Integrity"), null=True, blank=True)
+    infocom_technology = models.TextField(verbose_name=_("Information Communication Technology"), null=True, blank=True)
+    # >>> language_learning >> MultipleChoice + Text
+    # >>> tok_connections >> MultipleChoice + Text
+    # >>> cas_connections >> MultipleChoice + Text
+    # >>> atl_skills >> DataBase
+    description_atl = models.TextField(verbose_name=_("Description ATL"), null=True, blank=True)
+    # >> learner_profile >> DataBase
+    description_lp = models.TextField(verbose_name=_("Description Learning Profile"), null=True, blank=True)
+    formative_assessment = models.TextField(verbose_name=_("Formative assessment"), null=True, blank=True)
+    summative_assessment = models.TextField(verbose_name=_("Summative assessment"), null=True, blank=True)
+    peer_self_assessment = models.TextField(verbose_name=_("Peer and self assessment"), null=True, blank=True)
+    standardization_moderation = models.TextField(verbose_name=_("Standardization and moderation"), null=True, blank=True)
+    # >> criteria >> DataBase
+    description_criteria = models.TextField(verbose_name=_("Description Criteria"), null=True, blank=True)
+    prior_experiences = models.TextField(verbose_name=_("Prior learning experience"), null=True, blank=True)
+    pedagogical_approaches = models.TextField(verbose_name=_("Pedagogical approaches"), null=True, blank=True)
+    feedback = models.TextField(verbose_name=_("Feedback"), null=True, blank=True)
+    student_expectations = models.TextField(verbose_name=_("Student expectations"), null=True, blank=True)
+    # >>> support_materials >> MultipleChoice + Text
+    # >>> learning_process >> MultipleChoice + Text
+    # >>> differentiation >> MultipleChoice + Text
+    class Meta:
+        verbose_name = 'ЮнитПланер DP'
+        verbose_name_plural = 'ЮнитПланеры DP'
+        ordering = ['class_year', 'subject', 'order', 'title']
+    def __str__(self):
+        return "{} ({} | {})".format(self.title, self.subject, self.class_year)
+
+class InquiryQuestionDP(models.Model):
+    """ Исследовательские вопросы планеров DP """
+    QUESTION_TYPE = [
+        ('Skills-based', 'Skills-based'),
+        ('Content-based', 'Content-based'),
+        ('Debatable', 'Debatable'),
+        ('Concept-based', 'Concept-based'),
+    ]
+    question = models.CharField(max_length=255, verbose_name=_("Question"))
+    type_inq = models.CharField(choices=QUESTION_TYPE, verbose_name=_("Type"), default='Skills-based', max_length=24)
+    planner = models.ForeignKey('curriculum.UnitPlannerDP', verbose_name=_("Planner DP"), on_delete=models.CASCADE,
+                                related_name="inquestions")
+    class Meta:
+        verbose_name = 'Исследовательский вопрос DP'
+        verbose_name_plural = 'Исследовательские вопросы DP'
+        ordering = ['type_inq', 'question']
+    def __str__(self):
+        return "{} ({})".format(self.question, self.type_inq)
+
+class ReflectionDP(models.Model):
+    """ Посты рефлексии по планеру DP """
+    POST_TYPE = [
+        ('Prior', 'Prior to studying the unit'),
+        ('During', 'During the unit'),
+        ('Worked Well', 'What worked well'),
+        ('Didn’t work well', 'What didn’t work well'),
+        ('Transfer reflection', 'Transfer reflection'),        
+    ]
+    type_post = models.CharField(choices=POST_TYPE, verbose_name=_("Type"), default='Prior', max_length=24)
+    post = models.TextField(verbose_name=_("Post"), null=True, blank=True)
+    planner = models.ForeignKey('curriculum.UnitPlannerDP', verbose_name=_("Planner DP"), on_delete=models.CASCADE, related_name="reflections")
+    author = models.ForeignKey('member.ProfileTeacher', verbose_name=_("Author"), on_delete=models.SET_NULL,
+                               null=True, related_name="reflection_dp")
+    class Meta:
+        verbose_name = 'Пост рефлексии DP'
+        verbose_name_plural = 'Посты рефлексии DP'
         ordering = ['planner', 'type_post']
     def __str__(self):
         return "{}: {}".format(self.type_post, self.planner, self.post[:15])

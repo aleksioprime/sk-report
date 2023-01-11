@@ -2,8 +2,8 @@ from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from curriculum.models import SubjectGroupIB, ClassYear, SubjectGroupFGOS, Subject, AcademicPlan, Criterion, Strand, \
     Level, Objective, AchievementLevel, KeyConcept, RecommendSubjectKC, SubjectDirectionRC, RelatedConcept, \
-    GlobalContext, ExplorationToDevelop, CategoryATL, ClusterATL, SubClusterATL, IndicatorATL, Reflection, \
-    InquiryQuestion, Aim, LearnerProfileIB, UnitPlannerMYP, UnitPlannerMYPID
+    GlobalContext, ExplorationToDevelop, CategoryATL, ClusterATL, SubClusterATL, IndicatorATL, ReflectionMYP, \
+    InquiryQuestionMYP, Aim, LearnerProfileIB, UnitPlannerMYP, UnitPlannerMYPID, UnitPlannerDP, ReflectionDP, InquiryQuestionDP
 
 @admin.register(SubjectGroupIB)
 class SubjectGroupIBAdmin(ImportExportModelAdmin):
@@ -101,10 +101,22 @@ class UnitPlannerMYPAdmin(ImportExportModelAdmin):
 class UnitPlannerMYPIDAdmin(ImportExportModelAdmin):
     list_display = ("unitplan_myp", "form_integration")
     
-@admin.register(Reflection)
-class ReflectionAdmin(ImportExportModelAdmin):
+@admin.register(ReflectionMYP)
+class ReflectionMYPAdmin(ImportExportModelAdmin):
     list_display = ("planner", "type_post", "author")
 
-@admin.register(InquiryQuestion)
-class InquiryQuestionAdmin(ImportExportModelAdmin):
+@admin.register(InquiryQuestionMYP)
+class InquiryQuestionMYPAdmin(ImportExportModelAdmin):
+    list_display = ("question", "type_inq", "planner")
+
+@admin.register(UnitPlannerDP)
+class UnitPlannerDPAdmin(ImportExportModelAdmin):
+    list_display = ("title", "subject", "class_year")
+    
+@admin.register(ReflectionDP)
+class ReflectionDPAdmin(ImportExportModelAdmin):
+    list_display = ("planner", "type_post", "author")
+
+@admin.register(InquiryQuestionDP)
+class InquiryQuestionDPAdmin(ImportExportModelAdmin):
     list_display = ("question", "type_inq", "planner")

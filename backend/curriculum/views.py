@@ -29,10 +29,17 @@ class UnitPlannerMYPListCreate(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
     def create(self, request, *args, **kwargs):
-        print(request.data)
         return super().create(request, *args, **kwargs)
-    
-    
+    def get_queryset(self):
+        department = self.request.query_params.get("department", None)
+        teacher = self.request.query_params.get("teacher", None)
+        units_myp = UnitPlannerMYP.objects.all()
+        if department:
+            units_myp = units_myp.filter(subject__department=department)
+        if teacher:
+            units_myp = units_myp.filter(authors__in=[teacher])
+        return units_myp
+       
 class DepartmentViewSet(viewsets.ModelViewSet):
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
@@ -62,15 +69,16 @@ class SubjectViewSet(viewsets.ModelViewSet):
         if level:
             subjects = subjects.filter(type_subject=type_subject)
         return subjects
-
+    
 class CriterionViewSet(viewsets.ModelViewSet):
     queryset = Criterion.objects.all()
     serializer_class = CriterionSerializer
     def get_queryset(self):
+        criteria = Criterion.objects.all()
         subject = self.request.query_params.get("subject", None)
-        if not subject:
-            return Criterion.objects.all()
-        return Criterion.objects.filter(subject_group__subject=subject)
+        if subject:
+            criteria = criteria.filter(subject_group__subject=subject)
+        return criteria
     
 class LearnerProfileIBViewSet(viewsets.ModelViewSet):
     queryset = LearnerProfileIB.objects.all()
@@ -87,7 +95,6 @@ class ObjectiveViewSet(viewsets.ModelViewSet):
         subject = self.request.query_params.get("subject", None)
         class_year = self.request.query_params.get("class_year", None)
         criteria = self.request.query_params.get("criteria", None).split(',')
-        print(criteria)
         if not subject or not class_year:
             return Objective.objects.all()
         return Objective.objects.filter(strand__criterion__subject_group__subject=subject,
@@ -98,10 +105,11 @@ class AimViewSet(viewsets.ModelViewSet):
     queryset = Aim.objects.all()
     serializer_class = AimSerializer
     def get_queryset(self):
+        aims = Aim.objects.all()
         subject = self.request.query_params.get("subject", None)
-        if not subject:
-            return Aim.objects.all()
-        return Aim.objects.filter(subject_group__subject=subject)
+        if subject:
+            aims = aims.filter(subject_group__subject=subject)
+        return aims
     
 class GlobalContextViewSet(viewsets.ModelViewSet):
     queryset = GlobalContext.objects.all()

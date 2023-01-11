@@ -1,0 +1,68 @@
+.unit-field {
+  align-items: center;
+  margin-top: 10px;
+}
+.unit-field-data {
+  border: 0.5px solid rgb(92, 158, 158);
+  padding: 5px;
+  width: 100%;
+  border-radius: 5px;
+  margin-top: 5px;
+  font-weight: 500;
+  min-height: 40px;
+  position: relative;
+  white-space: pre-wrap;
+  padding-right: 30px;
+}
+.unit-field-data ul {
+  margin: 0px;
+}
+.unit-field-edtbtn {
+  position: absolute;
+  top: 0px;
+  right: 5px;
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: url('@/assets/img/edit.png') no-repeat 50% 50%;
+  background-size: 70%;
+  padding: 0;
+  margin: 0;
+}
+.unit-field-input {
+  margin-top: 5px;
+}
+.unit-field-done, .unit-field-cancel {
+  border: none;
+  background: rgb(202, 201, 201);
+  border-radius: 5px;
+  margin: 5px;
+  padding: 5px 10px;
+}
+.unit-field-description {
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+.unit-field-warning {
+  color: red;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+.cluster-atl {
+  color: rgb(202, 5, 5);
+}
+.kc-recomend span {
+  color: rgb(6, 134, 27);
+  text-decoration: underline;
+  font-weight: bold;
+}
+/* Анимации появления и исчезновения могут иметь    */
+/* различные продолжительности и функции плавности. */
+.slide-fade-enter-active {
+  transition: all 0.2s ease-out;
+}
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateY(-20px);
+  opacity: 0;
+}

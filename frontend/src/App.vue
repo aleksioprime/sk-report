@@ -1,5 +1,5 @@
 <template>
-  <div v-if="$store.state.auth.isAuth">
+  <div v-if="auth">
     <navbar />
     <router-view class="main" />
     <footbar />
@@ -11,10 +11,10 @@
 
 <script>
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Navbar from '@/components/Navbar.vue';
-import Footbar from '@/components/Footbar.vue';
-import LoginUser from '@/components/LoginUser.vue'
-import { mapActions } from 'vuex'
+import Navbar from '@/components/BaseNavbar.vue';
+import Footbar from '@/components/BaseFootbar.vue';
+import LoginUser from '@/components/UserLogin.vue'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   components: {
@@ -31,7 +31,12 @@ export default {
   },
   mounted() {
     this.fetchAuthUser();
-  }
+  },
+  computed: {
+    ...mapState({
+      auth: state => state.auth.isAuth,
+    }),
+  },
 }
 </script>
 

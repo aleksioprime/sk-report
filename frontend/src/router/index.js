@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import DashBoard from '@/views/DashBoard.vue'
-import UnitPlans from '@/views/UnitPlans.vue'
-import UnitPlansView from '@/views/UnitPlansView.vue'
-import UserList from '@/views/UserList.vue'
-import Assessment from '@/views/Assessment.vue'
+import UnitList from '@/views/UnitList.vue'
+import UnitView from '@/views/UnitView.vue'
+// import UserList from '@/views/UserList.vue'
+import AssessList from '@/views/AssessList.vue'
 
 const routes = [
   {
@@ -12,24 +12,24 @@ const routes = [
     component: DashBoard
   },
   {
-    path: '/unitplans',
-    name: 'unitplans',
-    component: UnitPlans
+    path: '/unit',
+    name: 'unitlist',
+    component: UnitList
   },
   {
-    path: '/unitplans/:id',
-    name: 'unitplansview',
-    component: UnitPlansView
+    path: '/unit/:id',
+    name: 'unitview',
+    component: UnitView
   },
+  // {
+  //   path: '/user',
+  //   name: 'userlist',
+  //   component: UserList
+  // },
   {
-    path: '/userlist',
-    name: 'userlist',
-    component: UserList
-  },
-  {
-    path: '/assessment',
-    name: 'assessment',
-    component: Assessment
+    path: '/assess',
+    name: 'assesslist',
+    component: AssessList
   },
 ]
 
