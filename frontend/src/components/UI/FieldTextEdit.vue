@@ -1,6 +1,6 @@
 <template>
   <div>
-    <input class="form-control unit-field-input" id="title" type="text" v-model="modelValue" @input="updateInput">
+    <input class="form-control unit-field-input" type="text" v-model="modelValue" @input="updateInput">
   </div>
 </template>
   

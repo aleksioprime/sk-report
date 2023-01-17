@@ -1,33 +1,33 @@
 <template>
   <nav class="navbar navbar-expand-md bg-light mb-4">
     <div class="container">
-      <a class="navbar-brand d-flex align-items-center" href @click="$router.push('/')"><img src="@/assets/img/logo.png"
-          alt="" width="35" class="logo-rotate">SKReport</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
         aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
+      <a class="navbar-brand d-flex align-items-center" href @click="$router.push('/')"><img src="@/assets/img/logo.png"
+          alt="" width="35" class="logo-rotate">SKReport</a>
       <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav me-auto mb-2 mb-md-0">
           <li class="nav-item">
-            <a class="nav-link" href="#" aria-current="page" @click="$router.push('/user')">
+            <a class="nav-link" href="/user" aria-current="page">
               Пользователи
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#" aria-current="page" @click="$router.push('/unit')">
+            <a class="nav-link" href="/unit" aria-current="page">
               Юниты
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#" aria-current="page" @click="$router.push('/assess')">
+            <a class="nav-link" href="/assess" aria-current="page">
               Оценки
             </a>
           </li>
         </ul>
       </div>
-      <span class="navbar-text ms-3">
-        Здравствуйте, {{ $store.state.auth.authUser.first_name }} {{ $store.state.auth.authUser.last_name.slice(0, 1) }}.
+      <span class="navbar-text ms-3" v-if="authUser">
+        Здравствуйте, {{ authUser.first_name }} {{ authUser.last_name.slice(0, 1) }}.
       </span>
       <span class="ms-2">
         <a class="nav-link" href="#" aria-current="page" @click="logout">
@@ -40,30 +40,25 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
+import { mapGetters } from 'vuex'
 
 export default {
+  name:  'BaseNavbar',
   data() {
     return {
     };
   },
   methods: {
-    ...mapMutations({
-      setAuth: 'auth/setAuth',
-      setUser: 'auth/setUser'
-    }),
     logout() {
-      this.axios.post('http://localhost:8080/api/v1/logout')
-        .then(() => {
-          this.setAuth(false);
-          this.setUser({});
-        })
-        .catch(() => {
-          console.log(error);
+      this.$store.dispatch('userLogout').then(() => {
+          this.$router.push({ name: 'login' })
         });
     },
   },
   mounted() {
+  },
+  computed: {
+    ...mapGetters(['authUser'])
   }
 }
 </script>

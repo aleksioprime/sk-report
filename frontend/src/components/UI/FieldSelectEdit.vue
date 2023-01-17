@@ -2,7 +2,9 @@
   <div>
     <select id="subject" class="form-select" v-model="modelValue" @change="changeOption">
       <option v-for="(op, i) in options" :key="i" :value="op.id">
-        {{ op.name_rus }}
+        <slot :field="op">
+          
+        </slot>
       </option>
     </select>
   </div>
@@ -13,14 +15,7 @@
     name: 'field-select-edit',
     props: {
       modelValue: [String, Number], 
-      options: {
-        type: Array,
-        default: () => []
-      },
-    },
-    data() {
-      return {
-      }
+      options: { type: Array, default: () => [] },
     },
     methods: {
       changeOption(event) {

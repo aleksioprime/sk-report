@@ -1,10 +1,10 @@
 <template>
   <tr>
     <td>
-      {{ unitplan.order }}
+      {{ index }}
     </td>
     <td>
-      <a class="title" href="#" @click="$router.push(`/unit/${unitplan.id}`)">{{ unitplan.title }}</a> ({{
+      <a class="title" :href="`/unit/${unitplan.id}`">{{ unitplan.title }}</a> ({{
           unitplan.hours
       }} часов)
     </td>
@@ -47,7 +47,8 @@ export default {
     unitplan: {
       type: Object,
       required: true,
-    }
+    },
+    index: { type: Number },
   },
   data() {
     return {

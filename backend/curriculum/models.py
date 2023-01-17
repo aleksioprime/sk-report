@@ -302,33 +302,20 @@ class ClusterATL(models.Model):
     def __str__(self):
         return "{} ({})".format(self.name_eng, self.category)
 
-class SubClusterATL(models.Model):
-    """ Подкластеры ATL """
+class SkillATL(models.Model):
+    """ Навыки ATL """
     name_eng = models.CharField(max_length=255, verbose_name=_("Название на англ. языке"))
     name_rus = models.CharField(max_length=255, verbose_name=_("Название на рус. языке"), null=True, blank=True)
-    question_eng = models.CharField(max_length=255, verbose_name=_("Вопрос на англ. языке"), null=True, blank=True)
-    question_rus = models.CharField(max_length=255, verbose_name=_("Вопрос на рус. языке"), null=True, blank=True)
+    description_eng = models.TextField(verbose_name=_("Описание на англ. языке"), null=True, blank=True)
+    description_rus = models.TextField(verbose_name=_("Описание на рус. языке"), null=True, blank=True)
     cluster = models.ForeignKey('curriculum.ClusterATL', verbose_name=_("Кластер ATL"), on_delete=models.CASCADE, \
-        null=True, blank=False, related_name="subcluster")
+        null=True, blank=False, related_name="skillATL")
     class Meta:
-        verbose_name = 'ATL Подкластер'
-        verbose_name_plural = 'ATL Подкластеры'
+        verbose_name = 'ATL Навыки'
+        verbose_name_plural = 'ATL Навыки'
         ordering = ['cluster', 'name_eng']
     def __str__(self):
-        return "{}... ({})".format(self.name_eng[:15], self.cluster)
-
-class IndicatorATL(models.Model):
-    """ Индикаторы ATL """
-    name_eng = models.CharField(max_length=255, verbose_name=_("Название на англ. языке"))
-    name_rus = models.CharField(max_length=255, verbose_name=_("Название на рус. языке"), null=True, blank=True)
-    subcluster = models.ForeignKey('curriculum.SubClusterATL', verbose_name=_("Подкластер ATL"), on_delete=models.CASCADE, \
-        null=True, blank=False, related_name="indicator")
-    class Meta:
-        verbose_name = 'ATL Индикатор'
-        verbose_name_plural = 'ATL Индикаторы'
-        ordering = ['subcluster', 'name_eng']
-    def __str__(self):
-        return "{} ({})".format(self.name_eng, self.subcluster)
+        return "{} ({})".format(self.name_eng, self.cluster)
 
 class Aim(models.Model):
     """ Цели """
@@ -378,10 +365,8 @@ class UnitPlannerMYP(models.Model):
     objectives = models.ManyToManyField('curriculum.Objective', verbose_name=_("Цели предметной группы"), blank=True, related_name="unitplan_myp")
     content = models.TextField(verbose_name=_("Содержание (темы, знания и умения)"), null=True, blank=True)
     skills = models.TextField(verbose_name=_("Умения"), null=True, blank=True)
-    atl_skills = models.ManyToManyField('curriculum.IndicatorATL', verbose_name=_("Умения ATL"), blank=True, related_name="unitplan_myp")
-    description_atl = models.TextField(verbose_name=_("Описание развития умений"), null=True, blank=True)
     learner_profile = models.ManyToManyField('curriculum.LearnerProfileIB',verbose_name=_("Профиль студента"), blank=True, related_name="unitplan_myp")
-    description_learner_profile = models.TextField(verbose_name=_("Описание развития профиля"), null=True, blank=True)
+    description_lp = models.TextField(verbose_name=_("Описание развития профиля"), null=True, blank=True)
     international_mindedness = models.TextField(verbose_name=_("Межкультурное понимание"), null=True, blank=True)
     academic_integrity = models.TextField(verbose_name=_("Академическая честность"), null=True, blank=True)
     language_development = models.TextField(verbose_name=_("Языковое развитие"), null=True, blank=True)
@@ -411,7 +396,7 @@ class UnitPlannerMYP(models.Model):
 class UnitPlannerMYPID(models.Model):
     """ Дополнение для междисциплинарных планеров MYP """
     unitplan_myp = models.OneToOneField('curriculum.UnitPlannerMYP', verbose_name=_("ЮнитПланер MYP"), related_name='inter', on_delete=models.CASCADE)
-    additional_subjects = models.ManyToManyField('curriculum.Subject', verbose_name=_("Линии исследования"), related_name="inter")
+    additional_subjects = models.ManyToManyField('curriculum.Subject', verbose_name=_("Дополнительные предметы"), related_name="inter")
     form_integration = models.TextField(verbose_name=_("Формы интеграции"), null=True, blank=True)
     purpose_integration = models.TextField(verbose_name=_("Цель интеграции"), null=True, blank=True)
     related_concepts = models.ManyToManyField('curriculum.RelatedConcept', verbose_name=_("Сопутствующие концепты"), blank=True, related_name="inter")
@@ -442,6 +427,20 @@ class InquiryQuestionMYP(models.Model):
         ordering = ['type_inq', 'question']
     def __str__(self):
         return "{} ({})".format(self.question, self.type_inq)
+    
+class ATLMappingMYP(models.Model):
+    """ Карта навыков в планерах MYP """
+    atl = models.ForeignKey('curriculum.SkillATL', verbose_name=_("Навыки ATL"), blank=True, on_delete=models.CASCADE, related_name="atlmapping")
+    objective = models.ForeignKey('curriculum.Objective', verbose_name=_("Предметная цель"), blank=True, on_delete=models.CASCADE, related_name="atlmapping")
+    action = models.TextField(verbose_name=_("Описание учебных действий"), null=True, blank=True)
+    planner = models.ForeignKey('curriculum.UnitPlannerMYP', verbose_name=_("Планнер MYP"), on_delete=models.CASCADE,
+                                related_name="atlmapping")
+    class Meta:
+        verbose_name = 'Карта навыков ATL в MYP'
+        verbose_name_plural = 'Карты навыков ATL в MYP'
+        ordering = ['planner', 'objective']
+    def __str__(self):
+        return "{} ({})".format(self.atl, self.action)
 
 class ReflectionMYP(models.Model):
     """ Посты рефлексии по планеру MYP """
@@ -454,7 +453,7 @@ class ReflectionMYP(models.Model):
     post = models.TextField(verbose_name=_("Содержание рефлексии"), null=True, blank=True)
     planner = models.ForeignKey('curriculum.UnitPlannerMYP', verbose_name=_("Планнер MYP"), on_delete=models.CASCADE, related_name="reflections")
     author = models.ForeignKey('member.ProfileTeacher', verbose_name=_("Автор поста"), on_delete=models.SET_NULL,
-                               null=True, related_name="reflection_myp")
+                               null=True, related_name="reflections")
     class Meta:
         verbose_name = 'Пост рефлексии MYP'
         verbose_name_plural = 'Посты рефлексии MYP'

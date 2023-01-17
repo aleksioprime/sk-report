@@ -1,10 +1,18 @@
 <template>
-    <div>Мой дашбоард</div>
+    <div>
+        <div>Мой дашбоард</div>
+    </div>
+    
 </template>
 
 <script>
 export default {
     name: 'DashBoard',
+    data() {
+        return {
+
+        }
+    },
 }
 </script>
 

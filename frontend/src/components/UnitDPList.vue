@@ -23,7 +23,7 @@
 </template>
 
 <script>
-  import { filterTeachersByDepartment } from "@/hooks/unit/myp/filterTeachersByDepartment";
+  import { filterTeachersByDepartment } from "@/hooks/unit/filterUnitMYPData";
   import { toRefs } from 'vue';
   
   export default {

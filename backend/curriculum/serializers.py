@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from curriculum.models import UnitPlannerMYP, KeyConcept, SubjectGroupIB, RelatedConcept, SubjectDirectionRC, Subject, \
-    SubjectGroupIB, ClassYear, GlobalContext, ExplorationToDevelop, Aim, Objective, Strand, Criterion, Level, IndicatorATL, \
-    SubClusterATL, ClusterATL, CategoryATL, LearnerProfileIB
+    SubjectGroupIB, ClassYear, GlobalContext, ExplorationToDevelop, Aim, Objective, Strand, Criterion, Level, SkillATL, \
+    ClusterATL, CategoryATL, LearnerProfileIB, InquiryQuestionMYP, ATLMappingMYP, ReflectionMYP
 from member.models import ProfileTeacher, User, Department
 
 class SubjectGroupIBSerializer(serializers.ModelSerializer):
@@ -118,17 +118,36 @@ class ClusterATLSerializer(serializers.ModelSerializer):
         model = ClusterATL
         fields = '__all__'
 
-class SubClusterATLSerializer(serializers.ModelSerializer):
+class SkillATLSerializer(serializers.ModelSerializer):
     cluster = ClusterATLSerializer()
     class Meta:
-        model = SubClusterATL
+        model = SkillATL
         fields = '__all__'
 
-class IndicatorATLSerializer(serializers.ModelSerializer):
-    subcluster = SubClusterATLSerializer()
+class InQuestionMYPSerializer(serializers.ModelSerializer):
     class Meta:
-        model = IndicatorATL
+        model = InquiryQuestionMYP
         fields = '__all__'
+        
+class ATLMappingMYPSerializer(serializers.ModelSerializer):
+    atl = SkillATLSerializer(read_only=True)
+    objective = ObjectiveSerializer(read_only=True)
+    class Meta:
+        model = ATLMappingMYP
+        fields = ['id', 'atl', 'atl_id', 'objective', 'objective_id', 'action', 'planner']
+        extra_kwargs = {
+            'objective_id': {'source': 'objective', 'write_only': True},
+            'atl_id': {'source': 'atl', 'write_only': True},
+        }
+        
+class ReflectionMYPSerializer(serializers.ModelSerializer):
+    author = ProfileTeacherSerializer(read_only=True)
+    class Meta:
+        model = ReflectionMYP
+        fields = ['id', 'type_post', 'post', 'author', 'author_id', 'planner']
+        extra_kwargs = {
+            'author_id': {'source': 'author', 'write_only': True},
+        }
 
 class UnitMYPSerializerViewEdit(serializers.ModelSerializer):
     key_concepts = KeyConceptSerializer(many=True, read_only=True)
@@ -140,18 +159,21 @@ class UnitMYPSerializerViewEdit(serializers.ModelSerializer):
     explorations = ExplorationToDevelopSerializer(many=True, read_only=True)
     aims = AimSerializer(many=True, read_only=True)
     objectives = ObjectiveSerializer(many=True, read_only=True)
-    atl_skills = IndicatorATLSerializer(many=True, read_only=True)
     criteria = CriterionSerializer(many=True, read_only=True)
     learner_profile = LearnerProfileIBSerializer(many=True, read_only=True)
+    inquestions = InQuestionMYPSerializer(many=True, read_only=True)
+    atlmapping = ATLMappingMYPSerializer(many=True, read_only=True)
+    reflections = ReflectionMYPSerializer(many=True, read_only=True)
     class Meta:
         model = UnitPlannerMYP
         fields = ['id', 'title', 'subject', 'authors', 'order', 'interdisciplinary', 'class_year', 'hours', 'description',
                   'key_concepts', 'related_concepts', 'conceptual_understanding', 'global_context', 'explorations', 'statement_inquiry',
-                  'aims', 'objectives', 'content', 'skills', 'atl_skills', 'description_atl', 'learner_profile', 'description_learner_profile', 'international_mindedness',
+                  'aims', 'objectives', 'content', 'skills', 'learner_profile', 'description_lp', 'international_mindedness',
                   'academic_integrity', 'language_development', 'infocom_technology', 'service_as_action', 'criteria', 'formative_assessment', 'summative_assessment_task',
                   'summative_assessment_soi', 'peer_self_assessment', 'standardization_moderation', 'prior_experiences', 'learning_experiences', 'teaching_strategies', 
-                  'teaching_strategies', 'student_expectations', 'feedback', 'differentiation', 'criteria_ids', 'learner_profile_ids', 'atl_skills_ids', 'objectives_ids',
-                  'aims_ids', 'global_context_id', 'explorations_ids', 'key_concepts_ids', 'related_concepts_ids', 'class_year_id', 'authors_ids', 'subject_id'
+                  'teaching_strategies', 'student_expectations', 'feedback', 'differentiation', 'criteria_ids', 'learner_profile_ids', 'objectives_ids',
+                  'aims_ids', 'global_context_id', 'explorations_ids', 'key_concepts_ids', 'related_concepts_ids', 'class_year_id', 'authors_ids', 'subject_id', 
+                  'inquestions', 'atlmapping', 'reflections',
                   ]
         extra_kwargs = {
             'title': {'required': False},
@@ -181,23 +203,20 @@ class UnitMYPSerializerListCreate(serializers.ModelSerializer):
     global_context = GlobalContextSerializer(required=False)
     explorations = ExplorationToDevelopSerializer(many=True, required=False)
     criteria = CriterionSerializer(many=True, read_only=True)
-    atl_skills = IndicatorATLSerializer(many=True, required=False)
     class Meta:
         model = UnitPlannerMYP
         fields = ['id', 'title', 'subject', 'order', 'class_year', 'hours', 'interdisciplinary', 'key_concepts', 
-                  'related_concepts', 'authors', 'global_context', 'explorations', 'statement_inquiry', 'criteria', 'atl_skills',
-                  'criteria_ids', 'subject_id', 'class_year_id', 'authors_ids']
+                  'related_concepts', 'authors', 'global_context', 'explorations', 'statement_inquiry', 'criteria',
+                  'criteria_ids', 'subject_id', 'class_year_id', 'authors_ids',
+                  ]
         extra_kwargs = {
             'criteria_ids': {'source': 'criteria', 'write_only': True},
             'subject_id': {'source': 'subject', 'write_only': True},
             'class_year_id': {'source': 'class_year', 'write_only': True},
             'authors_ids': {'source': 'authors', 'write_only': True},
-        }
+            }
     def create(self, validated_data):
         print(validated_data)
         return super().create(validated_data)
-    
-class ATLSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CategoryATL
-        fields = '__all__'
+        
+        

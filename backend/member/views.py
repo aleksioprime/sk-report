@@ -59,15 +59,14 @@ class UserViewSet(viewsets.ModelViewSet):
 class UserAuth(APIView):
     permission_classes = [permissions.IsAuthenticated]
     def get(self, request):
-        token = request.COOKIES.get('jwt_token')
-        print(token)
+        token = request.headers['Authorization'].split()[1]
         if not token:
             raise AuthenticationFailed('Unauthenticated')
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256', 'HS384', 'HS512'])
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed('Unauthenticated')
-        print(payload)
+        # print(payload)
         user =  User.objects.filter(id=payload['user_id']).first()
         serializer = UserSerializer(user)
         return Response(serializer.data)    

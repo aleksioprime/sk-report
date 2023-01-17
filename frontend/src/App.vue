@@ -1,46 +1,44 @@
 <template>
-  <div v-if="auth">
-    <navbar />
-    <router-view class="main" />
-    <footbar />
-  </div>
-  <div v-else>
-    <login-user />
+  <div>
+    <base-navbar v-if="isAuthenticated" />
+    <router-view :class="{ main: isAuthenticated }" />
+    <base-footbar v-if="isAuthenticated"/>
   </div>
 </template>
 
 <script>
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Navbar from '@/components/BaseNavbar.vue';
-import Footbar from '@/components/BaseFootbar.vue';
-import LoginUser from '@/components/UserLogin.vue'
-import { mapActions, mapState } from 'vuex'
+import BaseNavbar from '@/components/BaseNavbar';
+import BaseFootbar from '@/components/BaseFootbar';
+import { mapGetters } from 'vuex'
 
 export default {
+  onIdle() {
+    this.$store.dispatch('userLogout').then(() => {
+      this.$router.push({ name: 'login' })
+    })
+  },
   components: {
-    Navbar, Footbar, LoginUser
+    BaseNavbar, BaseFootbar
   },
   data() {
     return {
+
     };
   },
   methods: {
-    ...mapActions({
-      fetchAuthUser: 'auth/fetchAuthUser'
-    }),
+
   },
   mounted() {
-    this.fetchAuthUser();
   },
   computed: {
-    ...mapState({
-      auth: state => state.auth.isAuth,
-    }),
+    ...mapGetters(['isAuthenticated']),
   },
 }
 </script>
 
 <style>
+@import '@/assets/css/base.css';
 .main {
   max-width: 960px;
   margin: 0 auto;

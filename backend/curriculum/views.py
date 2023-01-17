@@ -1,10 +1,11 @@
 from django.shortcuts import render
-from curriculum.models import UnitPlannerMYP, ClassYear, Subject, Criterion, LearnerProfileIB, IndicatorATL, Objective, Aim, GlobalContext, \
-    ExplorationToDevelop, KeyConcept, RelatedConcept
+from curriculum.models import UnitPlannerMYP, ClassYear, Subject, Criterion, LearnerProfileIB, SkillATL, Objective, Aim, GlobalContext, \
+    ExplorationToDevelop, KeyConcept, RelatedConcept, InquiryQuestionMYP, ATLMappingMYP, ReflectionMYP
 from member.models import ProfileTeacher, Department
 from curriculum.serializers import UnitMYPSerializerViewEdit, UnitMYPSerializerListCreate, ProfileTeacherSerializer, ClassYearSerializer, \
-    SubjectSerializer, CriterionSerializer, DepartmentSerializer, LearnerProfileIBSerializer, IndicatorATLSerializer, ObjectiveSerializer, \
-    AimSerializer, GlobalContextSerializer, ExplorationToDevelopSerializer, KeyConceptSerializer, RelatedConceptSerializer
+    SubjectSerializer, CriterionSerializer, DepartmentSerializer, LearnerProfileIBSerializer, SkillATLSerializer, ObjectiveSerializer, \
+    AimSerializer, GlobalContextSerializer, ExplorationToDevelopSerializer, KeyConceptSerializer, RelatedConceptSerializer, InQuestionMYPSerializer, \
+    ATLMappingMYPSerializer, ReflectionMYPSerializer
 from rest_framework import viewsets
 from rest_framework.response import Response
 
@@ -84,9 +85,9 @@ class LearnerProfileIBViewSet(viewsets.ModelViewSet):
     queryset = LearnerProfileIB.objects.all()
     serializer_class = LearnerProfileIBSerializer
     
-class IndicatorATLViewSet(viewsets.ModelViewSet):
-    queryset = IndicatorATL.objects.all()
-    serializer_class = IndicatorATLSerializer
+class SkillATLViewSet(viewsets.ModelViewSet):
+    queryset = SkillATL.objects.all()
+    serializer_class = SkillATLSerializer
     
 class ObjectiveViewSet(viewsets.ModelViewSet):
     queryset = Objective.objects.all()
@@ -94,12 +95,19 @@ class ObjectiveViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         subject = self.request.query_params.get("subject", None)
         class_year = self.request.query_params.get("class_year", None)
-        criteria = self.request.query_params.get("criteria", None).split(',')
-        if not subject or not class_year:
-            return Objective.objects.all()
-        return Objective.objects.filter(strand__criterion__subject_group__subject=subject,
-                                        level__years__in=class_year,
-                                        strand__criterion__in=criteria)
+        criteria = self.request.query_params.get("criteria", None)
+        print(subject, class_year, criteria)
+        objectives = Objective.objects.all()
+        if subject:
+            objectives = objectives.filter(strand__criterion__subject_group__subject=subject)
+            print(objectives)
+        if class_year:
+            objectives = objectives.filter(level__years__in=class_year)
+            print(objectives)
+        if criteria:
+            objectives = objectives.filter(strand__criterion__in=criteria.split(','))
+            print(objectives)
+        return objectives
     
 class AimViewSet(viewsets.ModelViewSet):
     queryset = Aim.objects.all()
@@ -133,6 +141,39 @@ class RelatedConceptViewSet(viewsets.ModelViewSet):
     serializer_class = RelatedConceptSerializer
     def get_queryset(self):
         subject = self.request.query_params.get("subject", None)
-        if not subject:
-            return RelatedConcept.objects.all()
-        return RelatedConcept.objects.filter(subdirections__subject_group__subject=subject)
+        print(subject)
+        rconcepts = RelatedConcept.objects.all()
+        if subject:
+            rconcepts = rconcepts.filter(subdirections__subject_group__subject__in=[subject]).distinct()
+        return rconcepts
+    
+class InQuestionMYPViewSet(viewsets.ModelViewSet):
+    queryset = InquiryQuestionMYP.objects.all()
+    serializer_class = InQuestionMYPSerializer
+    def get_queryset(self):
+        inquestions = InquiryQuestionMYP.objects.all()
+        unit = self.request.query_params.get("unit", None)
+        if unit:
+            inquestions = inquestions.filter(planner=unit)
+        return inquestions
+    
+    
+class ATLMappingMYPViewSet(viewsets.ModelViewSet):
+    queryset = ATLMappingMYP.objects.all()
+    serializer_class = ATLMappingMYPSerializer
+    def get_queryset(self):
+        mapping = ATLMappingMYP.objects.all()
+        unit = self.request.query_params.get("unit", None)
+        if unit:
+            mapping = mapping.filter(planner=unit)
+        return mapping
+    
+class ReflectionMYPViewSet(viewsets.ModelViewSet):
+    queryset = ReflectionMYP.objects.all()
+    serializer_class = ReflectionMYPSerializer
+    def get_queryset(self):
+        reflections = ReflectionMYP.objects.all()
+        unit = self.request.query_params.get("unit", None)
+        if unit:
+            reflections = reflections.filter(planner=unit)
+        return reflections

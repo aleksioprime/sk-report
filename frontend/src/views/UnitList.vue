@@ -1,6 +1,8 @@
 <template>
   <div>
-    <h1 class="mb-2">Список юнитов</h1>
+    <base-header>
+      <template v-slot:header>Список юнитов</template>
+    </base-header>
     <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
       <li class="nav-item" role="presentation">
         <button class="nav-link active" id="pills-myp-tab" data-bs-toggle="pill" data-bs-target="#pills-myp" type="button" role="tab" aria-controls="pills-myp" aria-selected="true">MYP</button>
@@ -25,8 +27,7 @@
 import UnitMypList from "@/components/UnitMYPList";
 import UnitDpList from "@/components/UnitDPList";
 // Импорт модулей запросов базы подразделений, учителей
-import { getDepartments } from "@/hooks/unit/getDepartments";
-import { getTeachers } from "@/hooks/unit/getTeachers";
+import { getDepartments, getTeachers } from "@/hooks/unit/getUnitData"
 
 export default {
   name: 'UnitPlans',
@@ -34,10 +35,10 @@ export default {
     UnitMypList, UnitDpList
   },
   setup(props) {
-    const { departments } = getDepartments();
+    const { departments, getDepartmentsData } = getDepartments();
     const { teachers, getTeachersData } = getTeachers();
     return {
-      departments, teachers, getTeachersData
+      departments, teachers, getTeachersData, getDepartmentsData
     }
   },
   data() {
@@ -52,7 +53,9 @@ export default {
     
   },
   mounted() {
+    this.getDepartmentsData();
     this.getTeachersData();
+    
   },
 }
 </script>

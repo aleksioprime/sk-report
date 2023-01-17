@@ -2,7 +2,7 @@ from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from curriculum.models import SubjectGroupIB, ClassYear, SubjectGroupFGOS, Subject, AcademicPlan, Criterion, Strand, \
     Level, Objective, AchievementLevel, KeyConcept, RecommendSubjectKC, SubjectDirectionRC, RelatedConcept, \
-    GlobalContext, ExplorationToDevelop, CategoryATL, ClusterATL, SubClusterATL, IndicatorATL, ReflectionMYP, \
+    GlobalContext, ExplorationToDevelop, CategoryATL, ClusterATL, SkillATL, ReflectionMYP, \
     InquiryQuestionMYP, Aim, LearnerProfileIB, UnitPlannerMYP, UnitPlannerMYPID, UnitPlannerDP, ReflectionDP, InquiryQuestionDP
 
 @admin.register(SubjectGroupIB)
@@ -77,13 +77,10 @@ class CategoryATLAdmin(ImportExportModelAdmin):
 class ClusterATLAdmin(ImportExportModelAdmin):
     list_display = ("name_eng", "name_rus", "category")
 
-@admin.register(SubClusterATL)
-class SubClusterATLAdmin(ImportExportModelAdmin):
-    list_display = ("name_eng", "name_rus", "cluster")
 
-@admin.register(IndicatorATL)
-class IndicatorATLAdmin(ImportExportModelAdmin):
-    list_display = ("name_eng", "name_rus", "subcluster")
+@admin.register(SkillATL)
+class SkillATLAdmin(ImportExportModelAdmin):
+    list_display = ("name_eng", "name_rus", "cluster")
 
 @admin.register(Aim)
 class AimAdmin(ImportExportModelAdmin):
