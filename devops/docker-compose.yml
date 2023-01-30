@@ -1,8 +1,8 @@
-version: "1"
+version: "3"
 services:
   app:
-    container_name: igskolkovo-backend
-    image: index.docker.io/aleksioprime/igskolkovo-backend
+    container_name: igskolkovo-frontend
+    image: index.docker.io/aleksioprime/igskolkovo-frontend
     env_file:
       - .env.front
     networks:
@@ -35,6 +35,8 @@ services:
       - POSTGRES_DB=igskolkovo
     networks:
       - local_net
+    ports:
+      - "5432:5432"
   watchtower:
     image: containrrr/watchtower
     volumes:

@@ -8,6 +8,7 @@ RUN npm install
 # Копируем все файлы фронтенда и запускаем билд
 COPY frontend ./
 RUN npm run build
-
+# Запуск приложения
+CMD [ "npm", "run", "serve" ]
 
 

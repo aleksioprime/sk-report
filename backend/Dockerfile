@@ -14,3 +14,5 @@ COPY backend/requirements.txt ./
 RUN pip install -r requirements.txt
 # Копируем все файлы из локального проекта в контейнер
 COPY ./backend ./
+# Запуск проекта
+CMD python manage.py runserver
