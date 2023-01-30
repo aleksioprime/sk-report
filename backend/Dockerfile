@@ -16,7 +16,7 @@ COPY backend ./
 # ENTRYPOINT ["python3"] 
 # CMD ["manage.py", "runserver"]
 RUN ls -l
-COPY nginx_default.conf /etc/nginx/conf.d/default.conf
+COPY /usr/src/app/nginx_default.conf /etc/nginx/conf.d/default.conf
 
 RUN pip3 install gunicorn
 CMD gunicorn --workers 4 --bind 0.0.0.0:5000 --daemon server:app \
