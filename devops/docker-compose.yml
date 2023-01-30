@@ -36,7 +36,7 @@ services:
     networks:
       - local_net
     ports:
-      - "5432:5432"
+      - "5433:5432"
   watchtower:
     image: containrrr/watchtower
     volumes:

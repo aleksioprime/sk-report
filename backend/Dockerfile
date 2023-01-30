@@ -12,4 +12,5 @@ RUN pip install -r requirements.txt
 # Копируем все файлы из локального проекта в контейнер
 COPY ./backend ./
 # Запуск проекта
-CMD python manage.py runserver
+ENTRYPOINT ["python3"] 
+CMD ["manage.py", "runserver"]
