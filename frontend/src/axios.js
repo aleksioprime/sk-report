@@ -3,7 +3,7 @@ import store from '@/store'
 import cookie from 'vue3-cookies'
 
 const axiosAPI = axios.create({
-  baseURL: 'http://127.0.0.1:8080/api/v1/',
+  baseURL: 'http://127.0.0.1:8000/api/v1/',
 })
 
 axiosAPI.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token');
