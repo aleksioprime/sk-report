@@ -32,7 +32,7 @@ ALLOWED_HOSTS = ['*']
 # ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8080",
+    "http://localhost:8080", "http://176.57.218.9:8080",
 ]
 # Application definition
 
