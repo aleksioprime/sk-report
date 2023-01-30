@@ -8,5 +8,7 @@ RUN npm install
 # Копируем все файлы фронтенда и запускаем билд
 COPY frontend ./
 RUN npm run build
+
+COPY /dist /usr/share/nginx/html
 # Запуск приложения
-CMD [ "npm", "run", "serve" ]
+# CMD [ "npm", "run", "serve" ]
