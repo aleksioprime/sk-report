@@ -10,7 +10,7 @@ RUN pip install --upgrade pip
 COPY backend/requirements.txt ./
 RUN pip install -r requirements.txt
 # Копируем все файлы из локального проекта в контейнер
-COPY ./backend ./
+COPY backend ./
 # Запуск проекта
-ENTRYPOINT ["python3"] 
-CMD ["manage.py", "runserver"]
+# ENTRYPOINT ["python3"] 
+# CMD ["manage.py", "runserver"]

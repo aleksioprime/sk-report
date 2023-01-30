@@ -15,9 +15,11 @@ services:
   api:
     container_name: igskolkovo-backend
     image: index.docker.io/aleksioprime/igskolkovo-backend
-    env_file:
-      - .env.back
-      - .env.db
+    command: python3 manage.py runserver 0.0.0.0:5000
+    environment:
+      - POSTGRES_DB=igskolkovo
+      - POSTGRES_USER=igadmin
+      - POSTGRES_PASSWORD=Pox{@K
     networks:
       - local_net
     depends_on:
