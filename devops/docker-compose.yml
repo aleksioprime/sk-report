@@ -11,7 +11,7 @@ services:
       - api
       - db
     ports:
-      -"8080:8080"
+      - "8080:8080"
   api:
     container_name: igskolkovo-backend
     image: index.docker.io/aleksioprime/igskolkovo-backend
@@ -43,6 +43,10 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - $HOME/.docker/config.json:/config.json
     command: --interval 30
+    
 networks:
   local_net:
     driver: bridge
+
+volumes:
+  postgres_data:

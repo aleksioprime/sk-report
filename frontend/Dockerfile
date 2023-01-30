@@ -10,5 +10,3 @@ COPY frontend ./
 RUN npm run build
 # Запуск приложения
 CMD [ "npm", "run", "serve" ]
-
-
