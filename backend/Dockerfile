@@ -1,8 +1,12 @@
 # Указываем Docker использовать образ Python в качестве базового
-FROM python:3.7.6
+# FROM python:3.7.6
 FROM nginx:1.17.4-alpine
 # Устанавливаем рабочий каталог контейнера 
 WORKDIR /usr/src/app
+
+RUN apk update \
+  && apk add --no-cache python3 \
+  && pip3 install --upgrade pip setuptools
 # Устанавливаем необходимые переменные окружения
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
