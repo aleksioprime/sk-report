@@ -3,10 +3,10 @@ FROM node:lts-alpine
 # Устанавливаем рабочий каталог контейнера 
 WORKDIR /usr/src/app
 # Копируем файлы пакетов в контейнер и устанавливаем их
-COPY ./package.json ./
+COPY frontend/package*.json ./
 RUN npm install
 # Копируем все файлы фронтенда и запускаем билд
-COPY . ./
+COPY frontend ./
 RUN npm run build
 
 
