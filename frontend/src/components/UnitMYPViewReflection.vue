@@ -8,7 +8,7 @@
       <div v-for="rf in filteredReflections" :key="rf.id" class="my-2">
         <div class="d-flex border p-2">
           <div>"{{ rf.post }}" - <span>{{ rf.author.short_name }}</span></div>
-          <div v-if="$store.state.auth.authUser.teacher.id == rf.author.id" class="img-btn-all ms-auto">
+          <div v-if="authUser.teacher.id == rf.author.id" class="img-btn-all ms-auto">
             <div class="img-btn-edit" @click="editButton(rf)"></div>
             <div class="img-btn-del" @click="showModalDelete(rf)"></div>
           </div>
@@ -19,7 +19,6 @@
       <div ref="form">
         <div class="btn btn-primary" @click="addButton" v-if="!addMode && !editMode">Новый пост</div>
         <div><b><span v-if="addMode">Добавление нового поста рефлексии</span><span v-if="editMode">Редактирование поста</span></b></div>
-        <!-- Поля для добавления или редактирования записи -->
         <div v-if="addMode || editMode">
           <div class="my-2">
             <textarea class="form-control mb-2" type="text" v-model="reflection.post" placeholder="Вводите здесь текст..."></textarea>
@@ -33,24 +32,21 @@
       </div>
     </transition>
     <modal-delete :idName="idName + categoryValue" :del="true" @cancel="hideModalDelete" @delete="submitDelete">
-      <div>Вы действитель хотите удалить эту запись?</div>
+      <div>Вы действительно хотите удалить эту запись?</div>
     </modal-delete>
   </div>
 </template>
 
 <script>
 import { Modal } from 'bootstrap';
-import { mapState } from 'vuex'
+import { mapGetters } from 'vuex';
 
 export default {
-  name: 'unit-reflection',
+  name: 'unit-myp-view-reflection',
   props: {
     unit: Object,
     categoryValue: '',
     categoryText: Object,
-  },
-  setup(props) {
-
   },
   data() {
     return {
@@ -96,46 +92,30 @@ export default {
     submitAdd() {
       this.addMode = false;
       this.reflection.planner = this.unit.id;
-      this.reflection.author_id = this.$store.state.auth.authUser.teacher.id;
+      this.reflection.author_id = this.authUser.teacher.id;
       this.reflection.type_post = this.categoryValue;
-      console.log(this.reflection)
-      const url = `${this.api}/unitplans/myp/reflection`;
-	    const config = this.configJWT;
-      this.axios.post(url, this.reflection, config)
+      this.axios.post('/unitplans/myp/reflection', this.reflection)
         .then(() => {
           this.reflection = {};
           this.$emit('update');
-        })
-        .catch((error) => {
-          console.log(error);
         });
     },
     // Функция кнопки "Сохранить" при редактировании записи
     submitEdit(){
       this.editMode = false;
-      const url = `${this.api}/unitplans/myp/reflection/${this.reflection.id}`;
-	    const config = this.configJWT;
-      this.axios.put(url, this.reflection, config)
+      this.axios.put(`/unitplans/myp/reflection/${this.reflection.id}`, this.reflection)
         .then(() => {
           this.reflection = {};
           this.selectItem = 0;
           this.$emit('update');
-        })
-        .catch((error) => {
-          console.log(error);
         });
     },
     // Функция удаления вопроса
     submitDelete() {
-      const url = `${this.api}/unitplans/myp/reflection/${this.selectItem}`;
-	    const config = this.configJWT;
-      this.axios.delete(url, config)
+      this.axios.delete(`/unitplans/myp/reflection/${this.selectItem}`)
         .then(() => {
           this.$emit('update');
           this.modalDelete.hide();
-        })
-        .catch((error) => {
-          console.log(error);
         });
     },
   },
@@ -143,16 +123,11 @@ export default {
     this.modalDelete = new Modal(`#modalDelete${this.idName}${this.categoryValue}`, { backdrop: 'static' });
   },
   computed: {
-    ...mapState({
-      api: state => state.base.baseAPI,
-      configJWT: state => state.base.configJWT,
-    }),
+    ...mapGetters(['authUser']),
     filteredReflections () {
       return this.unit.reflections.filter((rf) => rf.type_post == this.categoryValue)
     }
   },
-  watch: {
-  }
 }
 </script>
 

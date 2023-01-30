@@ -3,22 +3,26 @@
     <base-header>
       <template v-slot:header>Список юнитов</template>
     </base-header>
-    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-      <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="pills-myp-tab" data-bs-toggle="pill" data-bs-target="#pills-myp" type="button" role="tab" aria-controls="pills-myp" aria-selected="true">MYP</button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="pills-dp-tab" data-bs-toggle="pill" data-bs-target="#pills-dp" type="button" role="tab" aria-controls="pills-dp" aria-selected="false">DP</button>
-      </li>
-    </ul>
-    <div class="tab-content" id="pills-tabContent">
-      <div class="tab-pane fade show active" id="pills-myp" role="tabpanel" aria-labelledby="pills-myp-tab">
-        <unit-myp-list :departments="departments" :teachers="teachers"/>
+    <transition name="fade">
+      <div v-show="showMYPData">
+        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="pills-myp-tab" data-bs-toggle="pill" data-bs-target="#pills-myp" type="button" role="tab" aria-controls="pills-myp" aria-selected="true">MYP</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pills-dp-tab" data-bs-toggle="pill" data-bs-target="#pills-dp" type="button" role="tab" aria-controls="pills-dp" aria-selected="false">DP</button>
+          </li>
+        </ul>
+        <div class="tab-content" id="pills-tabContent">
+          <div class="tab-pane fade show active" id="pills-myp" role="tabpanel" aria-labelledby="pills-myp-tab">
+            <unit-myp-list :departments="departments" @showMYPData="showMYPData = true"/>
+          </div>
+          <div class="tab-pane fade" id="pills-dp" role="tabpanel" aria-labelledby="pills-dp-tab">
+            <!-- <unit-dp-list :departments="departments"/> -->
+          </div>
+        </div>
       </div>
-      <div class="tab-pane fade" id="pills-dp" role="tabpanel" aria-labelledby="pills-dp-tab">
-        <unit-dp-list :departments="departments" :teachers="teachers"/>
-      </div>
-    </div>
+    </transition>
   </div>
 </template>
 
@@ -27,7 +31,7 @@
 import UnitMypList from "@/components/UnitMYPList";
 import UnitDpList from "@/components/UnitDPList";
 // Импорт модулей запросов базы подразделений, учителей
-import { getDepartments, getTeachers } from "@/hooks/unit/getUnitData"
+import { getDepartments } from "@/hooks/unit/getUnitData"
 
 export default {
   name: 'UnitPlans',
@@ -36,14 +40,13 @@ export default {
   },
   setup(props) {
     const { departments, getDepartmentsData } = getDepartments();
-    const { teachers, getTeachersData } = getTeachers();
     return {
-      departments, teachers, getTeachersData, getDepartmentsData
+      departments, getDepartmentsData
     }
   },
   data() {
     return {
-
+      showMYPData: false,
     }
   },
   methods: {
@@ -54,12 +57,18 @@ export default {
   },
   mounted() {
     this.getDepartmentsData();
-    this.getTeachersData();
-    
   },
 }
 </script>
 
 <style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
 
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
 </style>

@@ -15,7 +15,7 @@ class GroupAdmin(ImportExportModelAdmin):
     
 @admin.register(RoleUser)
 class RoleUserAdmin(ImportExportModelAdmin):
-    list_display = ("name",)
+    list_display = ("name", "codename")
     
 @admin.register(Department)
 class DepartmentAdmin(ImportExportModelAdmin):

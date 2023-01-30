@@ -29,7 +29,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:8080",
+# ]
 # Application definition
 
 INSTALLED_APPS = [
@@ -41,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'import_export',    # модуль импорт и экспорта данных
     'rest_framework',   # модуль архитектуры REST
-    'corsheaders',
+    # 'corsheaders',
     'member',            # приложение учёта пользователей
     'assess',            # приложение оценивания студентов
     'curriculum',        # приложение формирования учебного плана
@@ -50,13 +52,15 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
+    # 'corsheaders.middleware.CorsMiddleware',
+    # 'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CSRF_COOKIE_SECURE = True
 
 ROOT_URLCONF = 'igskolkovo.urls'
 
@@ -166,7 +170,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=90),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,
@@ -193,6 +197,6 @@ SIMPLE_JWT = {
     'JTI_CLAIM': 'jti',
 
     'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
-    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=1),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }

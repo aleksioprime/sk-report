@@ -12,7 +12,11 @@
           <slot name="body"></slot>
         </div>
         <div class="modal-footer">
-          <slot name="footer"></slot>
+          <button type="button" class="btn btn-secondary" @click="$emit('cancel')">Отмена</button>
+          <button v-if="flagUser.addUser" type="button" class="btn btn-primary" @click="$emit('create')">Добавить</button>
+          <button v-if="flagUser.editUser" type="button" class="btn btn-primary" @click="$emit('update')">Сохранить</button>
+          <button v-if="flagUser.delUser" type="button" class="btn btn-primary" @click="$emit('delete')">Удалить</button>
+          <button v-if="flagUser.import" type="button" class="btn btn-primary" @click="$emit('import')">Загрузить</button>
         </div>
       </div>
     </div>
@@ -42,13 +46,10 @@ export default {
     }
   },
   methods: {
-    hideDialog() {
-      this.$emit('update:show', false)
-    }
+
   },
   mounted() {
-    console.log('Dialog mounted');
-    // this.modal = new Modal('#modalUser', { backdrop: 'static' });
+
   },
   watch: {
 

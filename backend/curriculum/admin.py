@@ -3,7 +3,8 @@ from import_export.admin import ImportExportModelAdmin
 from curriculum.models import SubjectGroupIB, ClassYear, SubjectGroupFGOS, Subject, AcademicPlan, Criterion, Strand, \
     Level, Objective, AchievementLevel, KeyConcept, RecommendSubjectKC, SubjectDirectionRC, RelatedConcept, \
     GlobalContext, ExplorationToDevelop, CategoryATL, ClusterATL, SkillATL, ReflectionMYP, \
-    InquiryQuestionMYP, Aim, LearnerProfileIB, UnitPlannerMYP, UnitPlannerMYPID, UnitPlannerDP, ReflectionDP, InquiryQuestionDP
+    InquiryQuestionMYP, Aim, LearnerProfileIB, UnitPlannerMYP, UnitPlannerMYPID, UnitPlannerDP, \
+        ReflectionDP, InquiryQuestionDP, SubjectLevelMYP
 
 @admin.register(SubjectGroupIB)
 class SubjectGroupIBAdmin(ImportExportModelAdmin):
@@ -60,6 +61,10 @@ class SubjectDirectionRCAdmin(ImportExportModelAdmin):
 @admin.register(RelatedConcept)
 class RelatedConceptAdmin(ImportExportModelAdmin):
     list_display = ("name_eng", "description_eng")
+    
+# @admin.register(ConnectSubjectRC)
+# class ConnectSubjectRCAdmin(ImportExportModelAdmin):
+#     list_display = ("related_concept", "subject_group", "subject_direction")
 
 @admin.register(GlobalContext)
 class GlobalContextAdmin(ImportExportModelAdmin):
@@ -77,7 +82,6 @@ class CategoryATLAdmin(ImportExportModelAdmin):
 class ClusterATLAdmin(ImportExportModelAdmin):
     list_display = ("name_eng", "name_rus", "category")
 
-
 @admin.register(SkillATL)
 class SkillATLAdmin(ImportExportModelAdmin):
     list_display = ("name_eng", "name_rus", "cluster")
@@ -92,7 +96,7 @@ class LearnerProfileIBAdmin(ImportExportModelAdmin):
 
 @admin.register(UnitPlannerMYP)
 class UnitPlannerMYPAdmin(ImportExportModelAdmin):
-    list_display = ("title", "subject", "class_year")
+    list_display = ("title", "class_year")
 
 @admin.register(UnitPlannerMYPID)
 class UnitPlannerMYPIDAdmin(ImportExportModelAdmin):
@@ -117,3 +121,7 @@ class ReflectionDPAdmin(ImportExportModelAdmin):
 @admin.register(InquiryQuestionDP)
 class InquiryQuestionDPAdmin(ImportExportModelAdmin):
     list_display = ("question", "type_inq", "planner")
+
+@admin.register(SubjectLevelMYP)
+class SubjectLevelMYPAdmin(ImportExportModelAdmin):
+    list_display = ("unit", "subject", "level")

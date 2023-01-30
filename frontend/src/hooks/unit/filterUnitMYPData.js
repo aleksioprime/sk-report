@@ -1,6 +1,46 @@
 import { ref, computed } from 'vue'
 
-// составление списка годов обучения из имеющихся юнитов
+
+// export function getTeachersFromDepartment(departments) {
+//     const queryDepartment = ref('');
+//     const teachersFromDepartment = computed(() => {
+//         if (!queryDepartment.value) {
+//             let teacherDepartments = departments.value.filter(dp => dp.teacher.length > 0).map(dp => dp.teacher).flat();
+//             return [...new Map(teacherDepartments.map((item) => [item["id"], item])).values()]
+//         } else {
+//             return departments.value.find((item => item.id == queryDepartment.value)).teacher
+//         }
+//     });
+//     return {
+//         queryDepartment, teachersFromDepartment
+//     }
+// };
+
+export function getSubjectsFromDepartment(departments) {
+    const queryDepartment = ref('');
+    const subjectsFromDepartment = computed(() => {
+        if (!queryDepartment.value) {
+            let subjectDepartments = departments.value.filter(dp => dp.subject.length > 0).map(dp => dp.subject).flat();
+            return [...new Map(subjectDepartments.map((item) => [item["id"], item])).values()]
+        } else {
+            return departments.value.find((item => item.id == queryDepartment.value)).subject
+        }
+    })
+    return {
+        subjectsFromDepartment, queryDepartment
+    }
+};
+
+export function getSubjectsFromTeacher() {
+    const subjectsFromTeacher = (teacher) => {
+        let subjectTeacher = teacher.teacher.units.map(un => un.subjects).flat().map(sb => sb.subject);
+        return [...new Map(subjectTeacher.map((item) => [item["id"], item])).values()]
+    }
+    return {
+        subjectsFromTeacher
+    }
+};
+
 export function getYearsFromUnits(units) {
     const yearsFromUnits = computed(() => {
         let objArray = units.value.map((unit) => { return unit.class_year });
@@ -11,71 +51,26 @@ export function getYearsFromUnits(units) {
     }
 };
 
-// составление списка годов обучения из имеющихся юнитов
-export function getSubjectsFromUnits(units) {
-    const subjectsFromUnits = computed(() => {
-        let objArray = units.value.map((unit) => {return unit.subject})
-        return [...new Map(objArray.map((item) => [item["id"], item])).values()]
-    })
-        
-    return {
-        subjectsFromUnits
-    }
-};
-
 export function filterUnitsByYears(units) {
     const queryYears = ref([]);
     const filteredUnitsByYears = computed(() => {
-        if (queryYears.value.length) {
-            return units.value.filter(unit => queryYears.value.map(item => item.id).includes(unit.class_year.id));
-        }
-        return units.value
+        return units.value.filter(unit => queryYears.value.map(item => item.id).includes(unit.class_year.id));
     });
     return {
         queryYears, filteredUnitsByYears
     }
 };
 
-export function filterUnitsBySubject(units) {
-    const querySubject = ref('');
-    const filteredUnitsBySubject = computed(() => {
-        if (querySubject.value) {
-            return units.value.filter(unit => unit.subject.id == querySubject.value.id);
-        }  
-        return units.value
-    });
-    return {
-        querySubject, filteredUnitsBySubject
-    }
-};
-
-export function filterTeachersByDepartment(teachers) {
-    const queryDepartment = ref('');
-    const filteredTeachersByDepartment = computed(() => {
-        if (!queryDepartment.value) {
-            return teachers.value
-        } else {
-            return teachers.value.filter((teacher) => {
-                const teachersDepartment = teacher.departments.find(item => item.id == queryDepartment.value)
-                return teachersDepartment ? true : false
-            })
-        }   
-    });
-    return {
-        queryDepartment, filteredTeachersByDepartment
-    }
-};
-
 export function filterCriteriaBySubject(criteria) {
-    const querySubject = ref('');
+    const querySubjects = ref([]);
     const filteredCriteriaBySubject = computed(() => {
-        if (!querySubject.value) {
+        if (!querySubjects.value.length) {
             return []
         } else {
-            return criteria.value.filter((cr) => cr.subject_group.id == querySubject.value)
+            return criteria.value.filter(cr => querySubjects.value.includes(cr.subject_group.id))
         }   
     });
     return {
-        querySubject, filteredCriteriaBySubject
+        querySubjects, filteredCriteriaBySubject
     }
 };

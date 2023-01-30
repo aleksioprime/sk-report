@@ -5,7 +5,7 @@
         <tr>
           <th scope="col" style="width: 150px">Тип</th>
           <th scope="col">Вопрос</th>
-          <th scope="col" style="width: 40%">Исследование</th>
+          <th scope="col" style="width: 30%">Исследование</th>
           <th style="width: 40px"></th>
         </tr>
       </thead>
@@ -65,10 +65,9 @@
 
 <script>
 import { Modal } from 'bootstrap';
-import { mapState } from 'vuex'
 
 export default {
-  name: 'unit-myp-question',
+  name: 'unit-myp-view-question',
   props: {
     unit: { type: Object },
   },
@@ -106,9 +105,7 @@ export default {
     submitAdd() {
       this.addMode = false;
       this.inquestion.planner = this.unit.id;
-      const url = `${this.api}/unitplans/myp/inquestion`;
-	    const config = this.configJWT;
-      this.axios.post(url, this.inquestion, config)
+      this.axios.post('/unitplans/myp/inquestion', this.inquestion)
         .then(() => {
           this.inquestion = {};
           this.$emit('update');
@@ -120,9 +117,7 @@ export default {
     // Функция кнопки "Сохранить" при редактировании записи
     submitEdit(){
       this.editMode = false;
-      const url = `${this.api}/unitplans/myp/inquestion/${this.inquestion.id}`;
-	    const config = this.configJWT;
-      this.axios.put(url, this.inquestion, config)
+      this.axios.put(`/unitplans/myp/inquestion/${this.inquestion.id}`, this.inquestion)
         .then(() => {
           this.inquestion = {};
           this.selectItem = 0;
@@ -155,15 +150,10 @@ export default {
     },
     // Функция удаления вопроса
     submitDelete() {
-      const url = `${this.api}/unitplans/myp/inquestion/${this.selectItem}`;
-	    const config = this.configJWT;
-      this.axios.delete(url, config)
+      this.axios.delete(`${this.api}/unitplans/myp/inquestion/${this.selectItem}`)
         .then(() => {
           this.$emit('update');
           this.modalDelete.hide();
-        })
-        .catch((error) => {
-          console.log(error);
         });
     },
   },
@@ -171,10 +161,6 @@ export default {
     this.modalDelete = new Modal(`#modalDelete${this.idName}`, { backdrop: 'static' });
   },
   computed: {
-    ...mapState({
-      api: state => state.base.baseAPI,
-      configJWT: state => state.base.configJWT,
-    }),
   },
   watch: {
     addMode() {

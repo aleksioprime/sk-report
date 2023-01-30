@@ -1,5 +1,5 @@
 <template>
-  <header>
+  <header class="my-3">
     <small><slot name="link"></slot></small>
     <h1><slot name="header"></slot></h1>
   </header>

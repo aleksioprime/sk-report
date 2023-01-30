@@ -13,7 +13,7 @@
       <div class="col-md-4">
         <select id="subject" class="form-select me-3 mb-2" v-model="queryTeacher">
           <option :value="''" selected>Все учителя</option>
-          <option v-for="(teacher, i) in filteredTeachersByDepartment" :key="i" :value="teacher.id">
+          <option v-for="(teacher, i) in teachersFromDepartment" :key="i" :value="teacher.id">
             {{ teacher.user.first_name }} {{ teacher.user.middle_name }} {{ teacher.user.last_name }}
           </option>
         </select>
@@ -23,7 +23,7 @@
 </template>
 
 <script>
-  import { filterTeachersByDepartment } from "@/hooks/unit/filterUnitMYPData";
+  import { getTeachersFromDepartment } from "@/hooks/unit/filterUnitMYPData";
   import { toRefs } from 'vue';
   
   export default {
@@ -38,9 +38,9 @@
     setup(props) {
       const { teachers } = toRefs(props);
       // Фильтрация списка учителей по выбранному подразделению
-      const { filteredTeachersByDepartment, queryDepartment } = filterTeachersByDepartment(teachers);
+      const { teachersFromDepartment, queryDepartment } = getTeachersFromDepartment(teachers);
       return {
-        teachers, filteredTeachersByDepartment, queryDepartment
+        teachers, teachersFromDepartment, queryDepartment
       }
     },
     data() {

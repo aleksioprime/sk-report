@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div class="alert alert-danger">Проверить модуль формы и оставить комментарии</div>
+    <!-- <div class="alert alert-danger"></div> -->
     <!-- Блок фильтрации юнитов MYP по подразделению и учителю -->
     <div class="row border-bottom mb-2">
-      <div class="col-md-5">
+      <div class="col-md-5" v-if="checkAdmin">
         <select id="department" class="form-select me-3 mb-2" v-model="queryDepartment" @change="refreshUnitByDepartment">
           <option :value="''" selected>Все подразделения</option>
           <option v-for="(department, i) in departments" :key="i" :value="department.id">
@@ -11,34 +11,49 @@
           </option>
         </select>
       </div>
-      <div class="col-md-4">
-        <select id="subject" class="form-select me-3 mb-2" v-model="queryTeacher" @change="getUnitsMYPData">
+      <div class="col-md" v-if="checkAdmin">
+        <select id="teacher" class="form-select me-3 mb-2" v-model="queryTeacher" @change="refreshUnitByTeacher" :disabled="Boolean(querySubject)">
           <option :value="''" selected>Все учителя</option>
-          <option v-for="(teacher, i) in filteredTeachersByDepartment" :key="i" :value="teacher.id">
-            {{ teacher.user.first_name }} {{ teacher.user.middle_name }} {{ teacher.user.last_name }}
+          <option v-for="(teacher, i) in teachers" :key="i" :value="teacher.id">
+              {{ teacher.user.first_name }} {{ teacher.user.middle_name }} {{ teacher.user.last_name }}
           </option>
         </select>
       </div>
-      <div class="col-md d-flex">
-        <button type="button" class="btn btn-primary ms-auto mb-2" @click="showModalUnit">
-          Cоздать MYP юнит
+      <div v-else class="col-md d-flex align-items-center my-2">
+        <span>Учитель:&nbsp;</span> 
+        <span class="fw-bold">{{ authUser.last_name }} {{ authUser.first_name }} {{ authUser.middle_name }}</span>
+      </div>
+      <div class="col-md-3 d-flex">
+        <button type="button" class="btn btn-primary ms-auto mb-2 w-100" @click="showModalUnit">
+          Cоздать юнит
         </button>
       </div>
     </div>
-    <!-- Модальное окно добавления юнита -->
+    <!-- Модальное окно с формой добавления юнита -->
+    <!-- checkValid - флаг необходимости проверки формы,  validForm - сигнал успешности проверки формы  -->
     <modal-unit :modalTitle="modalTitle" @cancel="hideModalUnit" @create="createUnit">
-      <unit-myp-form v-model="unit" :grades="grades" :teachers="teachers" :subjects="subjects" :criteria="criteriaMYP"
-        :checkValid="checkValid" @validForm="validForm = true" :resetValid="resetValid" :showValid="showValid"/>
+      <unit-myp-form v-model="unit" :grades="grades" :teachers="teachers" :subjects="subjects" :criteria="criteriaMYP" :levels="levels"
+        :checkValid="checkValid" :resetValid="resetValid" @validForm="validFormResult"/>
     </modal-unit>
     <!-- Блок таблицы и дополнительной фильтрации -->
     <div class="row">
       <!-- Фильтрация по предмету и году обучения -->
-      <div class="col-md-3 border-end">
-        <div class="d-flex flex-md-column align-items-center align-items-md-start">
-          <a href="#" class="me-2" @click="querySubject = ''">Все предметы</a>
-          <a href="#" class="me-2" v-for="sb in subjectsFromUnits" :key="sb" @click="querySubject = sb">
-            <span>{{ sb.name_rus }}</span>
-          </a>
+      <div class="col-md-3">
+        <div class="d-flex flex-md-column align-items-center align-items-md-start flex-wrap">
+          <div class="form-check me-2">
+            <input class="form-check-input" type="radio" name="subject" :value="''" :id="'subject-x'" v-model="querySubject" @change="refreshUnitBySubject">
+            <label class="form-check-label" :for="'subject-x'">
+              Все предметы
+            </label>
+          </div>
+          <div v-for="sb in subjectFilter" :key="sb.id" class="me-2">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="subject" :value="sb.id" :id="'subject-' + sb.id" v-model="querySubject" @change="refreshUnitBySubject">
+              <label class="form-check-label" :for="'subject-' + sb.id">
+                {{ sb.name_rus }}
+              </label>
+            </div>
+          </div>
         </div>
         <div class="d-flex flex-md-column align-items-center align-items-md-start" v-if="yearsFromUnits.length > 0">
           <div class="my-3 me-2">Года обучения</div>
@@ -53,7 +68,7 @@
         </div>
       </div>
       <!-- Таблица вывода юнитов MYP -->
-      <div class="col-md flex-grow-1">
+      <div class="col-md table-responsive p-2">
         <table class="table table-sm table-bordered mt-0">
           <thead>
             <tr class="align-middle">
@@ -67,7 +82,6 @@
             </tr>
           </thead>
           <tbody v-if="Object.keys(groupedUnits).length !== 0">
-            <!-- Вывод строк таблицы сгруппированных по годам обучения юнитов -->
             <template v-for="(units, grade) in groupedUnits" :key="grade">
               <tr><td colspan="7" class="text-center bg-light fw-bold" v-if="findGrade(grade)">{{ findGrade(grade).year_ib }} ({{ findGrade(grade).year_rus }} класс)</td></tr>
               <unit-myp-item v-for="(unitplan, index) in units" :key="unitplan.id" :unitplan="unitplan" :index="index + 1"/>
@@ -88,16 +102,13 @@
 // импорт библиотек
 import { Modal } from 'bootstrap';
 import { toRefs } from 'vue';
-import { mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 // импорт компонентов формы создания юнита и вывода SSO
 import UnitMypForm from "@/components/UnitMYPForm.vue";
 import UnitMypItem from "@/components/UnitMYPItem";
 // импорт функций Composition API
-import { getYearsFromUnits, getSubjectsFromUnits,
-  filterUnitsByYears, filterUnitsBySubject, 
-  filterTeachersByDepartment  } from "@/hooks/unit/filterUnitMYPData"
-import { getGrades } from "@/hooks/unit/getUnitData"
-import { getUnitsMYP, getSubjectsMYP, getCriteriaMYP  } from "@/hooks/unit/getUnitMYPList"
+import { getYearsFromUnits, filterUnitsByYears, getSubjectsFromDepartment, getSubjectsFromTeacher  } from "@/hooks/unit/filterUnitMYPData"
+import { getUnitsMYP, getSubjectsMYP, getCriteriaMYP, getTeachers, getGrades, getLevels  } from "@/hooks/unit/getUnitMYPList"
 
 export default {
   name: 'UnitMYPList',
@@ -107,31 +118,38 @@ export default {
   },
   props: {
     departments: Array,
-    teachers: Array,
   },
   setup(props) {
-    const { teachers } = toRefs(props)
+    const { departments } = toRefs(props)
     // Фильтрация списка учителей по выбранному подразделению
-    const { filteredTeachersByDepartment, queryDepartment } = filterTeachersByDepartment(teachers);
-    // Получение списка критериев оценки
-    const { criteriaMYP, getCriteriaData } = getCriteriaMYP();
-    // Получение списка годов обучения в MYP
-    const { grades, getGradesData } = getGrades();
-    // Получение списка предметов в MYP
-    const { subjects, getSubjectsData } = getSubjectsMYP();
+    // const { teachersFromDepartment, queryDepartment } = getTeachersFromDepartment(departments);
+    const { subjectsFromDepartment, queryDepartment } =  getSubjectsFromDepartment(departments);
+    const { subjectsFromTeacher } =  getSubjectsFromTeacher();
     // Получение юнитов MYP и функции запроса юнитов по подразделению и учителю
-    const { unitsMYP, queryTeacher, getUnitsMYPData } = getUnitsMYP(queryDepartment);
-    // Получение предметов из всех юнитов 
-    const { subjectsFromUnits } = getSubjectsFromUnits(unitsMYP);
-    // Фильтрация юнитов по предмету
-    const { querySubject, filteredUnitsBySubject } = filterUnitsBySubject(unitsMYP);
+    const { unitsMYP, queryTeacher, querySubject, getUnitsMYPData} = getUnitsMYP(queryDepartment);
+    // Получение списков учителей, годов обучения, предметов, уровней, критериев оценки
+    const { teachers, getTeachersData } = getTeachers()    
+    const { grades, getGradesData } = getGrades();
+    const { subjects, getSubjectsData } = getSubjectsMYP();
+    const { levels, getLevelsData } = getLevels();
+    const { criteriaMYP, getCriteriaData } = getCriteriaMYP();
     // Получние годов обучения из отфильтрованных по предмету юнитов
-    const { yearsFromUnits } = getYearsFromUnits(filteredUnitsBySubject);
+    const { yearsFromUnits } = getYearsFromUnits(unitsMYP);
     // Фильтрация юнитов по годам обучения
-    const { queryYears, filteredUnitsByYears } = filterUnitsByYears(filteredUnitsBySubject);
+    const { queryYears, filteredUnitsByYears } = filterUnitsByYears(unitsMYP);
     return {
-      filteredTeachersByDepartment, queryDepartment, criteriaMYP, getCriteriaData, teachers, grades, getGradesData, subjects, getSubjectsData,
-      unitsMYP, getUnitsMYPData, queryTeacher, subjectsFromUnits, yearsFromUnits, querySubject, queryYears, filteredUnitsByYears
+      departments,
+      // teachersFromDepartment, 
+      queryDepartment, 
+      subjectsFromDepartment, subjectsFromTeacher,
+      unitsMYP, getUnitsMYPData, queryTeacher, querySubject,
+      teachers, getTeachersData,
+      grades, getGradesData, 
+      subjects, getSubjectsData,
+      levels, getLevelsData,
+      criteriaMYP, getCriteriaData,
+      yearsFromUnits, 
+      queryYears, filteredUnitsByYears
     }
   },
   
@@ -140,12 +158,13 @@ export default {
       validForm: false,
       checkValid: false,
       resetValid: false,
-      showValid: false,
       unit: {
+        subjects: [],
         authors_ids: [],
         criteria_ids: [],
       },
       newUnitDefault: {
+        subjects: [],
         authors_ids: [],
         criteria_ids: [],
       },
@@ -154,59 +173,65 @@ export default {
     }
   },
   methods: {
+    // Функция записи сигнала успещности валидации формы
+    validFormResult(value) {
+      this.validForm = value;
+    },
     // Вызов модального окна для создания юнита
     showModalUnit() {
       this.modalTitle = 'Создание юнита';
       this.getCriteriaData();
       this.getSubjectsData('ooo', 'base');
+      this.getTeachersData();
+      this.getGradesData('MYP');
+      this.getLevelsData();
       this.resetValid = false;
-      this.checkValid = true;
+      this.unit.authors_ids.push(this.authUser.teacher.id);
       this.modalUnit.show();
     },
     // Закрытие модального окна для создания юнита
     hideModalUnit() {
-      this.unit = Object.assign({}, this.newUnitDefault);
-      this.checkValid = false;
-      this.showValid = false;
       this.resetValid = true;
+      this.checkValid = false;
+      this.unit = { ...this.newUnitDefault };
       this.modalUnit.hide();
     },
     // Создание юнита (отправка post запроса на сервер)
     createUnit() {
-      console.log('Создание юнита');
-      this.showValid = true;
-      console.log(this.validForm);
-      // console.log(this.unit)
+      this.checkValid = true;
       if (this.validForm) {
-        console.log('Запрос отправлен')
-        const url = `${this.api}/unitplans/myp`;
-        const config = this.configJWT;
-        this.axios.post(url, this.unit, config).then((response) => {
-          this.unit = Object.assign({}, this.newUnitDefault);
-          this.checkValid = false;
-          this.validForm = false;
-          this.showValid = false;
+        let formData = { ...this.unit };
+        formData.subjects = [... this.unit.subjects.map(item => {  
+          return { subject_id: item.subject.id, level_id: item.level.id }
+        })]
+        this.axios.post('/unitplans/myp', formData).then((response) => {
+          this.hideModalUnit();
+          this.$store.dispatch('getUserData');
           this.getUnitsMYPData();
-          this.modalUnit.hide();
         });
       }
     },
-    // Обновление юнитов при изменении подразделения
+    // Обновление юнитов при выборе подразделения
     refreshUnitByDepartment() {
       this.queryTeacher = '';
+      this.querySubject = '';
       this.getUnitsMYPData();
     },
-    // Получение года обучения по его ID
+    // Обновление юнитов при выборе учителя
+    refreshUnitByTeacher() {
+      this.querySubject = '';
+      this.getUnitsMYPData();
+    },
+    // Обновление юнитов при выборе предмета
+    refreshUnitBySubject() {
+      this.getUnitsMYPData();
+    },
+    // Получение данных о годе обучения по его ID
     findGrade(id) {
-      return this.grades.find(item => item.id == id); 
+      return this.yearsFromUnits.find(item => item.id == id); 
     },
   },
   computed: {
-    // Использование переменных store
-    ...mapState({
-      api: state => state.base.baseAPI,
-      configJWT: state => state.base.configJWT,
-    }),
     // преобраование массива юнитов в группированный по классу объект массивов
     groupedUnits() {
       let groupedObject = this.filteredUnitsByYears.reduce((acc, obj) => {
@@ -217,23 +242,47 @@ export default {
       }, {});
       return groupedObject;
     },
+    // Проверка у текущего пользователя прав администратора
+    checkAdmin() {
+      if (this.authUser) {
+        return this.authUser.role.map(item => item.codename).includes('admin')
+      }
+    },
+    subjectFilter() {
+      if (this.checkAdmin) {
+        return this.subjectsFromDepartment
+      } else {
+        return this.subjectsFromTeacher(this.authUser)
+      }
+    },
+    // подключение переменной авторизированного пользователя из store
+    ...mapGetters(['authUser']),
   },
   mounted() {
     // Определение модального окна для создания юнита
     this.modalUnit = new Modal('#modalUnit', { backdrop: 'static' });
-    this.unit = Object.assign({}, this.newUnitDefault);
+    // Автоматическая загрузка юнитов и учителей при монтировании страницы
+    // Если пользователь не администратор, то фильтра по подразделению и учителя нет, 
+    // а в таблицу подгруджаются юниты текущего учителя
+    if (this.checkAdmin) {
+      this.getTeachersData();
+    } else {
+      this.queryTeacher = this.authUser.teacher.id;
+    }
     this.getUnitsMYPData();
-    this.getGradesData('MYP');
   },
   watch: {
-    // Для выделения всех галочек лет обучения в MYP
+    // Автовыделение всех лет обучения в MYP в меню фильтра
     yearsFromUnits() {
       this.queryYears = this.yearsFromUnits
     },
+    // Сигнал успешности загрузки юнитов на странице
+    unitsMYP() {
+      this.$emit('showMYPData', true);
+    }
   }
 }
 </script>
 
 <style scoped>
-
 </style>

@@ -15,7 +15,7 @@
             {{ map.atl.name_eng }} <span v-if="map.atl.description_eng"><i>({{ map.atl.description_eng }})</i></span><br>
             <b>{{ map.atl.cluster.name_eng }}</b>
           </td>
-          <td><b>{{ map.objective.strand.criterion.letter }}{{ map.objective.strand.letter }}:</b> {{ map.objective.name_eng }}</td>
+          <td><b>{{ map.strand.criterion.letter }}{{ map.strand.letter }}:</b> {{ firstLetterBig(map.strand.name_eng) }}</td>
           <td>{{ map.action }}</td>
           <td>
             <div class="img-btn-all">
@@ -41,10 +41,10 @@
                     </select>
                   </div>
                   <div class="my-2">
-                    <select id="objective" class="form-select mb-2" v-model="mapping.objective_id">
+                    <select id="strand" class="form-select mb-2" v-model="mapping.strand_id">
                       <option value="-">Выберите предметную цель</option>
-                      <option v-for="(ob, i) in unit.objectives" :key="i" :value="ob.id">
-                        {{ ob.strand.criterion.letter }}{{ ob.strand.letter }}: {{ ob.name_eng.slice(0, 30) }}...
+                      <option v-for="(ob, i) in unit.strands" :key="i" :value="ob.id">
+                        <span v-if="unit.subjects.length > 0"><b>{{ ob.criterion.subject_group.name_eng }} - </b></span>{{ ob.criterion.letter }}{{ ob.letter }}: {{ firstLetterBig(ob.name_eng) }}
                       </option>
                     </select>
                   </div>
@@ -71,12 +71,11 @@
 
 <script>
 import { Modal } from 'bootstrap';
-import { mapState } from 'vuex'
 import { getATLSkills } from "@/hooks/unit/getUnitMYPEdit";
 
 
 export default {
-  name: 'unit-atl-mapping',
+  name: 'unit-myp-view-atl',
   props: {
     unit: { type: Object },
   },
@@ -110,30 +109,20 @@ export default {
       console.log(this.mapping)
       this.addMode = false;
       this.mapping.planner = this.unit.id;
-      const url = `${this.api}/unitplans/myp/atlmapping`;
-	    const config = this.configJWT;
-      this.axios.post(url, this.mapping, config)
+      this.axios.post('/unitplans/myp/atlmapping', this.mapping)
         .then(() => {
           this.mapping = {};
           this.$emit('update');
-        })
-        .catch((error) => {
-          console.log(error);
         });
     },
     // Функция кнопки "Сохранить" при редактировании записи
     submitEdit(){
       this.editMode = false;
-      const url = `${this.api}/unitplans/myp/atlmapping/${this.mapping.id}`;
-	    const config = this.configJWT;
-      this.axios.put(url, this.mapping, config)
+      this.axios.put(`/unitplans/myp/atlmapping/${this.mapping.id}`, this.mapping)
         .then(() => {
           this.mapping = {};
           this.selectItem = 0;
           this.$emit('update');
-        })
-        .catch((error) => {
-          console.log(error);
         });
     },
     // Функция активации режима добавления записи
@@ -150,7 +139,7 @@ export default {
       this.addMode = false;
       this.selectItem = item.id;
       this.mapping = Object.assign({}, item);
-      this.mapping.objective_id = item.objective.id;
+      this.mapping.strand_id = item.strand.id;
       this.mapping.atl_id = item.atl.id;
     },
     showModalDelete(item) {
@@ -163,32 +152,25 @@ export default {
     },
     // Функция удаления записи
     submitDelete() {
-      const url = `${this.api}/unitplans/myp/atlmapping/${this.selectItem}`;
-	    const config = this.configJWT;
-      this.axios.delete(url, config)
+      this.axios.delete(`/unitplans/myp/atlmapping/${this.selectItem}`)
         .then(() => {
           this.$emit('update');
           this.modalDelete.hide();
-        })
-        .catch((error) => {
-          console.log(error);
         });
+    },
+    // Функция делает первую букву заглавной в тексте
+    firstLetterBig(text) {
+      return text.charAt(0).toUpperCase() + text.slice(1);
     },
   },
   mounted() {
     this.modalDelete = new Modal(`#modalDelete${this.idName}`, { backdrop: 'static' });
   },
-  computed: {
-    ...mapState({
-      api: state => state.base.baseAPI,
-      configJWT: state => state.base.configJWT,
-    }),
-  },
   watch: {
     addMode() {
       if (this) {
         this.mapping.atl_id = '-';
-        this.mapping.objective_id = '-';
+        this.mapping.strand_id = '-';
       }
     }
   }

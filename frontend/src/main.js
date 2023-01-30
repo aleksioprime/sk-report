@@ -4,24 +4,29 @@ import router from './router'
 import components from '@/components/UI';
 import { axiosAPI }  from './axios.js'
 import store from '@/store'
+import VueCookies from 'vue3-cookies';
 
-router.beforeEach(async (to, from, next) => {
-  const user = store.getters['getUser'];
+router.beforeEach(async (to) => {
+  const user = store.getters['authUser'];
   const token = localStorage.getItem('access_token');
+  if (to.name !== 'unitmypview') {
+    localStorage.removeItem('currentTab');
+  }
   if (!token && to.name !== 'login') {
     console.log('Не найден токен в localStorage: выполняется разлогирование');
     await store.dispatch('userLogout');
-    next('login');
+    return { name: 'login' }
   }
   if (!user && token) {
     console.log('Найден токен в localStorage: запрос данных пользователя');
-    await store.dispatch('getUserData');
+    await store.dispatch('getUserData').then(() => {
+      return { name: to.name }
+    });
   }
   if (to.name == 'login' && token) {
     console.log('Вы залогинены: перенаправление на главную страницу');
-    next('dashboard');
+    return { name: 'unitlist' }
   }
-  next();
 })
 
 const app = createApp(App)
@@ -31,4 +36,4 @@ components.forEach(component => {
   app.component(component.name, component)
 })
 
-app.use(router).use(store).mount('#app')
+app.use(router).use(store).use(VueCookies).mount('#app')

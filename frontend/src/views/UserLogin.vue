@@ -74,7 +74,7 @@
           username: this.username,
           password: this.password,
         }).then(() => {
-          this.$router.push({name: 'dashboard'})
+          this.$router.push({name: 'unitlist'})
         }).catch((error) => {
           console.log(error);
           this.incorrectAuth = true;

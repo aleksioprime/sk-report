@@ -1,15 +1,24 @@
 import { ref } from 'vue';
 import { axiosAPI } from '@/axios'
 
-export function getDepartments() {
-	const departments = ref([]);
-	const getDepartmentsData = async () => {
-		await axiosAPI.get('/departments').then((response) => {
-			departments.value = response.data;
+export function getUnitsMYP(queryDepartment) {
+	const queryTeacher = ref('');
+	const querySubject = ref('');
+	const unitsMYP = ref([]);
+	const getUnitsMYPData = async () => {
+		const config = {
+			params: {
+				department: queryDepartment.value,
+				teacher: queryTeacher.value,
+				subject: querySubject.value,
+			}
+		}
+		await axiosAPI.get('/unitplans/myp', config).then((response) => {
+			unitsMYP.value = response.data;
 		});
 	};
 	return {
-		departments, getDepartmentsData
+		unitsMYP, queryTeacher, querySubject, getUnitsMYPData
 	}
 }
 
@@ -18,6 +27,7 @@ export function getTeachers() {
 	const getTeachersData = async () => {
 		await axiosAPI.get('/teachers').then((response) => {
 			teachers.value = response.data;
+			// console.log(teachers.value)
 		});
 	};
 	return {
@@ -42,25 +52,6 @@ export function getGrades() {
 	}
 }
 
-export function getUnitsMYP(queryDepartment) {
-	const queryTeacher = ref('')
-	const unitsMYP = ref([]);
-	const getUnitsMYPData = async () => {
-		const config = {
-			params: {
-				department: queryDepartment.value,
-				teacher: queryTeacher.value,
-			}
-		}
-		await axiosAPI.get('/unitplans/myp', config).then((response) => {
-			unitsMYP.value = response.data;
-		});
-	};
-	return {
-		unitsMYP, queryTeacher, getUnitsMYPData
-	}
-}
-
 export function getSubjectsMYP() {
 	const subjects = ref([]);
 	const getSubjectsData = async (level, type) => {
@@ -78,6 +69,18 @@ export function getSubjectsMYP() {
 		subjects, getSubjectsData
 	}
 }
+
+export function getLevels() {
+	const levels = ref([]);
+	const getLevelsData = async () => {
+	  await axiosAPI.get('/levels').then((response) => {
+		levels.value = response.data;
+	  });
+	};
+	return {
+	  levels, getLevelsData
+	}
+  }
 
 export function getCriteriaMYP() {
   const criteriaMYP = ref([]);

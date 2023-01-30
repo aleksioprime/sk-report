@@ -4,9 +4,10 @@
       {{ index }}
     </td>
     <td>
-      <a class="title" :href="`/unit/${unitplan.id}`">{{ unitplan.title }}</a> ({{
-          unitplan.hours
-      }} часов)
+      <a class="title" :href="`/unit/${unitplan.id}`">{{ unitplan.title }}</a>
+      ({{ unitplan.hours }} ч.)<br>
+      <span v-if="checkInterdisciplinary" class="badge rounded-pill text-bg-primary me-1">МДП</span><br>
+      <span v-for="(sb, i) in unitplan.subjects" :key="i">{{ sb.subject.name_rus }}<br></span>
     </td>
     <td>
       <div v-if="unitplan.key_concepts.length > 0">
@@ -24,18 +25,20 @@
     </td>
     <td>
       <div v-if="unitplan.statement_inquiry">
-        {{ unitplan.statement_inquiry }}
+        <div v-html="unitplan.statement_inquiry"></div>
       </div>
       <div v-else>Нет данных</div>
     </td>
     <td>
-      <span class="badge rounded-pill text-bg-primary me-1" v-for="cr in unitplan.criteria" :key="cr.id">{{ cr.letter
-      }}</span>
+      <div v-for="(value, field) in groupedField(unitplan.criteria, 'subject_group')" :key="field">
+        <div v-if="checkInterdisciplinary && subjectGroupUnit.length > 0"><small>{{ subjectGroupUnit.find(item => item.id == field).name_eng }}</small></div>
+        <span class="badge rounded-pill text-bg-primary me-1" v-for="cr in value" :key="cr.id">{{ cr.letter }}</span>
+      </div>
     </td>
     <td>
-      <ul v-if="unitplan.key_concepts.length > 0">
-        <li v-for="atl in unitplan.atl_skills" :key="atl.id">{{ atl.name_eng }}</li>
-        </ul>
+      <div v-if="unitplan.atlmapping.length > 0">
+        <div v-for="am in unitplan.atlmapping" :key="am.id">{{ am.atl.name_eng }}<br><b>{{ am.atl.cluster.name_eng }}</b></div>
+      </div>
       <div v-else>Нет данных</div>
     </td>
   </tr>
@@ -52,6 +55,26 @@ export default {
   },
   data() {
     return {
+    }
+  },
+  methods: {
+    groupedField(field, name) {
+      let groupedObject = field.reduce((acc, obj) => {
+        const property = obj[name].id;
+        acc[property] = acc[property] || [];
+        acc[property].push(obj);
+        return acc;
+      }, {});
+      return groupedObject;
+    },
+  },
+  computed: {
+    subjectGroupUnit() {
+      let objArray = this.unitplan.subjects.map(sb => sb.subject.group_ib);
+      return [...new Map(objArray.map((item) => [item["id"], item])).values()];
+    },
+    checkInterdisciplinary() {
+      return this.unitplan.subjects.length > 1;
     }
   },
 }

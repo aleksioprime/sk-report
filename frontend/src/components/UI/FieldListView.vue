@@ -1,12 +1,10 @@
 <template>
   <div>
-    <ul>
-      <li v-for="op in options" :key="op.id">
-        <slot :field="op">
-          
-        </slot>
-      </li>
-    </ul>
+    <div v-for="op in options" :key="op.id">
+      <slot :field="op">
+        
+      </slot>
+    </div>
   </div>
 </template>
   

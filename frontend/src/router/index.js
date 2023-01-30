@@ -3,7 +3,7 @@ import UserLogin from '@/views/UserLogin.vue'
 import DashBoard from '@/views/DashBoard.vue'
 import UnitList from '@/views/UnitList.vue'
 import UnitMYPView from '@/views/UnitMYPView.vue'
-// import UserList from '@/views/UserList.vue'
+import UserList from '@/views/UserList.vue'
 import AssessList from '@/views/AssessList.vue'
 
 
@@ -11,7 +11,7 @@ const routes = [
   {
     path: '/',
     name: 'dashboard',
-    component: DashBoard,
+    component: UnitList,
   },
   {
     path: '/login',
@@ -28,11 +28,11 @@ const routes = [
     name: 'unitmypview',
     component: UnitMYPView,
   },
-  // {
-  //   path: '/user',
-  //   name: 'userlist',
-  //   component: UserList
-  // },
+  {
+    path: '/user',
+    name: 'userlist',
+    component: UserList
+  },
   {
     path: '/assess',
     name: 'assesslist',

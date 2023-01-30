@@ -6,6 +6,7 @@ from django.contrib.auth.models import AbstractUser
 class RoleUser(models.Model):
     """ Роли пользователей """
     name = models.CharField(max_length=16, verbose_name=_("Название роли"))
+    codename = models.CharField(max_length=16, verbose_name=_("Кодовое имя"))
     class Meta:
         verbose_name = 'Роль пользователей'
         verbose_name_plural = 'Роли пользователей'
@@ -33,10 +34,9 @@ class User(AbstractUser):
     id_str = models.CharField(editable=False, unique=True, max_length=10)
     middle_name = models.CharField(max_length=32, verbose_name=_("Отчество"), null=True, blank=True)
     date_of_birth = models.DateField(max_length=10, verbose_name=_("Дата рождения"), null=True, blank=True)
-    gender = models.CharField(max_length=1, verbose_name=_("Пол"), choices=GENDER_CHOICES, default='O', blank=True)
+    gender = models.CharField(max_length=1, verbose_name=_("Пол"), choices=GENDER_CHOICES, default='O', null=True, blank=True)
     photo = models.ImageField(upload_to="member_photos", blank=True, verbose_name=_("Фотография"), null=True)
-    role = models.ManyToManyField('member.RoleUser', verbose_name=_("Роли пользователя"),
-                                      blank=True, related_name="role_user")
+    role = models.ManyToManyField('member.RoleUser', verbose_name=_("Роли пользователя"), blank=True, related_name="role_user")
     position = models.CharField(max_length=255, verbose_name=_("Должность"), blank=True, null=True)
     class Meta:
         verbose_name = 'Пользователь'
@@ -57,7 +57,7 @@ class User(AbstractUser):
 class ProfileStudent(models.Model):
     """ Дополнительный профиль студента """
     user = models.OneToOneField('member.User', verbose_name=_("Пользователь"), related_name='student',
-                                blank=True, null=True, on_delete=models.CASCADE)
+                                blank=True, null=True, on_delete=models.SET_NULL)
     short_name = models.CharField(max_length=32, verbose_name=_("Студент"), null=True, blank=True)
     id_dnevnik = models.CharField(verbose_name=_('ID системы Дневник.РУ'), max_length=40, blank=True, null=True)
     group = models.ForeignKey('assess.ClassGroup', verbose_name=_("Класс"), on_delete=models.SET_NULL,
@@ -77,11 +77,11 @@ class ProfileStudent(models.Model):
 class ProfileTeacher(models.Model):
     """ Дополнительный профиль учителя """
     user = models.OneToOneField('member.User', verbose_name=_("Пользователь"), related_name='teacher',
-                                blank=True, null=True, on_delete=models.CASCADE)
+                                blank=True, null=True, on_delete=models.SET_NULL)
     short_name = models.CharField(max_length=32, verbose_name=_("Учитель"), null=True, blank=True)
     id_dnevnik = models.CharField(verbose_name=_('ID системы Дневник.РУ'), max_length=40, blank=True, null=True)
-    departments = models.ManyToManyField('member.Department', verbose_name=_("Отдел"),
-                                      blank=True, related_name="teacher")
+    # departments = models.ManyToManyField('member.Department', verbose_name=_("Отдел"),
+    #                                   blank=True, related_name="teacher")
     
     class Meta:
         verbose_name = 'Профиль учителя'
