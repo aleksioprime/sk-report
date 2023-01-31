@@ -5,8 +5,10 @@ WORKDIR /app
 # Копируем файлы пакетов в контейнер и устанавливаем их
 COPY frontend/package*.json ./
 RUN npm install
+RUN ls -l
 # Копируем все файлы фронтенда и запускаем билд
 COPY frontend ./
+RUN ls -l
 RUN npm run build
 RUN ls -l
 COPY /app/dist /usr/share/nginx/html
