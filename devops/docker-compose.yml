@@ -1,21 +1,31 @@
-version: "3.7"
+version: "3.6"
 services:
-  igskolkovo:
-    container_name: igskolkovo
-    image: index.docker.io/aleksioprime/igskolkovo
+  frontend:
+    container_name: igskolkovo-frontend
+    image: index.docker.io/aleksioprime/igskolkovo-frontend
+    depends_on:
+      - backend
+    volumes:
+      - ./app/nginx:etc/nginx/conf.d
+    ports:
+      - "80:80"
+  backend:
+    container_name: igskolkovo-backend
+    image: index.docker.io/aleksioprime/igskolkovo-backend
+    command: bash -c "gunicorn django_cache.wsgi --bind 0.0.0.0:8000"
     environment:
       - POSTGRES_DB=igskolkovo
       - POSTGRES_USER=igadmin
       - POSTGRES_PASSWORD=Pox{@K
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
-    networks:
-      - local_net
+    volumes:
+      - ./backend:/backend
     depends_on:
-      - db
+      - postgres
     ports:
       - "8000:8000"
-  db:
+  postgres:
     container_name: postgres
     image: postgres:12.0-alpine
     volumes:
@@ -34,10 +44,3 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - $HOME/.docker/config.json:/config.json
     command: --interval 30
-    
-networks:
-  local_net:
-    driver: bridge
-
-volumes:
-  postgres_data:
