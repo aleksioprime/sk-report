@@ -1,13 +1,16 @@
 # frontend: node + js
 FROM node:lts-alpine as vue-stage
+
 WORKDIR /app
+
 COPY frontend/package*.json ./
 RUN npm install
 COPY frontend ./
+
 RUN npm run build
 
 # backend: django and nginx
-FROM nginx:1.17.4 as prod-stage
+FROM nginx:1.17.4-alpine as prod-stage
 WORKDIR /app
 
 RUN apk update \
