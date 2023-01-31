@@ -21,7 +21,7 @@ COPY --from=vue-stage /app/dist /usr/share/nginx/html
 COPY ./nginx_default.conf /etc/nginx/conf.d/default.conf
 
 COPY ./backend/requirements.txt ./
-RUN pip3 install -r requirements.txt
+RUN pip3 install -r requirements.txt --use-pep517
 RUN pip3 install gunicorn
 
 COPY ./backend/entrypoint.sh ./
