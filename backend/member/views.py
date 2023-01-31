@@ -18,7 +18,7 @@ from django.core.files.storage import FileSystemStorage
 from django.core.files.base import ContentFile
 from django.contrib.auth.hashers import make_password
 import csv
-import pandas as pd
+# import pandas as pd
 from django.forms.models import model_to_dict
 
 temp_storage = FileSystemStorage(location='tmp/')
@@ -121,49 +121,18 @@ class UserImportView(APIView):
         # reader = csv.reader(csv_file, delimiter=';')
         # next(reader)
         
-        dfs = pd.read_excel(tmp_file, engine='openpyxl').fillna('')
-        applicant_list = dfs.to_dict('records')
-        validated_list = [obj for obj in applicant_list if User.objects.filter(username=obj['username']).first() is None]
+        # dfs = pd.read_excel(tmp_file, engine='openpyxl').fillna('')
+        # applicant_list = dfs.to_dict('records')
+        # validated_list = [obj for obj in applicant_list if User.objects.filter(username=obj['username']).first() is None]
         
         temp_storage.delete(file_name)
-        # for obj in applicant_list:
-        #     if User.objects.filter(username=obj['username']).first() is None:
-        #         validated_list.append(obj)
-        # for i, item in dfs.iterrows():
-        #     item
-        #     object_list.append(User(
-        #         username=item['username'],
-        #         email=item['email'],
-        #         password=make_password(item['password']),
-        #         first_name=item['first_name'],
-        #         middle_name=item['middle_name'],
-        #         last_name=item['last_name'],
-        #         date_of_birth=item['date_of_birth'] or None,
-        #         gender=item['gender'],
-        #         position=item['position'],
-        #     ))
-            
-        
-        # for index, item in dfs.iterrows():
-        #     if User.objects.filter(username=item['username']).first() is None:
-        #         print(item)
-        #         user = User.objects.create(
-        #             username=item['username'],
-        #             email=item['email'],
-        #             password=make_password(item['password']),
-        #             first_name=item['first_name'],
-        #             middle_name=item['middle_name'],
-        #             last_name=item['last_name'],
-        #             date_of_birth=item['date_of_birth'] or None,
-        #             gender=item['gender'],
-        #             position=item['position'],
-        #         )
-        #         user.role.set([RoleUser.objects.filter(codename=x).first().id for x in item['role'].split(',')])
 
-        return Response({
-            'applicant_users': applicant_list,
-            'validated_users': validated_list,
-            'file_import': file_name})
+
+        # return Response({
+        #     'applicant_users': applicant_list,
+        #     'validated_users': validated_list,
+        #     'file_import': file_name})
+        return Response({'test': 'test'})
 
 class UserImportApply(APIView):
     def post(self, request):

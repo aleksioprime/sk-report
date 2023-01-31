@@ -10,11 +10,12 @@ COPY frontend ./
 RUN npm run build
 
 # backend: django and nginx
-FROM nginx:1.16.1-alpine as prod-stage
+FROM nginx:1.17.4-alpine as prod-stage
 WORKDIR /app
 
 RUN apk update \
-  && apk add --no-cache python3 py3-pip
+  && apk add --no-cache python3 py3-pip\
+  && pip3 install --upgrade pip setuptools
 
 COPY --from=vue-stage /app/dist /usr/share/nginx/html
 COPY ./nginx_default.conf /etc/nginx/conf.d/default.conf
