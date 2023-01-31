@@ -14,7 +14,7 @@ FROM nginx:1.22.1-alpine as prod-stage
 WORKDIR /app
 
 RUN apk update \
-  && apk add --no-cache python3=~3.7 \
+  && apk add --no-cache python3.7 \
   && pip3 install --no-cache --upgrade pip setuptools
 
 COPY --from=vue-build-stage /app/dist /usr/share/nginx/html
