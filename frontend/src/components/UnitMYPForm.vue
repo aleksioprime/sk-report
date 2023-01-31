@@ -174,7 +174,7 @@ export default {
     checkFieldsValidate() {
       this.modelValue.title ? this.errorField.title = false : this.errorField.title = true;
       this.modelValue.authors_ids.length ? this.errorField.teacher = false : this.errorField.teacher = true;
-      this.modelValue.grade ? this.errorField.grade = false : this.errorField.grade = true;
+      this.modelValue.class_year_id ? this.errorField.grade = false : this.errorField.grade = true;
       this.modelValue.subjects.length ? this.errorField.subjects = false : this.errorField.subjects = true;
       this.modelValue.hours ? this.errorField.hours = false : this.errorField.hours = true;
       this.modelValue.criteria_ids.length ? this.errorField.criteria = false : this.errorField.criteria = true;
