@@ -11,6 +11,6 @@ COPY frontend ./
 RUN ls -l
 RUN npm run build
 RUN ls -l
-COPY /app/dist /usr/share/nginx/html
+COPY /dist /usr/share/nginx/html
 # Запуск приложения
 # CMD [ "npm", "run", "serve" ]
