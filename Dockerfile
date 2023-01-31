@@ -10,7 +10,7 @@ COPY frontend ./
 RUN npm run build
 
 # backend: django and nginx
-FROM nginx:1.22.1-alpine as prod-stage
+FROM nginx:1.17.4-alpine as prod-stage
 WORKDIR /app
 
 RUN apk update \
