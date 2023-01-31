@@ -1,11 +1,11 @@
 # frontend: node + js
-FROM node:current-alpine as vue-build-stage
+FROM node:lts-alpine as vue-build-stage
 
 WORKDIR /app
 
-COPY ./frontend/package.json ./
+COPY frontend/package*.json ./
 RUN npm install
-COPY ./frontend .
+COPY frontend ./
 
 RUN npm run build
 
