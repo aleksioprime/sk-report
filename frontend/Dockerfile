@@ -1,5 +1,5 @@
 # Указываем Docker использовать образ Node.js в качестве базового
-FROM node:lts-alpine as build-vue
+FROM node:lts-alpine
 # Устанавливаем рабочий каталог контейнера 
 WORKDIR /app
 # Копируем файлы пакетов в контейнер и устанавливаем их
@@ -9,6 +9,6 @@ RUN npm install
 COPY frontend ./
 RUN npm run build
 RUN ls -l
-COPY --from=build-vue /app/dist /usr/share/nginx/html
+COPY /app/dist /usr/share/nginx/html
 # Запуск приложения
 # CMD [ "npm", "run", "serve" ]
