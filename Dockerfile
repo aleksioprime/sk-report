@@ -1,5 +1,5 @@
 # frontend: node + js
-FROM node:lts-alpine as vue-build-stage
+FROM node:lts-alpine as vue-stage
 
 WORKDIR /app
 
@@ -10,7 +10,7 @@ COPY frontend ./
 RUN npm run build
 
 # backend: django and nginx
-FROM python:3.7.6 as python-stage
+FROM python:3.7.6 as django-stage
 WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -29,9 +29,9 @@ COPY ./backend .
 FROM nginx:1.22.1-alpine as prod-stage
 WORKDIR /app
 
-COPY --from=vue-build-stage /app/dist /usr/share/nginx/html
+COPY --from=vue-stage /app/dist /usr/share/nginx/html
 COPY ./nginx_default.conf /etc/nginx/conf.d/default.conf
 
-CMD gunicorn --workers 4 --bind 0.0.0.0:5000 --daemon server:app \
+CMD --from=django-stage gunicorn --workers 4 --bind 0.0.0.0:5000 --daemon server:app \
   && sed -i -e "s/__PORT__/$PORT/" /etc/nginx/conf.d/default.conf \
   && nginx -g 'daemon off;'
