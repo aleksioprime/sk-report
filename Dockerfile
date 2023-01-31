@@ -15,7 +15,7 @@ WORKDIR /app
 
 RUN apk update \
   && apk add --no-cache python3 py3-pip\
-  && pip3 install --upgrade pip setuptools
+  && pip3 install --upgrade pip setuptools wheel
 
 COPY --from=vue-stage /app/dist /usr/share/nginx/html
 COPY ./nginx_default.conf /etc/nginx/conf.d/default.conf
