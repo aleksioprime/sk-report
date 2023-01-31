@@ -10,28 +10,26 @@ COPY frontend ./
 RUN npm run build
 
 # backend: django and nginx
-FROM python:3.7.6 as django-stage
+FROM nginx:1.22.1-alpine as prod-stage
 WORKDIR /app
 
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-RUN pip install --upgrade pip
+RUN apk update \
+  && apk add --no-cache python3 \
+  && pip3 install --upgrade pip setuptools
+
+COPY --from=vue-stage /app/dist /usr/share/nginx/html
+COPY ./nginx_default.conf /etc/nginx/conf.d/default.conf
 
 COPY ./backend/requirements.txt ./
-RUN pip install -r requirements.txt
+RUN pip3 install -r requirements.txt
 RUN pip3 install gunicorn
 
 COPY ./backend/entrypoint.sh ./
 RUN chmod +x entrypoint.sh
 ENTRYPOINT [ "./entrypoint.sh" ]
+
 COPY ./backend .
 
-FROM nginx:1.22.1-alpine as prod-stage
-WORKDIR /app
-
-COPY --from=vue-stage /app/dist /usr/share/nginx/html
-COPY ./nginx_default.conf /etc/nginx/conf.d/default.conf
-
-CMD --from=django-stage gunicorn --workers 4 --bind 0.0.0.0:5000 --daemon server:app \
+CMD gunicorn --workers 4 --bind 0.0.0.0:5000 --daemon server:app \
   && sed -i -e "s/__PORT__/$PORT/" /etc/nginx/conf.d/default.conf \
   && nginx -g 'daemon off;'
