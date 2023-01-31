@@ -11,7 +11,7 @@ COPY frontend ./
 RUN npm run build
 
 # Развёртывание сборки фронтенда в NGINX
-FROM nginx:lts-alpine
+FROM nginx:1.22.1-alpine
 RUN  apt-get update \
   && apt-get install -y wget \
   && rm -rf /var/lib/apt/lists/*
