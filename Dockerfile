@@ -10,7 +10,7 @@ COPY frontend ./
 RUN npm run build
 
 # backend: django and nginx
-FROM nginx:1.17.4-alpine as prod-stage
+FROM nginx:1.15.7-alpine as prod-stage
 WORKDIR /app
 
 RUN apk update \
@@ -21,7 +21,7 @@ COPY --from=vue-stage /app/dist /usr/share/nginx/html
 COPY ./nginx_default.conf /etc/nginx/conf.d/default.conf
 
 COPY ./backend/requirements.txt ./
-RUN pip3 install -r requirements.txt --use-pep517
+RUN pip3 install -r requirements.txt
 RUN pip3 install gunicorn
 
 COPY ./backend/entrypoint.sh ./
