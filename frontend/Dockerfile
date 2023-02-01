@@ -9,7 +9,6 @@ RUN npm install
 # Копируем все файлы фронтенда и запускаем билд
 COPY frontend ./
 RUN npm run build
-RUN ls
 
 # Развёртывание сборки фронтенда в NGINX
 FROM nginx:1.22.1
