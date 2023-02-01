@@ -12,5 +12,3 @@ EXPOSE 8000
 RUN pip install -r requirements.txt
 # Копируем все файлы из локального проекта в контейнер
 COPY backend /backend/
-# RUN ["chmod", "+x", "/backend/entrypoint.sh"]
-# ENTRYPOINT ["/backend/entrypoint.sh"]
