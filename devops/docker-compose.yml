@@ -5,8 +5,6 @@ services:
     image: index.docker.io/aleksioprime/igskolkovo-frontend
     depends_on:
       - backend
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
     ports:
       - "80:80"
     networks:
