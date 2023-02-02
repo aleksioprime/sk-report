@@ -22,13 +22,11 @@ from rest_framework_simplejwt.views import (
 )
 from django.conf import settings
 from django.conf.urls.static import static
-# from member.views import get_router_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include('member.urls')),
     path('api/v1/', include('curriculum.urls')),
-    # path('api/v1/', include(get_router_urls())),
     path('api/v1/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/v1/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/v1/token/verify/', TokenVerifyView.as_view(), name='token_verify'),

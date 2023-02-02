@@ -3,6 +3,7 @@
     <div class="me-3"><img :src='user.photo ? user.photo : require("@/assets/img/user.png")' alt="" width="50"></div>
     <div class="d-flex flex-column">
       <div class="user-name">{{ user.last_name }} {{ user.first_name }} {{ user.middle_name }}</div>
+      <div>Пользователь: {{ user.username }} ({{ user.email }})</div>
       <div>
         <div v-for="role in user.role" :key="role.id">
           {{ role.name }}

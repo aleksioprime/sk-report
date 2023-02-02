@@ -163,7 +163,6 @@ export default {
     },
     // Сброс информации о валидации формы
     resetValidForm() {
-      console.log('reset')
       for (let key in this.textAlert) {
         this.$refs[`${key}_alert`].innerText = "";
         if (!this.extraFields.includes(key)) { this.$refs[key].classList.remove('alert-field') };

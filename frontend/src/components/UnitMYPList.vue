@@ -186,7 +186,7 @@ export default {
       this.getGradesData('MYP');
       this.getLevelsData();
       this.resetValid = false;
-      this.unit.authors_ids.push(this.authUser.teacher.id);
+      this.authUser.teacher ? this.unit.authors_ids.push(this.authUser.teacher.id) : this.unit.authors_ids = [];
       this.modalUnit.show();
     },
     // Закрытие модального окна для создания юнита
@@ -245,7 +245,7 @@ export default {
     // Проверка у текущего пользователя прав администратора
     checkAdmin() {
       if (this.authUser) {
-        return this.authUser.role.map(item => item.codename).includes('admin')
+        return this.authUser.role.map(item => item.codename).includes('admin') || this.authUser.is_staff == true
       }
     },
     subjectFilter() {
@@ -267,7 +267,7 @@ export default {
     if (this.checkAdmin) {
       this.getTeachersData();
     } else {
-      this.queryTeacher = this.authUser.teacher.id;
+      this.authUser.teacher ? this.queryTeacher = this.authUser.teacher.id : this.queryTeacher = '';
     }
     this.getUnitsMYPData();
   },

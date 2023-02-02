@@ -41,8 +41,8 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ["id", "id_str", "username", "email", "first_name", "middle_name", 
                   "last_name", "last_login", "date_of_birth", "gender", "role", "student", 
-                  "teacher", "photo", 'roles_ids']
-        read_only_fields = ['photo']
+                  "teacher", "photo", 'roles_ids', 'is_staff']
+        read_only_fields = ['photo', 'is_staff']
         write_only_fields = ["password"]
         # extra_kwargs = {'username': {'required': False}, 'role': {'validators': []}}
         extra_kwargs = {

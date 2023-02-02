@@ -5,12 +5,12 @@
     </base-header>
     <transition name="fade">
       <div v-show="showMYPData">
-        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+        <ul class="nav nav-tabs mb-3" id="pills-tab" role="tablist">
           <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="pills-myp-tab" data-bs-toggle="pill" data-bs-target="#pills-myp" type="button" role="tab" aria-controls="pills-myp" aria-selected="true">MYP</button>
+            <button class="nav-link active" id="pills-myp-tab" data-bs-toggle="pill" data-bs-target="#pills-myp" type="button" role="tab" aria-controls="pills-myp" aria-selected="true">Программа средней школы (MYP)</button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link" id="pills-dp-tab" data-bs-toggle="pill" data-bs-target="#pills-dp" type="button" role="tab" aria-controls="pills-dp" aria-selected="false">DP</button>
+            <button class="nav-link" id="pills-dp-tab" data-bs-toggle="pill" data-bs-target="#pills-dp" type="button" role="tab" aria-controls="pills-dp" aria-selected="false">Программа средней школы (DP)</button>
           </li>
         </ul>
         <div class="tab-content" id="pills-tabContent">
@@ -70,5 +70,9 @@ export default {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+.nav-link.active {
+  background-color: #ffffff !important;
+  color: #495057;
 }
 </style>
