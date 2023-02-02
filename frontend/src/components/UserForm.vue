@@ -2,14 +2,14 @@
   <form>
     <div class="row mt-2">
       <div class="col">
-        <label for="first-name" class="form-label">Имя:</label>
-        <input id="first-name" class="form-control" type="text" v-model="modelValue.first_name" @input="updateFieldUnit('first_name', $event.target.value)" required>
-        <small ref="first_name_alert" class="alert-text"></small>
-      </div>
-      <div class="col">
         <label for="last-name" class="form-label">Фамилия:</label>
         <input id="last-name" class="form-control" type="text" v-model="modelValue.last_name" @input="updateFieldUnit('last_name', $event.target.value)" required>
         <small ref="last_name_alert" class="alert-text"></small>
+      </div>
+      <div class="col">
+        <label for="first-name" class="form-label">Имя:</label>
+        <input id="first-name" class="form-control" type="text" v-model="modelValue.first_name" @input="updateFieldUnit('first_name', $event.target.value)" required>
+        <small ref="first_name_alert" class="alert-text"></small>
       </div>
     </div>
     <div class="row mt-2">
