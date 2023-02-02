@@ -6,7 +6,7 @@
     <td>
       <a class="title" :href="`/unit/${unitplan.id}`">{{ unitplan.title }}</a>
       ({{ unitplan.hours }} ч.)<br>
-      <span v-if="checkInterdisciplinary" class="badge rounded-pill text-bg-primary me-1">МДП</span><br>
+      <span v-if="checkInterdisciplinary" class="badge rounded-pill text-bg-primary me-1">МДП<br></span>
       <span v-for="(sb, i) in unitplan.subjects" :key="i">{{ sb.subject.name_rus }}<br></span>
     </td>
     <td>
