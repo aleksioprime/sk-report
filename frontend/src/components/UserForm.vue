@@ -173,6 +173,7 @@ export default {
     // Наблюдение за переменной со списком ролей пользователя для сброса значений связанных данный учителя и студента
     'modelValue.roles_ids': {
       handler(value) {
+        if (value) {
           if (!value.includes(1)) {
             this.modelValue.student = {
               group: null,
@@ -180,6 +181,7 @@ export default {
           } else if (!value.includes(2)) {
             this.modelValue.teacher = {};
           }
+        }
       },
     },
     // Наблюдение за переменной-флагом необходимости валидации формы (запуск валидации при true)

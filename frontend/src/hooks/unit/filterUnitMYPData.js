@@ -33,7 +33,7 @@ export function getSubjectsFromDepartment(departments) {
 
 export function getSubjectsFromTeacher() {
     const subjectsFromTeacher = (teacher) => {
-        if (teacher.teacher) {
+        if (teacher) {
             let subjectTeacher = teacher.teacher.units.map(un => un.subjects).flat().map(sb => sb.subject);
             return [...new Map(subjectTeacher.map((item) => [item["id"], item])).values()]
         } else {

@@ -21,7 +21,7 @@
       </div>
       <div v-else class="col-md d-flex align-items-center my-2">
         <span>Учитель:&nbsp;</span> 
-        <span class="fw-bold">{{ authUser.last_name }} {{ authUser.first_name }} {{ authUser.middle_name }}</span>
+        <span class="fw-bold" v-if="authUser">{{ authUser.last_name }} {{ authUser.first_name }} {{ authUser.middle_name }}</span>
       </div>
       <div class="col-md-3 d-flex">
         <button type="button" class="btn btn-primary ms-auto mb-2 w-100" @click="showModalUnit">

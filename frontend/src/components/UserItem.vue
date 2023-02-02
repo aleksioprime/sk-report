@@ -4,10 +4,7 @@
     <div class="d-flex flex-column">
       <div class="user-name">{{ user.last_name }} {{ user.first_name }} {{ user.middle_name }}</div>
       <div>Пользователь: {{ user.username }} ({{ user.email }})</div>
-      <div>
-        <div v-for="role in user.role" :key="role.id">
-          {{ role.name }}
-        </div>
+      <div>Роли: <span v-for="role, index in user.role" :key="index"><span v-if="index != 0">, </span>{{ role.name }}</span>
       </div>
     </div>
   </div>
