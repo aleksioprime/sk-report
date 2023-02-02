@@ -41,7 +41,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ["id", "id_str", "username", "email", "first_name", "middle_name", 
                   "last_name", "last_login", "date_of_birth", "gender", "role", "student", 
-                  "teacher", "photo", 'roles_ids', 'is_staff']
+                  "teacher", "photo", 'roles_ids', 'is_staff', 'password']
         read_only_fields = ['photo', 'is_staff']
         write_only_fields = ["password"]
         # extra_kwargs = {'username': {'required': False}, 'role': {'validators': []}}
@@ -63,7 +63,7 @@ class UserSerializer(serializers.ModelSerializer):
             date_of_birth=validated_data.get('date_of_birth'),
             gender=validated_data.get('gender'),
         )
-        user.set_password(validated_data.get('password', '1qaz@WSX'))
+        user.set_password(validated_data.get('password'))
         user.save()
         user.role.set(validated_data.get('role'))
         roles_list = [x.id for x in validated_data.get('role')]
