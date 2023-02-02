@@ -29,14 +29,14 @@
       </div>
       <span class="navbar-text d-flex align-items-center" v-if="authUser">
         <img :src='authUser.photo ? authUser.photo : require("@/assets/img/user.png")' alt="" width="30" class="me-2">
-        <span>{{ authUser.first_name }} {{ authUser.last_name.slice(0, 1) }}.</span>
+        <span v-if="authUser.last_name && authUser.first_name">{{ authUser.first_name }} {{ authUser.last_name.slice(0, 1) }}.</span> 
+        <span v-else>{{ authUser.username }}</span>
       </span>
       <span class="ms-2">
         <a class="nav-link" href="#" @click="logout">
             Выход
           </a>
       </span>
-          
     </div>
   </nav>
 </template>
