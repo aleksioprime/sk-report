@@ -1,6 +1,18 @@
 # Проект SKReport
 
 ## Запуск приложения у разработчика
+### Подготовка базы данных
+1. Установить PostgreSQL (https://www.postgresql.org/download/)
+2. Открыть PSQL (в Linux - ввести *psql*, в Windows - открыть *SQL Shell*) из под администратора (например, с логином **postgre** и паролем **12345**)
+3. Создать пользователя *igadmin* с паролем *Pox{@K*:
+```
+CREATE USER igadmin WITH PASSWORD 'Pox{@K';
+```
+4. Создать базу данных *igskolkovo* и дать все права к ней пользователю *igadmin*:
+```
+postgres=# CREATE DATABASE igskolkovo WITH owner=postgres ENCODING = 'UTF-8' lc_collate = 'en_US.utf8' lc_ctype = 'en_US.utf8' template template1;
+postgres=# GRANT ALL PRIVILEGES ON DATABASE "igskolkovo" to igadmin;
+```
 ### Запуск бэкенда:
 1. Создать каталог на локальном компьютере и загрузить в него репозиторий через команды **Code -> Download ZIP** или через команду терминала:
 ```
@@ -8,7 +20,7 @@ git clone https://https://github.com/aleksioprime/igskolkovo
 ```
 2. Установить виртуальное окружение для Python (используется версия 3.7.9):
 ```
-pip install  virtualenv
+pip install virtualenv
 python -m venv <название каталога>
 ```
 Примечание. В MacOS используются команды *pip3* и *python3*
@@ -67,7 +79,7 @@ npm run build
 npm run serve
 ```
 
-## Запуск приложения у разработчика
+## Запуск приложения на сервере
 
 1. Установить сервер на Ubintu (текущая версия 20.04) с Docker из маркетплейса
 2. Загрузить папку *devops* на сервер в домашний каталог
@@ -91,18 +103,7 @@ docker exec -it CONTAINER_ID python3 manage.py loaddata data.json
 ```
 
 ## Справочные материалы
-### Создание базы данных PostgreSQL
-1. Открыть PSQL (в Linux - ввести *psql*, в Windows - открыть *SQL Shell*) из под администратора (например, с логином **postgre** и паролем **12345**)
-2. Создать пользователя *igadmin* с паролем *Pox{@K*:
-```
-CREATE USER igadmin WITH PASSWORD 'Pox{@K';
-```
-3. Создать базу данных *igskolkovo* и дать все права к ней пользователю *igadmin*:
-```
-postgres=# CREATE DATABASE igskolkovo WITH owner=postgres ENCODING = 'UTF-8' lc_collate = 'en_US.utf8' lc_ctype = 'en_US.utf8' template template1;
-postgres=# GRANT ALL PRIVILEGES ON DATABASE "igskolkovo" to igadmin;
-```
-**Примечание**
+### Работа в PostgreSQL
 - Резервное копирования и восстановление данных из БД PostgreSQL:
 ```
 pg_dump -U user_name database_name > file_name.dump
@@ -117,8 +118,8 @@ psql -U user_name database_name < file_name.dump
 ```
 DROP DATABASE <название базы>;
 ```
-## Server
-### Удаление всех контейнеров и образов:
+### Работа с Docker
+- Удаление всех контейнеров и образов:
 ```
 docker kill $(docker ps -q)
 docker rm $(docker ps -a -q)
