@@ -15,7 +15,7 @@
           <button type="button" class="btn btn-secondary" @click="$emit('cancel')">Отмена</button>
           <button v-if="flagUser.addUser" type="button" class="btn btn-primary" @click="$emit('create')">Добавить</button>
           <button v-if="flagUser.editUser" type="button" class="btn btn-primary" @click="$emit('update')">Сохранить</button>
-          <button v-if="flagUser.delUser" type="button" class="btn btn-primary" @click="$emit('delete')">Удалить</button>
+          <button v-if="flagUser.deleteUser" type="button" class="btn btn-primary" @click="$emit('delete')">Удалить</button>
           <button v-if="flagUser.import" type="button" class="btn btn-primary" @click="$emit('import')">Загрузить</button>
         </div>
       </div>
@@ -29,7 +29,7 @@ export default {
   props: {
     modalTitle: {
       type: String,
-      default: 'Заголовк окна'
+      default: 'Заголовок окна'
     },
     flagUser: {
       type: Object,

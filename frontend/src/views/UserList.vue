@@ -27,7 +27,7 @@
         <user-form v-if="flagUser.addUser || flagUser.editUser" v-model="currentUser" :roles="roles" :groups="groups"
           :addMode="flagUser.addUser" :checkValid="checkValid" @validForm="validFormResult" />
         <user-import-form v-if="flagUser.import" v-model="newUsers" />
-        <div v-if="flagUser.delUser">Вы действительно хотите удалить этого пользователя?</div>
+        <div v-if="flagUser.deleteUser">Вы действительно хотите удалить этого пользователя?</div>
       </template>
     </modal-user>
     <transition name="fade">
@@ -234,6 +234,7 @@ export default {
       this.checkValid = true;
       if (this.validForm) {
         this.axios.post('/user', this.currentUser).then((response) => {
+          this.currentUser = {};
           this.userCancel();
           this.getUserData();
         }).catch((error) => {
@@ -246,10 +247,9 @@ export default {
       this.checkValid = true;
       if (this.validForm) {
         this.axios.put(`/user/${this.currentUser.id}`, this.currentUser).then((response) => {
-          this.getUserData();
-          this.checkValid = false;
           this.currentUser = this.users.find(item => item.id == this.currentUser.id);
-          this.modalUser.hide();
+          this.userCancel();
+          this.getUserData();
         }).catch((error) => {
           console.log('Ошибка запроса: ', error);
         });
@@ -259,7 +259,7 @@ export default {
     userDelete() {
       this.axios.delete(`/user/${this.currentUser.id}`, this.currentUser).then((response) => {
         this.currentUser = {};
-        this.modalUser.hide();
+        this.userCancel();
         this.getUserData();
       }).catch((error) => {
         console.log('Ошибка запроса: ', error);
@@ -284,7 +284,7 @@ export default {
           console.log(response);
           this.users = response.data;
           this.currentUser = {};
-          this.modalUser.hide();
+          this.userCancel();
         })
         .catch((error) => {
           console.log(error);
