@@ -35,23 +35,27 @@ pip3 install -r requirements.txt
 <название каталога>\Scripts\activate.bat
 pip install -r requirements.txt
 ```
-4. Перейти в каталог бэкенда в терминале, подготовить и выполнить миграции:
+4. Установить переменные виртуальное окружения для подключения к базе данных:
+```
+set POSTGRES_PORT="5432" & set POSTGRES_HOST="localhost" & set POSTGRES_DB="igskolkovo" & set POSTGRES_USER="igadmin" & set POSTGRES_PASSWORD="Pox{@K"
+```
+5. Перейти в каталог бэкенда в терминале, подготовить и выполнить миграции:
 ```
 python manage.py makemigrations
 python manage.py migrate
 ```
-5. Создать суперпользователя (возможно пропустить при наличии фикстур):
+6. Создать суперпользователя (возможно пропустить при наличии фикстур):
 ```
 python manage.py createsuperuser
 superuser: alexprime
 email: aleksioprime@gmail.com
 password: A0Ru$$22
 ```
-6. Импортировать статические файлы:
+7. Импортировать статические файлы:
 ```
 python manage.py collectstatic
 ```
-7. Загрузить фикстуры в БД из JSON:
+8. Загрузить фикстуры в БД из JSON:
 ```
 python manage.py loaddata data.json 
 ```
@@ -60,7 +64,7 @@ python manage.py loaddata data.json
 python manage.py dumpdata > data.json 
 python -Xutf8 manage.py dumpdata > data.json 
 ```
-6. Запустить сервер Django
+9. Запустить сервер Django
 ```
 python manage.py runserver
 ```
@@ -74,7 +78,7 @@ npm install
 ```
 npm run build
 ```
-3. Запустить сервер:
+3. Запустить сервер Vue:
 ```
 npm run serve
 ```
