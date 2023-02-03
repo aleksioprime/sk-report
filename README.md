@@ -37,7 +37,11 @@ pip install -r requirements.txt
 ```
 4. Установить переменные виртуальное окружения для подключения к базе данных:
 ```
-set POSTGRES_PORT="5432" & set POSTGRES_HOST="localhost" & set POSTGRES_DB="igskolkovo" & set POSTGRES_USER="igadmin" & set POSTGRES_PASSWORD="Pox{@K"
+set POSTGRES_PORT=5432
+set POSTGRES_HOST=localhost
+set POSTGRES_DB=igskolkovo
+set POSTGRES_USER=igadmin
+set POSTGRES_PASSWORD=Pox{@K
 ```
 5. Перейти в каталог бэкенда в терминале, подготовить и выполнить миграции:
 ```
