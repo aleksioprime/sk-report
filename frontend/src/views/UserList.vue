@@ -150,7 +150,7 @@ export default {
         { value: 'first_name', name: 'По имени' },
       ],
       currentPage: 1,
-      pageSize: 5,
+      pageSize: 10,
       totalPages: 1,
       checkValid: false,
       validForm: false,
