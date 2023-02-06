@@ -13,12 +13,10 @@ from django.conf import settings
 from django.http import HttpResponse
 
 import os
-from io import BytesIO
-import pypandoc
-
+# from io import BytesIO
+# import pypandoc
 from htmldocx import HtmlToDocx
 from docx import Document
-
 import tempfile
 
 # Набор методов для просмотра, редактирования и удаления текущей записи UnitPlannerMYP
