@@ -208,11 +208,11 @@ export default {
       if (this.searchAuthors == '') {
         return this.teachers.filter(teacher => this.modelValue.authors_ids.includes(teacher.id))
       } 
-      return this.authors_list.filter((teacher) => {
+      return this.teachers.filter((teacher) => {
         if (teacher.user) {
-          return teacher.user.last_name.toLowerCase().includes(this.searchAuthors.toLowerCase()) || this.editUnit.authors_ids.includes(teacher.id)
+          return teacher.user.last_name.toLowerCase().includes(this.searchAuthors.toLowerCase()) || this.modelValue.authors_ids.includes(teacher.id)
         } else {
-          return this.editUnit.authors_ids.includes(teacher.id)
+          return this.modelValue.authors_ids.includes(teacher.id)
         }
       })
     },

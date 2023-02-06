@@ -38,8 +38,8 @@
     <!-- Блок таблицы и дополнительной фильтрации -->
     <div class="row">
       <!-- Фильтрация по предмету и году обучения -->
-      <div class="col-md-3">
-        <div class="d-flex flex-md-column align-items-center align-items-md-start flex-wrap">
+      <div class="col-lg-3">
+        <div class="d-flex flex-lg-column align-items-center align-items-lg-start flex-wrap">
           <div class="form-check me-2">
             <input class="form-check-input" type="radio" name="subject" :value="''" :id="'subject-x'" v-model="querySubject" @change="refreshUnitBySubject">
             <label class="form-check-label" :for="'subject-x'">
@@ -55,7 +55,7 @@
             </div>
           </div>
         </div>
-        <div class="d-flex flex-md-column align-items-center align-items-md-start" v-if="yearsFromUnits.length > 0">
+        <div class="d-flex flex-lg-column align-items-center align-items-lg-start" v-if="yearsFromUnits.length > 0">
           <div class="my-3 me-2">Года обучения</div>
           <div class="me-2" v-for="year in yearsFromUnits" :key="year.id">
             <div class="form-check">
@@ -68,7 +68,7 @@
         </div>
       </div>
       <!-- Таблица вывода юнитов MYP -->
-      <div class="col-md table-responsive p-2">
+      <div class="col-lg table-responsive p-2">
         <table class="table table-sm table-bordered mt-0">
           <thead>
             <tr class="align-middle">
