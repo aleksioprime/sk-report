@@ -8,7 +8,7 @@
       ({{ unitplan.hours }} ч.)<br>
       <span v-if="checkInterdisciplinary" class="badge rounded-pill text-bg-primary me-1">МДП<br></span>
       <span v-for="(sb, i) in unitplan.subjects" :key="i">{{ sb.subject.name_rus }}<br></span>
-      <a href="#" @click="$emit('export', unitplan.id)">Экспорт в word</a>
+      <a href="#" @click="$emit('export', unitplan)">Экспорт в word</a>
     </td>
     <td>
       <div v-if="unitplan.key_concepts.length > 0">

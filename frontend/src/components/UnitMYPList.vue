@@ -213,19 +213,19 @@ export default {
       }
     },
     // Экспорт юнита
-    exportUnit(id) {
-      console.log(id)
+    exportUnit(unit) {
+      console.log(unit)
       // const data = { 'unit': id };
       // this.axios.post('/unitplans/export', data).then((response) => console.log(response));
       const config = {
         responseType: 'blob',
         params: {
-          unit: id,
+          unit: unit.id,
         }
       }
       this.axios.get('/unitplans/myp/export', config).then((response) => {
         console.log(response);
-        saveAs(response.data, 'unitplan.docx');
+        saveAs(response.data, `${unit.title.replace(/ /g,"_")}.docx`);
       });
     },
     // Обновление юнитов при выборе подразделения
