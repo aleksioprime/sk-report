@@ -26,6 +26,10 @@
   /* white-space: pre-wrap; */
 }
 
+.unit-field-data p {
+  margin-bottom: 0;
+}
+
 .unit-field-editing {
   border: 0.5px solid #ffbf40;
 }
@@ -102,7 +106,7 @@
   min-width: 25px;
   min-height: 25px;
   cursor: pointer;
-  margin-left: 5px;
+  margin: 5px;
 }
 .img-btn-add {
   background: url('@/assets/img/add-btn.png') no-repeat 50%;

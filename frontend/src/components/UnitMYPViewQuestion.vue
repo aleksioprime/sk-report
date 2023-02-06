@@ -1,19 +1,20 @@
 <template>
   <div class="unit-field-data"> 
-    <table class="table table-bordered">
+    <table class="table">
       <thead>
         <tr>
           <th scope="col" style="width: 150px">Тип</th>
           <th scope="col">Вопрос</th>
-          <th scope="col" style="width: 30%">Исследование</th>
           <th style="width: 40px"></th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="inq in unit.inquestions" :key="inq.id" :class="{'item-editing': selectItem == inq.id}">
-          <td>{{ findType(inq.type_inq).name }}</td>
-          <td>{{ inq.question }}</td>
-          <td>{{ inq.line }}</td>
+          <td><div class="badge" :class="classTypeQuestion(inq)">{{ findType(inq.type_inq).name }}</div></td>
+          <td>
+            <div>{{ inq.question }}</div>
+            <div v-if="inq.line">{{ inq.line }}</div>
+          </td>
           <td>
             <div class="img-btn-all">
               <div class="img-btn-edit" @click="editButton(inq)"></div>
@@ -156,11 +157,19 @@ export default {
           this.modalDelete.hide();
         });
     },
+    classTypeQuestion(inq) {
+      return {
+        'text-bg-primary': inq.type_inq == 'Factual',
+        'text-bg-info': inq.type_inq == 'Conceptual',
+        'text-bg-warning': inq.type_inq == 'Debatable',
+      }
+    }
   },
   mounted() {
     this.modalDelete = new Modal(`#modalDelete${this.idName}`, { backdrop: 'static' });
   },
   computed: {
+    
   },
   watch: {
     addMode() {

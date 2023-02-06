@@ -1,31 +1,35 @@
 <template>
   <div class="unit-field-data"> 
-    <table class="table table-bordered">
+    <table class="table">
       <thead>
         <tr>
-          <th scope="col" style="width: 20%">ATL</th>
-          <th scope="col">Предметная цель</th>
-          <th scope="col" style="width: 40%">Описание учебных действий</th>
-          <th style="width: 40px"></th>
+          <th scope="col" style="width: 40%">ATL и предметная цель</th>
+          <th scope="col">Описание учебных действий</th>
+          <th style="width: 50px"></th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="map in unit.atlmapping" :key="map.id" :class="{'item-editing': selectItem == map.id}">
-          <td>
-            {{ map.atl.name_eng }} <span v-if="map.atl.description_eng"><i>({{ map.atl.description_eng }})</i></span><br>
-            <b>{{ map.atl.cluster.name_eng }}</b>
-          </td>
-          <td><b>{{ map.strand.criterion.letter }}{{ map.strand.letter }}:</b> {{ firstLetterBig(map.strand.name_eng) }}</td>
-          <td>{{ map.action }}</td>
-          <td>
-            <div class="img-btn-all">
-              <div class="img-btn-edit" @click="editButton(map)"></div>
-              <div class="img-btn-del" @click="showModalDelete(map)"></div>
-            </div>
-          </td>
-        </tr>
+        <template v-for="map in unit.atlmapping" :key="map.id" :class="{'item-editing': selectItem == map.id}">
+          <tr>
+            <td>
+              {{ map.atl.name_eng }} <span v-if="map.atl.description_eng"><i>({{ map.atl.description_eng }})</i></span> (<b>{{ map.atl.cluster.name_eng }}</b>)
+            </td>
+            <td rowspan="2" class="border">
+              {{ map.action }}
+            </td>
+            <td rowspan="2">
+              <div class="img-btn-all flex-column">
+                <div class="img-btn-edit" @click="editButton(map)"></div>
+                <div class="img-btn-del" @click="showModalDelete(map)"></div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><b>{{ map.strand.criterion.letter }}{{ map.strand.letter }}:</b> {{ firstLetterBig(map.strand.name_eng) }}</td>
+          </tr>
+        </template>
         <tr>
-          <td colspan="4">
+          <td colspan="3">
             <transition name="slide-fade">
               <div ref="form">
                 <div class="btn btn-primary" @click="addButton" v-if="!addMode && !editMode">Добавить</div>

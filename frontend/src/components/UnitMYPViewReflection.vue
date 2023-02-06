@@ -7,7 +7,10 @@
     <div v-if="filteredReflections.length" class="my-2">
       <div v-for="rf in filteredReflections" :key="rf.id" class="my-2">
         <div class="d-flex border p-2">
-          <div>"{{ rf.post }}" - <span>{{ rf.author.short_name }}</span></div>
+          <div>
+            <div>{{ rf.post }}</div>
+            <div>- {{ rf.author.user.last_name }} {{ rf.author.user.first_name }} {{ rf.author.user.middle_name }}</div>
+          </div>
           <div v-if="authUser.teacher.id == rf.author.id" class="img-btn-all ms-auto">
             <div class="img-btn-edit" @click="editButton(rf)"></div>
             <div class="img-btn-del" @click="showModalDelete(rf)"></div>
@@ -22,6 +25,14 @@
         <div v-if="addMode || editMode">
           <div class="my-2">
             <textarea class="form-control mb-2" type="text" v-model="reflection.post" placeholder="Вводите здесь текст..."></textarea>
+            <div class="my-2">
+              <select id="author" class="form-select mb-2" v-model="reflection.author_id">
+                <option value="-">Выберите автора</option>
+                <option v-for="(author, i) in teachers" :key="i" :value="author.id">
+                  {{ author.user.last_name }} {{ author.user.first_name }} {{ author.user.middle_name }}
+                </option>
+              </select>
+            </div>
           </div>
           <div class="my-2">
             <button class="btn btn-success me-2" type="button" @click="submitAdd" v-if="addMode" >Добавить</button>
@@ -40,6 +51,7 @@
 <script>
 import { Modal } from 'bootstrap';
 import { mapGetters } from 'vuex';
+import { getTeachers } from "@/hooks/unit/getUnitMYPList"
 
 export default {
   name: 'unit-myp-view-reflection',
@@ -47,6 +59,13 @@ export default {
     unit: Object,
     categoryValue: '',
     categoryText: Object,
+  },
+  setup(props) {
+    // Получение функции запроса списка учителей
+    const { teachers, getTeachersData } = getTeachers();
+    return {
+      teachers, getTeachersData
+    }
   },
   data() {
     return {
@@ -61,12 +80,15 @@ export default {
   methods: {
     // Функция активации режима добавления записи
     addButton() {
+      this.getTeachersData();
+      this.reflection.author_id = this.authUser.teacher.id;
       this.addMode = true;
       this.editMode = false;
       this.$refs.form.scrollIntoView(true);
     },
     // Функция активации режима редактирования записи
     editButton(item) {
+      this.getTeachersData();
       this.editMode = true;
       this.addMode = false;
       this.selectItem = item.id;
@@ -92,7 +114,6 @@ export default {
     submitAdd() {
       this.addMode = false;
       this.reflection.planner = this.unit.id;
-      this.reflection.author_id = this.authUser.teacher.id;
       this.reflection.type_post = this.categoryValue;
       this.axios.post('/unitplans/myp/reflection', this.reflection)
         .then(() => {

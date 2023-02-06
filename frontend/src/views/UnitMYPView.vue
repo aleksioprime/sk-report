@@ -235,7 +235,7 @@
               <template v-slot:read="data">
                 <field-list-view :options="unit[data.field]" v-slot="selectData">
                   <span><b>{{ selectData.field.name_eng }}</b></span>:<br>
-                  <small>{{ selectData.field.description_eng }}</small>
+                  <div class="ms-3"><small>{{ selectData.field.description_eng }}</small></div>
                 </field-list-view>
               </template>
               <template v-slot:edit="data">
@@ -259,7 +259,7 @@
                   <span v-if="checkInterdisciplinary" >
                     (<span v-for="(rs, index) in selectData.field.subject_directions" :key="rs.id"><span v-if="index != 0">, </span>{{ rs.name_eng }}</span>)
                   </span><br>
-                  <small>{{ selectData.field.description_eng }}</small>
+                  <div class="ms-3"><small>{{ selectData.field.description_eng }}</small></div>
                 </field-list-view>
               </template>
               <template v-slot:edit="data">
@@ -284,8 +284,8 @@
             <unit-field :fieldName="'global_context'" :fieldData="unit.global_context" :fieldEditing="fieldCurrent" :checkLoad="Boolean(global_context_list.length)"
                @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
                <template v-slot:read="data">
-                  <span><b>{{ unit[data.field].name_eng }}</b></span>:<br>
-                  <small>{{ unit[data.field].description_eng }}</small>
+                  <div><b>{{ unit[data.field].name_eng }}</b>:</div>
+                  <div class="ms-3"><small>{{ unit[data.field].description_eng }}</small></div>
               </template>
               <template v-slot:edit="data">
                 <field-radio-edit v-model="editUnit[`${data.field}_id`]" :options="this[`${data.field}_list`]"
@@ -300,7 +300,7 @@
               @edit="editMode" @save="submitEdit" @cancel="cancelEdit" v-if="unit.global_context">
               <template v-slot:read="data">
                 <field-list-view :options="unit[data.field]" v-slot="selectData">
-                  <span>{{ selectData.field.name_eng }}</span>
+                  <span>- {{ selectData.field.name_eng }}</span>
                 </field-list-view>
               </template>
               <template v-slot:edit="data">
@@ -330,8 +330,8 @@
               <template v-slot:read="data"> 
                 <div v-for="(value, field) in groupedField(unit[data.field], 'subject_group')" :key="field">
                   <div v-if="checkInterdisciplinary" class="my-2"><b>{{ subjectGroupUnit.find(item => item.id == field).name_eng }}</b></div>
-                  <field-list-view :options="value" v-slot="selectData" class="ms-3">
-                    <span>{{ firstLetterBig(selectData.field.name_eng) }}</span>
+                  <field-list-view :options="value" v-slot="selectData" class="">
+                    <span>- {{ firstLetterBig(selectData.field.name_eng) }}</span>
                   </field-list-view>
                 </div>
               </template>
@@ -350,7 +350,7 @@
               <template v-slot:read="data">
                 <div v-for="(value, field) in groupedField(unit[data.field], 'subject_group')" :key="field">
                   <div v-if="checkInterdisciplinary" class="my-2"><b>{{ subjectGroupUnit.find(item => item.id == field).name_eng }}</b></div>
-                  <field-list-view :options="value" v-slot="selectData" class="ms-3">
+                  <field-list-view :options="value" v-slot="selectData" class="">
                     <b>{{ selectData.field.letter }}.</b> {{ selectData.field.name_eng }}
                   </field-list-view>
                 </div>
@@ -369,7 +369,7 @@
                 <div v-for="(valueSG, fieldSG) in groupedField(unit[data.field], 'criterion', 'subject_group')" :key="fieldSG">
                   <div v-if="checkInterdisciplinary" class="my-1"><b>{{ getFieldData(subjectGroupUnit, fieldSG).name_eng }}</b></div>
                   <div v-for="(valueCR, fieldCR) in groupedField(valueSG, 'criterion')" :key="fieldCR">
-                    <div v-if="checkInterdisciplinary" class="mt-1"><b>{{ getFieldData(criteriaStrandsUnit, fieldCR).letter }}. {{ getFieldData(criteriaStrandsUnit, fieldCR).name_eng }}</b></div>
+                    <div class="mt-1" ><b>{{ getFieldData(criteriaStrandsUnit, fieldCR).letter }}. {{ getFieldData(criteriaStrandsUnit, fieldCR).name_eng }}</b></div>
                     <field-list-view :options="valueCR" v-slot="selectData" class="ms-3">
                       <span><b>{{ selectData.field.letter }}:</b> {{ firstLetterBig(selectData.field.name_eng) }}</span>
                     </field-list-view>
