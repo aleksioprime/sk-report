@@ -35,6 +35,7 @@ pip3 install -r requirements.txt
 <название каталога>\Scripts\activate.bat
 pip install -r requirements.txt
 ```
+Примечание. Для запуска интерпретатора Python из виртуальной среды в VS Code нужно нажать Ctrl + Shift + P
 4. Установить переменные виртуальное окружения для подключения к базе данных:
 ```
 set POSTGRES_PORT=5432

@@ -84,7 +84,7 @@
           <tbody v-if="Object.keys(groupedUnits).length !== 0">
             <template v-for="(units, grade) in groupedUnits" :key="grade">
               <tr><td colspan="7" class="text-center bg-light fw-bold" v-if="findGrade(grade)">{{ findGrade(grade).year_ib }} ({{ findGrade(grade).year_rus }} класс)</td></tr>
-              <unit-myp-item v-for="(unitplan, index) in units" :key="unitplan.id" :unitplan="unitplan" :index="index + 1"/>
+              <unit-myp-item v-for="(unitplan, index) in units" :key="unitplan.id" :unitplan="unitplan" :index="index + 1" @export="exportUnit"/>
             </template>
           </tbody>
           <tbody v-else>
@@ -103,6 +103,7 @@
 import { Modal } from 'bootstrap';
 import { toRefs } from 'vue';
 import { mapGetters } from 'vuex'
+import { saveAs } from 'file-saver';
 // импорт компонентов формы создания юнита и вывода SSO
 import UnitMypForm from "@/components/UnitMYPForm.vue";
 import UnitMypItem from "@/components/UnitMYPItem";
@@ -210,6 +211,22 @@ export default {
           this.getUnitsMYPData();
         });
       }
+    },
+    // Экспорт юнита
+    exportUnit(id) {
+      console.log(id)
+      // const data = { 'unit': id };
+      // this.axios.post('/unitplans/export', data).then((response) => console.log(response));
+      const config = {
+        responseType: 'blob',
+        params: {
+          unit: id,
+        }
+      }
+      this.axios.get('/unitplans/myp/export', config).then((response) => {
+        console.log(response);
+        saveAs(response.data, 'unitplan.docx');
+      });
     },
     // Обновление юнитов при выборе подразделения
     refreshUnitByDepartment() {

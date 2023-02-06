@@ -197,7 +197,7 @@ class UnitMYPSerializerViewEdit(serializers.ModelSerializer):
                   'summative_assessment_soi', 'peer_self_assessment', 'standardization_moderation', 'prior_experiences', 'learning_experiences', 'teaching_strategies', 
                   'teaching_strategies', 'student_expectations', 'feedback', 'differentiation', 'criteria_ids', 'learner_profile_ids', 
                   'aims_ids', 'global_context_id', 'explorations_ids', 'key_concepts_ids', 'related_concepts_ids', 'class_year_id', 'authors_ids', 
-                  'inquestions', 'atlmapping', 'reflections', 'strands_ids', 'subjects', 'inter'
+                  'inquestions', 'atlmapping', 'reflections', 'strands_ids', 'subjects', 'inter', 'resources'
                   ]
         extra_kwargs = {
             'title': {'required': False},

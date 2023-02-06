@@ -4,8 +4,10 @@
     <editor api-key="j30bef5hr2ipfdbu7b9lww7t4oez2v6f27c94otp9to2j9mk" 
       :init="{ plugins: 'lists link wordcount autoresize',
                menubar: false,
-               toolbar: 'undo redo | blocks | bold italic | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist '}" 
-      model-events="change keydown blur focus paste" v-model="modelValue" @selectionChange="updateInput"/>
+               toolbar: 'undo redo | bold italic | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist '}" 
+      model-events="change keydown blur focus paste" 
+      output-format="html"
+      v-model="modelValue" @selectionChange="updateInput"/>
   </div>
 </template>
   

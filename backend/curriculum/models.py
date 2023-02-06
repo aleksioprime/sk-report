@@ -385,6 +385,7 @@ class UnitPlannerMYP(models.Model):
     student_expectations = models.TextField(verbose_name=_("Ожидания студентов"), null=True, blank=True)
     feedback = models.TextField(verbose_name=_("Обратная связь"), null=True, blank=True)
     differentiation = models.TextField(verbose_name=_("Дифференцированный подход"), null=True, blank=True)
+    resources = models.TextField(verbose_name=_("Ресурсы"), null=True, blank=True)
     # Посты обратной связи от педагогов добавляются в связанных таблицах
     class Meta:
         verbose_name = 'UnitPlan MYP: Основные данные юнита'

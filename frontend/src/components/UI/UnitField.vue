@@ -200,6 +200,10 @@ export default {
           label: 'Междисциплинарные связи',
           description: 'Опишите междисциплинарные связи'
         },
+        resources: { 
+          label: 'Ресурсы',
+          description: 'Укажите ресурсы'
+        },
         inter_aims: { 
           label: 'Общие цели',
           description: 'Выберите междисциплинарные общие цели'

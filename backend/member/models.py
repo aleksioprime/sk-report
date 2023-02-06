@@ -77,12 +77,11 @@ class ProfileStudent(models.Model):
 class ProfileTeacher(models.Model):
     """ Дополнительный профиль учителя """
     user = models.OneToOneField('member.User', verbose_name=_("Пользователь"), related_name='teacher',
-                                blank=True, null=True, on_delete=models.SET_NULL)
+                                blank=True, null=True, on_delete=models.CASCADE)
     short_name = models.CharField(max_length=32, verbose_name=_("Учитель"), null=True, blank=True)
     id_dnevnik = models.CharField(verbose_name=_('ID системы Дневник.РУ'), max_length=40, blank=True, null=True)
     # departments = models.ManyToManyField('member.Department', verbose_name=_("Отдел"),
     #                                   blank=True, related_name="teacher")
-    
     class Meta:
         verbose_name = 'Профиль учителя'
         verbose_name_plural = 'Профили учителей'
@@ -93,9 +92,9 @@ class ProfileTeacher(models.Model):
         if not self.short_name:
             if self.user:
                 if self.user.middle_name:
-                    self.short_name = "{} {} {}.".format(self.user.first_name, self.user.middle_name, self.user.last_name[0])
+                    self.short_name = "{} {}. {}.".format(self.user.last_name, self.user.first_name[0], self.user.middle_name[0], )
                 else:
-                    self.short_name = "{} {}.".format(self.user.first_name, self.user.last_name[0])
+                    self.short_name = "{} {}.".format(self.user.last_name, self.user.first_name[0])
         super(ProfileTeacher, self).save(*args, **kwargs)
 
 class WorkLoad(models.Model):

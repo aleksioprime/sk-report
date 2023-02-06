@@ -2,7 +2,8 @@ from django.urls import path
 from curriculum.views import UnitPlannerMYPViewEdit, UnitPlannerMYPListCreate, TeacherViewSet, ClassYearViewSet, \
     SubjectViewSet, CriterionViewSet, DepartmentViewSet, LearnerProfileIBViewSet, SkillATLViewSet, ObjectiveViewSet, StrandViewSet, \
     AimViewSet, GlobalContextViewSet, ExplorationToDevelopViewSet, KeyConceptViewSet, RelatedConceptViewSet, \
-    InQuestionMYPViewSet, ATLMappingMYPViewSet, ReflectionMYPViewSet, LevelViewSet, UnitPlannerMYPIDViewSet, SubjectLevelMYPViewSet
+    InQuestionMYPViewSet, ATLMappingMYPViewSet, ReflectionMYPViewSet, LevelViewSet, UnitPlannerMYPIDViewSet, \
+    SubjectLevelMYPViewSet, UnitExport
 
 urlpatterns = [
     path('unitplans/myp', UnitPlannerMYPListCreate.as_view({'get': 'list', 'post': 'create'})),
@@ -22,6 +23,7 @@ urlpatterns = [
     path('explorations', ExplorationToDevelopViewSet.as_view({'get': 'list'})),
     path('kconcepts', KeyConceptViewSet.as_view({'get': 'list'})),
     path('rconcepts', RelatedConceptViewSet.as_view({'get': 'list'})),
+    path('unitplans/myp/export', UnitExport.as_view()),
     path('unitplans/myp/inquestion', InQuestionMYPViewSet.as_view({'get': 'list', 'post': 'create'})),
     path('unitplans/myp/inquestion/<int:pk>', InQuestionMYPViewSet.as_view({'put': 'update', 'delete': 'destroy' })),
     path('unitplans/myp/atlmapping', ATLMappingMYPViewSet.as_view({'get': 'list', 'post': 'create'})),

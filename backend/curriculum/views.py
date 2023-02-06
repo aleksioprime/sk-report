@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from curriculum.models import UnitPlannerMYP, ClassYear, Subject, Criterion, LearnerProfileIB, SkillATL, Objective, Aim, GlobalContext, \
     ExplorationToDevelop, KeyConcept, RelatedConcept, InquiryQuestionMYP, ATLMappingMYP, ReflectionMYP, Strand, Level, UnitPlannerMYPID, SubjectLevelMYP
 from member.models import ProfileTeacher, Department
@@ -8,6 +7,19 @@ from curriculum.serializers import UnitMYPSerializerViewEdit, UnitMYPSerializerL
     ATLMappingMYPSerializer, ReflectionMYPSerializer, StrandSerializer, LevelSerializer, UnitPlannerMYPIDSerializer, SubjectLevelMYPSerializer
 from rest_framework import viewsets
 from rest_framework.response import Response
+from docxtpl import DocxTemplate, RichText
+from rest_framework.views import APIView
+from django.conf import settings
+from django.http import HttpResponse
+
+import os
+from io import BytesIO
+import pypandoc
+
+from htmldocx import HtmlToDocx
+from docx import Document
+
+import tempfile
 
 # Набор методов для просмотра, редактирования и удаления текущей записи UnitPlannerMYP
 class UnitPlannerMYPViewEdit(viewsets.ModelViewSet):
@@ -224,3 +236,121 @@ class UnitPlannerMYPIDViewSet(viewsets.ModelViewSet):
         if unit:
             unit_inter = unit_inter.filter(unitplan_myp=unit)
         return unit_inter
+    
+def get_docx_from_html(file, field):
+    document = Document()
+    parser = HtmlToDocx()
+    if field is None:
+        field = ''
+    parser.add_html_to_document(field, document)
+    document.save(file)
+    return file
+
+class UnitExport(APIView):
+    def get(self, request):
+        doc = DocxTemplate(os.path.join(settings.BASE_DIR, 'reports', 'temp_unitplan_myp.docx'))
+        # type = request.query_params.get("type", None)
+        current_unitplan = UnitPlannerMYP.objects.filter(id=request.query_params.get("unit", None)).first()
+        if current_unitplan:
+            temp_file = tempfile.NamedTemporaryFile(prefix="tmp_", dir=os.path.join(settings.BASE_DIR, 'tmp'))
+            # Подготовка данных полей для экспорта
+            text_authors = "\n".join([teacher.user.get_full_name() for teacher in current_unitplan.authors.all()])
+            text_subjects = ", ".join([f'{subject.name_rus} ({subject.group_ib.name_eng})' for subject in current_unitplan.subjects.all()])
+            text_key_concepts = ", ".join([key.name_eng for key in current_unitplan.key_concepts.all()])
+            text_related_concepts = ", ".join([related.name_eng for related in current_unitplan.related_concepts.all()])
+            text_explorations = "\n".join([exp.name_eng for exp in current_unitplan.explorations.all()])
+            doc_conceptual_understanding = doc.new_subdoc(get_docx_from_html(temp_file, current_unitplan.conceptual_understanding))
+            doc_statement_inquiry = doc.new_subdoc(get_docx_from_html(temp_file, current_unitplan.statement_inquiry))
+            text_inquiry_questions = "\n".join([f'{inq.type_inq} - {inq.question} ({inq.line})' for inq in current_unitplan.inquestions.all()])
+            text_aims = "\n".join([f'- {aim.name_eng}' for aim in current_unitplan.aims.all()])
+            text_strands = "\n\n".join([f'{cr.letter}. {cr.name_eng}\n'+"\n".join([f'{st.get_letter_display()}. {st.name_eng}' for st in current_unitplan.strands.filter(criterion=cr)]) for cr in current_unitplan.criteria.all()])
+            doc_summative_assessment_task = doc.new_subdoc(get_docx_from_html(temp_file, current_unitplan.summative_assessment_task))
+            doc_summative_assessment_soi = doc.new_subdoc(get_docx_from_html(temp_file, current_unitplan.summative_assessment_soi))
+            text_atlmapping = "\n".join([f'{atl.atl.name_eng} ({atl.atl.cluster.name_eng})\n{atl.strand.get_letter_display()}. {atl.strand.name_eng}: \n{atl.action}' for atl in current_unitplan.atlmapping.all()])
+            doc_content = doc.new_subdoc(get_docx_from_html(temp_file, current_unitplan.content))
+            doc_skills = doc.new_subdoc(get_docx_from_html(temp_file, current_unitplan.skills))
+            doc_prior_experiences = doc.new_subdoc(get_docx_from_html(temp_file, current_unitplan.prior_experiences))
+            doc_learning_experiences = doc.new_subdoc(get_docx_from_html(temp_file, current_unitplan.learning_experiences))
+            doc_teaching_strategies = doc.new_subdoc(get_docx_from_html(temp_file, current_unitplan.teaching_strategies))
+            doc_formative_assessment = doc.new_subdoc(get_docx_from_html(temp_file, current_unitplan.formative_assessment))
+            doc_differentiation = doc.new_subdoc(get_docx_from_html(temp_file, current_unitplan.differentiation))
+            doc_peer_self_assessment = doc.new_subdoc(get_docx_from_html(temp_file, current_unitplan.peer_self_assessment))
+            doc_standardization_moderation = doc.new_subdoc(get_docx_from_html(temp_file, current_unitplan.standardization_moderation))
+            doc_student_expectations = doc.new_subdoc(get_docx_from_html(temp_file, current_unitplan.student_expectations))
+            doc_feedback = doc.new_subdoc(get_docx_from_html(temp_file, current_unitplan.feedback))
+            text_learner_profile = "\n".join([f'- {lp.name_eng}' for lp in current_unitplan.learner_profile.all()])
+            doc_description_lp = doc.new_subdoc(get_docx_from_html(temp_file, current_unitplan.description_lp))
+            doc_international_mindedness = doc.new_subdoc(get_docx_from_html(temp_file, current_unitplan.international_mindedness))
+            doc_academic_integrity = doc.new_subdoc(get_docx_from_html(temp_file, current_unitplan.academic_integrity))
+            doc_language_development = doc.new_subdoc(get_docx_from_html(temp_file, current_unitplan.language_development))
+            doc_infocom_technology = doc.new_subdoc(get_docx_from_html(temp_file, current_unitplan.infocom_technology))
+            doc_service_as_action = doc.new_subdoc(get_docx_from_html(temp_file, current_unitplan.service_as_action))
+            doc_resources = doc.new_subdoc(get_docx_from_html(temp_file, current_unitplan.resources))
+            text_prior_reflection = "\n".join([f'{ref.post} ({ref.author})' for ref in current_unitplan.reflections.filter(type_post="Prior")])
+            text_during_reflection = "\n".join([f'{ref.post} ({ref.author})' for ref in current_unitplan.reflections.filter(type_post="During")])
+            text_after_reflection = "\n".join([f'{ref.post} ({ref.author})' for ref in current_unitplan.reflections.filter(type_post="After")])
+            # print(doc_statement_inquiry)
+            # new_parser = HtmlToDocx()
+            # docx = new_parser.parse_html_string(current_unitplan.statement_inquiry)
+            context = {'title': current_unitplan.title, 
+                       'authors': text_authors,
+                       'subjects': text_subjects,
+                       'class_year': current_unitplan.class_year.year_ib,
+                       'hrs': current_unitplan.hours,
+                       'key_concepts': text_key_concepts,
+                       'related_concepts': text_related_concepts,
+                       'global_context': current_unitplan.global_context.name_eng,
+                       'explorations': text_explorations,
+                       'conceptual_understanding': doc_conceptual_understanding,
+                       'statement_inquiry': doc_statement_inquiry,
+                       'inquiry_questions': text_inquiry_questions,
+                       'aims': text_aims,
+                       'strands': text_strands,
+                       'summative_assessment_task': doc_summative_assessment_task,
+                       'summative_assessment_soi': doc_summative_assessment_soi,
+                       'atlmapping': text_atlmapping,
+                       'content': doc_content,
+                       'skills': doc_skills,
+                       'prior_experiences': doc_prior_experiences,
+                       'learning_experiences': doc_learning_experiences,
+                       'teaching_strategies': doc_teaching_strategies,
+                       'formative_assessment': doc_formative_assessment,
+                       'differentiation': doc_differentiation,
+                       'peer_self_assessment': doc_peer_self_assessment,
+                       'standardization_moderation': doc_standardization_moderation,
+                       'student_expectations': doc_student_expectations,
+                       'feedback': doc_feedback,
+                       'learner_profile': text_learner_profile,
+                       'description_lp': doc_description_lp,
+                       'international_mindedness': doc_international_mindedness,
+                       'academic_integrity': doc_academic_integrity,
+                       'language_development': doc_language_development,
+                       'infocom_technology': doc_infocom_technology,
+                       'service_as_action': doc_service_as_action,
+                       'resources': doc_resources,
+                       'prior_reflection': text_prior_reflection,
+                       'during_reflection': text_during_reflection,
+                       'after_reflection': text_after_reflection,
+                       }
+            doc.render(context)
+            doc.save(os.path.join(settings.BASE_DIR, 'tmp', 'generated_report.docx'))
+            # if type == 'pdf':
+            #     pypandoc.convert_file(os.path.join(settings.BASE_DIR, 'tmp', 'generated_report.docx'),
+            #                           'pdf', outputfile=os.path.join(settings.BASE_DIR, 'tmp', 'generated_report.pdf'))
+            #     file_path = os.path.join(settings.BASE_DIR, 'tmp', 'generated_report.pdf')
+            #     with open(file_path, 'rb') as file:
+            #         print('Экспорт в PDF')
+            #         response_file = HttpResponse(file.read())
+            #         response_file["Content-Disposition"] = "attachment; filename=generated_report.pdf"
+            #         response_file["Content-Type"] = "application/pdf"
+            #         return response_file
+            file_path = os.path.join(settings.BASE_DIR, 'tmp', 'generated_report.docx')
+            with open(file_path, 'rb') as file:
+                print('Экспорт в WORD')
+                response_file = HttpResponse(file.read())
+                response_file["Content-Disposition"] = "attachment; filename=generated_report.docx"
+                response_file["Content-Type"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                return response_file
+        return Response({
+            'Message': 'ERROR'})
+    

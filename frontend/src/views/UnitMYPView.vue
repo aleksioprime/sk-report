@@ -534,6 +534,12 @@
               <template v-slot:read="data"><div v-html="unit[data.field]"></div></template>
               <template v-slot:edit="data"><field-textarea-edit v-model="editUnit[data.field]" /></template>
             </unit-field>
+            <!-- Ресурсы -->
+            <unit-field :fieldName="'resources'" :fieldData="unit.resources" :fieldEditing="fieldCurrent" 
+              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
+              <template v-slot:read="data"><div v-html="unit[data.field]"></div></template>
+              <template v-slot:edit="data"><field-textarea-edit v-model="editUnit[data.field]" /></template>
+            </unit-field>
           </div>
           <!-- РЕФЛЕКСИЯ -->
           <div class="tab-pane fade" :class="getClassActive('reflection')" id="v-pills-reflection" role="tabpanel" aria-labelledby="v-pills-reflection-tab"
@@ -833,7 +839,6 @@ export default {
   mounted() {
     this.getUnitData(this.$route.params.id);
     this.ModalDelete = new Modal(`#modalDelete${this.idNameModal}`, { backdrop: 'static' });
-    // this.TabUnitData = new Tab(`#myTab`);
   },
   computed: {
     // Переменная с данными отфильтрованных учителей по значению поля поиска по фамилии (searchAuthors)
@@ -841,7 +846,13 @@ export default {
       if (this.searchAuthors == '') {
         return this.authors_list.filter(teacher => this.editUnit.authors_ids.includes(teacher.id))
       }
-      return this.authors_list.filter(teacher => (teacher.user.last_name.toLowerCase().includes(this.searchAuthors.toLowerCase()) || this.editUnit.authors_ids.includes(teacher.id)))
+      return this.authors_list.filter((teacher) => {
+        if (teacher.user) {
+          return teacher.user.last_name.toLowerCase().includes(this.searchAuthors.toLowerCase()) || this.editUnit.authors_ids.includes(teacher.id)
+        } else {
+          return this.editUnit.authors_ids.includes(teacher.id)
+        }
+      })
     },
     // Переменная для выборки предменых групп из текущих предметов юнита
     subjectGroupUnit() {
