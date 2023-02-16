@@ -13,4 +13,4 @@ RUN pip install -r requirements.txt
 # Копируем все файлы из локального проекта в контейнер
 COPY backend /backend/
 RUN ls
-RUN /backend/start.sh
+RUN chmod +x /backend/start.sh
