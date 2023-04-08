@@ -62,7 +62,8 @@ python manage.py collectstatic
 ```
 8. Загрузить фикстуры в БД из JSON:
 ```
-python manage.py loaddata data.json 
+python manage.py loaddata data.json
+python manage.py loaddata --exclude auth.permission --exclude contenttypes back.json
 ```
 **Примечание.** Для формирования файла фикстур в Django можно выполнить команду:
 ```
