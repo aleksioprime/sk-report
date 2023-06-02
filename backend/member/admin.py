@@ -1,21 +1,17 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
 from import_export.admin import ImportExportModelAdmin
-from member.models import User, RoleUser, ProfileTeacher, ProfileStudent, WorkLoad, Department
+from member.models import User, ProfileTeacher, ProfileStudent, Department
 
 admin.site.unregister(Group)
 
 @admin.register(User)
 class UserAdmin(ImportExportModelAdmin):
-    list_display = ("username", "first_name", "middle_name", "last_name")
+    list_display = ("username", "first_name", "middle_name", "last_name", 'is_active')
 
 @admin.register(Group)
 class GroupAdmin(ImportExportModelAdmin):
     list_display = ("name",)
-    
-@admin.register(RoleUser)
-class RoleUserAdmin(ImportExportModelAdmin):
-    list_display = ("name", "codename")
     
 @admin.register(Department)
 class DepartmentAdmin(ImportExportModelAdmin):
@@ -23,12 +19,8 @@ class DepartmentAdmin(ImportExportModelAdmin):
     
 @admin.register(ProfileStudent)
 class ProfileStudentAdmin(ImportExportModelAdmin):
-    list_display = ("user", "short_name", "id_dnevnik", "group")
+    list_display = ("user", "id_dnevnik")
     
 @admin.register(ProfileTeacher)
 class ProfileTeacherAdmin(ImportExportModelAdmin):
-    list_display = ("user", "short_name", "id_dnevnik")
-    
-@admin.register(WorkLoad)
-class WorkLoadAdmin(ImportExportModelAdmin):
-    list_display = ("teacher", "subject", "group", "hours")
+    list_display = ("user", "id_dnevnik", 'position', 'admin')

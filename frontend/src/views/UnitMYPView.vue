@@ -1,900 +1,817 @@
 <template>
   <div>
     <base-header>
-      <template v-slot:link><a href="/unit">Вернуться к списку юнитов</a></template>
-      <template v-slot:header>Работа с юнитпланером MYP</template>
+      <template v-slot:link><div @click="$router.push(`/myp`)"  class="link">Вернуться к списку юнитов</div></template>
+      <template v-slot:header>MYP: Работа с предметным юнитом</template>
     </base-header>
     <transition name="fade">
-    <div v-if="Object.keys(unit).length != 0">
-      <h4>
-        <div><b>"{{ unit.title }}"</b> ({{ unit.class_year.year_rus }} класс) <small v-if="checkInterdisciplinary" class="badge rounded-pill text-bg-primary">Междисциплинарный юнит</small></div>
-        <div v-if="unit.subjects.length || unit.class_year"><span v-for="(sb, index) in unit.subjects" :key="sb.id"><span v-if="index != 0">, </span>{{ sb.subject.name_rus }} ({{ sb.subject.group_ib.name_eng }})</span></div>
-      </h4>
-      <div class="row mt-4">
-        <div class="col-lg-3 border-end">
-          <div class="nav nav-pills flex-lg-column mb-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-            <button class="nav-link" :class="getClassActive(null)"
-              id="v-pills-base-tab" data-bs-toggle="pill" data-bs-target="#v-pills-base"
-              type="button" role="tab" aria-controls="v-pills-base" aria-selected="true" 
-              @click="rememberTab(null)">Основная информация</button>
-            <button v-if="checkInterdisciplinary" class="nav-link" id="v-pills-interdisciplinary-tab"
-              :class="getClassActive('interdisciplinary')" data-bs-toggle="pill" 
-              data-bs-target="#v-pills-interdisciplinary" type="button" role="tab"
-              aria-controls="v-pills-interdisciplinary" aria-selected="false" 
-              @click="rememberTab('interdisciplinary')">Междисциплинарность</button>
-            <button class="nav-link" id="v-pills-inquiry-tab" data-bs-toggle="pill" data-bs-target="#v-pills-inquiry"
-              :class="getClassActive('inquiry')" type="button" role="tab" aria-controls="v-pills-inquiry" aria-selected="false"
-              @click="rememberTab('inquiry')">Исследование</button>
-            <button class="nav-link" id="v-pills-objectives-tab" data-bs-toggle="pill"
-              :class="getClassActive('objectives')" data-bs-target="#v-pills-objectives" type="button" role="tab" 
-              aria-controls="v-pills-objectives" aria-selected="false" 
-              @click="rememberTab('objectives')">Образовательные цели</button>
-            <button class="nav-link" id="v-pills-learner-profile-tab" data-bs-toggle="pill"
-              :class="getClassActive('profile')" data-bs-target="#v-pills-learner-profile" type="button" role="tab" 
-              aria-controls="v-pills-learner-profile" aria-selected="false"
-              @click="rememberTab('profile')">Профиль студента</button>
-            <button class="nav-link" id="v-pills-assessment-tab" data-bs-toggle="pill"
-              :class="getClassActive('assessment')" data-bs-target="#v-pills-assessment" type="button" role="tab" 
-              aria-controls="v-pills-assessment" aria-selected="false" 
-              @click="rememberTab('assessment')">Оценивание</button>
-            <button class="nav-link" id="v-pills-teaching-tab" data-bs-toggle="pill" 
-              :class="getClassActive('teaching')" data-bs-target="#v-pills-teaching" type="button" role="tab"
-              aria-controls="v-pills-teaching" aria-selected="false" 
-              @click="rememberTab('teaching')">Стратегии преподавания</button>
-            <button class="nav-link" id="v-pills-reflection-tab" data-bs-toggle="pill"
-              :class="getClassActive('reflection')" data-bs-target="#v-pills-reflection" type="button" role="tab"
-              aria-controls="v-pills-reflection" aria-selected="false" 
-              @click="rememberTab('reflection')">Рефлексия</button>
+      <div class="row" v-if="!isUnitLoading">
+        <div class="col-sm myp-sidebar">
+          <!-- Процент заполнения юнита -->
+          <div>Заполнение юнита</div>
+          <div class="progress" style="height: 20px;">
+            <div class="progress-bar" role="progressbar" :style="`width: ${unitMYP.fullness}%`" :aria-valuenow="unitMYP.fullness" aria-valuemin="0" aria-valuemax="100">{{ unitMYP.fullness }}%</div>
           </div>
+          <nav id="navbar-myp" class="navbar-myp">
+            <nav class="nav nav-pills flex-column">
+              <a class="nav-link myp-group" href="#myp-base">Основная информация</a>
+              <a class="nav-link myp-group" href="#myp-inquiry">Исследование</a>
+              <nav class="nav nav-pills flex-sm-column">
+                <a class="nav-link myp-field cheking" :class="checkField('key_concepts')" href="#key_concepts">Ключевые концепты</a>
+                <a class="nav-link myp-field cheking" :class="checkField('related_concepts')" href="#related_concepts">Предметные концепты</a>
+                <a class="nav-link myp-field cheking" :class="checkField('conceptual_understanding')" href="#conceptual_understanding">Концептуальное понимание</a>
+                <a class="nav-link myp-field cheking" :class="checkField('global_context')" href="#global_context">Глобальный контекст</a>
+                <a class="nav-link myp-field cheking" :class="checkField('explorations')" href="#explorations">Линии исследования</a>
+                <a class="nav-link myp-field cheking" :class="checkField('statement_inquiry')" href="#statement_inquiry">Формулировка исследования</a>
+                <a class="nav-link myp-field cheking" :class="checkField('inquiry_questions')" href="#inquiry_questions">Исследовательские вопросы</a>
+              </nav>
+              <a class="nav-link myp-group" href="#myp-objectives">Образовательные цели</a>
+              <nav class="nav nav-pills flex-sm-column">
+                <a class="nav-link myp-field cheking" :class="checkField('aims')" href="#aims">Общие цели</a>
+                <a class="nav-link myp-field cheking" :class="checkField('criteria')" href="#criteria">Критерии оценивания</a>
+                <a class="nav-link myp-field cheking" :class="checkField('strands')" href="#strands">Цели предметной группы</a>
+                <a class="nav-link myp-field cheking" :class="checkField('content')" href="#content">Содержание</a>
+                <a class="nav-link myp-field cheking" :class="checkField('skills')" href="#skills">Умения</a>
+                <a class="nav-link myp-field cheking" :class="checkField('atl_mapping')" href="#atl_mapping">Карта ATL</a>
+              </nav>
+              <a class="nav-link myp-group" href="#myp-profile">Профиль студента</a>
+              <nav class="nav nav-pills flex-sm-column">
+                <a class="nav-link myp-field cheking" :class="checkField('learner_profile')" href="#learner_profile">Профиль студента IB</a>
+                <a class="nav-link myp-field cheking" :class="checkField('international_mindedness')" href="#international_mindedness">Межкультурное понимание</a>
+                <a class="nav-link myp-field cheking" :class="checkField('academic_integrity')" href="#academic_integrity">Академическая честность</a>
+                <a class="nav-link myp-field cheking" :class="checkField('language_development')" href="#language_development">Языковое развитие</a>
+                <a class="nav-link myp-field cheking" :class="checkField('infocom_technology')" href="#infocom_technology">Использование средств ИКТ</a>
+                <a class="nav-link myp-field cheking" :class="checkField('service_as_action')" href="#service_as_action">Служение как действие</a>
+              </nav>
+              <a class="nav-link myp-group" href="#myp-assessment">Оценивание</a>
+              <nav class="nav nav-pills flex-sm-column">
+                <a class="nav-link myp-field cheking" :class="checkField('formative_assessment')" href="#formative_assessment">Текущее оценивание</a>
+                <a class="nav-link myp-field cheking" :class="checkField('summative_assessment_task')" href="#summative_assessment_task">Итоговое оценивание (задания)</a>
+                <a class="nav-link myp-field cheking" :class="checkField('summative_assessment_soi')" href="#summative_assessment_soi">Итоговое оценивание (взаимосвязь с
+                  исследовательским утверждением)</a>
+                <a class="nav-link myp-field cheking" :class="checkField('peer_self_assessment')" href="#peer_self_assessment">Взаимное и самооценивание</a>
+                <a class="nav-link myp-field cheking" :class="checkField('standardization_moderation')" href="#standardization_moderation">Стандартизация и модерация</a>
+              </nav>
+              <a class="nav-link myp-group" href="#myp-teaching">Стратегии преподавания</a>
+              <nav class="nav nav-pills flex-sm-column">
+                <a class="nav-link myp-field cheking" :class="checkField('prior_experiences')"  href="#prior_experiences">Предыдущий опыт обучения</a>
+                <a class="nav-link myp-field cheking" :class="checkField('learning_experiences')" href="#learning_experiences">Учебная деятельность</a>
+                <a class="nav-link myp-field cheking" :class="checkField('teaching_strategies')" href="#teaching_strategies">Стратегии преподавания</a>
+                <a class="nav-link myp-field cheking" :class="checkField('student_expectations')" href="#student_expectations">Ожидания студентов</a>
+                <a class="nav-link myp-field cheking" :class="checkField('feedback')" href="#feedback">Обратная связь</a>
+                <a class="nav-link myp-field cheking" :class="checkField('differentiation')" href="#differentiation">Дифференциация</a>
+                <a class="nav-link myp-field cheking" :class="checkField('resources')" href="#resources">Ресурсы</a>
+              </nav>
+              <a class="nav-link myp-group" href="#myp-reflections">Рефлексия</a>
+              <nav class="nav nav-pills flex-sm-column">
+                <a class="nav-link myp-field cheking" :class="checkField('reflections', type='Prior')"  href="#reflections_prior">До начала изучения</a>
+                <a class="nav-link myp-field cheking" :class="checkField('reflections', type='During')" href="#reflections_during">В процессе изучения юнита</a>
+                <a class="nav-link myp-field cheking" :class="checkField('reflections', type='After')" href="#reflections_after">По окончании изучения юнита</a>
+              </nav>
+            </nav>
+          </nav>
         </div>
-        <div class="tab-content w-100 col-md" id="v-pills-tabContent">
-          <!-- ОСНОВНАЯ ИНФОРМАЦИЯ -->
-          <div class="tab-pane fade" :class="getClassActive(null)" id="v-pills-base" role="tabpanel" aria-labelledby="v-pills-base-tab"
-            tabindex="0">
-            <!-- Название юнита -->
-            <unit-field :fieldName="'title'" :fieldData="unit.title" :fieldEditing="fieldCurrent" 
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit" >
-              <template v-slot:read="data">{{ unit[data.field] }}</template>
-              <template v-slot:edit="data"><field-text-edit v-model="editUnit[data.field]" /></template>
-            </unit-field>
-            <!-- Предметы -->
-            <unit-field :fieldName="'subjects'" :fieldData="unit.subjects" :fieldEditing="fieldCurrent" :checkLoad="Boolean(subjects_list.length)"
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data">
-                <field-list-view :options="unit[data.field]" v-slot="selectData">
-                  <div class="d-flex w-100">
-                    <div>{{ selectData.field.subject.name_rus }} ({{ selectData.field.subject.group_ib.name_eng.toUpperCase() }}, {{ selectData.field.level.name_eng }})</div>
-                    <div></div>
-                  </div>
-                </field-list-view>
-              </template>
-              <template v-slot:edit="data">
-                <div class="subjects-adding">
-                  <table class="table">
-                    <tr v-for="(sb, i) in editUnit[data.field]" :key="i">
-                      <td>{{ sb.subject.name_rus }} ({{ sb.subject.group_ib.name_eng }})</td>
-                      <td>{{ sb.level.name_eng }}</td>
-                      <td>
-                        <button class="img-btn-del my-1" @click="deleteSubjectLevel(i)"></button>
-                      </td>
-                    </tr>
-                  </table>
-                </div>
-                <div class="unit-field-description">Чтобы добавить предмет, выберите его в выпадающем списке и укажите его уровень, а затем нажмите на +</div>
-                <div class="row">
-                  <div class="col-sm">
-                    <select id="level" class="form-select" v-model="choisenSL.subject">
-                      <option :value="null">Выберите предмет</option>
-                      <option v-for="sb in subjects_list" :key="sb.id" :value="sb">
-                        {{ sb.name_rus }} ({{ sb.group_ib.name_eng }})
-                      </option>
-                    </select>
-                  </div>
-                  <div class="col-sm-4">
-                    <select id="level" class="form-select" v-model="choisenSL.level" :disabled="choisenSL.subject == null">
-                      <option :value="null">Уровень</option>
-                      <option v-for="lv in filteredLevels" :key="lv.id" :value="lv">
-                        <div>{{ lv.name_eng }}</div>
-                      </option>
-                    </select>
-                  </div>
-                  <div class="col-sm-1 d-flex align-items-center me-2">
-                    <button class="img-btn-add" @click="addSubjectLevel" :disabled="choisenSL.subject == null || choisenSL.level == null"></button>
-                  </div>
-                </div>
-              </template>
-            </unit-field>
-            <!-- Авторы юнита -->
-            <unit-field :fieldName="'authors'" :fieldData="unit.authors" :fieldEditing="fieldCurrent" :checkLoad="Boolean(authors_list.length)" 
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data">
-                <field-list-view :options="unit[data.field]" v-slot="viewData">
-                  {{ viewData.field.user.first_name }} {{ viewData.field.user.middle_name }} {{ viewData.field.user.last_name }}
-                </field-list-view>
-              </template>
-              <template v-slot:edit="data">
-                <input id="search-authors" class="form-control mb-2" type="text" v-model="searchAuthors"
-                  placeholder="Введите фамилию для поиска...">
-                <field-checkbox-edit v-model="editUnit[`${data.field}_ids`]" :options="searchTeachers" :fieldName="data.field"
-                  v-slot="selectData">
-                  {{ selectData.field.user.first_name }} {{ selectData.field.user.middle_name }} {{
-                    selectData.field.user.last_name
-                  }}
-                </field-checkbox-edit>
-              </template>
-            </unit-field>
-            <!-- Год обучения и часы -->
-            <div class="row">
-              <div class="col-sm">
-                <unit-field :fieldName="'class_year'" :fieldData="unit.class_year" :fieldEditing="fieldCurrent" :checkLoad="Boolean(class_year_list.length)" 
-                  @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-                  <template v-slot:read="data">{{ unit[data.field].year_ib }} ({{ unit[data.field].year_rus }} класс)</template>
-                  <template v-slot:edit="data">
-                    <field-select-edit v-model="editUnit[`${data.field}_id`]" :options="this[`${data.field}_list`]" v-slot="selectData">
-                      <span>{{ selectData.field.year_ib }} ({{ selectData.field.year_rus }} класс)</span>
-                    </field-select-edit>
-                  </template>
-                </unit-field>
+        <div class="col-sm">
+          <div data-bs-spy="scroll" data-bs-target="#navbar-myp" data-bs-smooth-scroll="true" tabindex="0">
+            <!-- МЕЖДИСЦИПЛИНАРНЫЙ ЮНИТ -->
+            <div v-if="unitMYP.interdisciplinary">
+              <div id="myp-base" class="myp-header"><h2>Это междисциплинарный юнит</h2></div>
+              <div class="myp-interdisciplinary" @click="$router.push(`/myp/idu/${unitMYP.interdisciplinary.id}`)">
+                <div class="idu-header">{{ unitMYP.interdisciplinary.title }}</div>
+                <div>Предметы: 
+                  <span v-for="(un, index) in unitMYP.interdisciplinary.unitplan_myp" :key="un.id">
+                  {{ un.subject.name_rus }}<span v-if="++index !== unitMYP.interdisciplinary.unitplan_myp.length">,&nbsp;</span>
+                </span></div>
               </div>
-              <div class="col-sm">
-                <unit-field :fieldName="'hours'" :fieldData="unit.hours" :fieldEditing="fieldCurrent" 
-                  @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-                  <template v-slot:read="data">{{ unit[data.field] }}</template>
-                  <template v-slot:edit="data"><field-text-edit v-model="editUnit[data.field]" /></template>
-                </unit-field>
+              <div class="d-flex">
+                <button class="idu-btn-delete" @click="showUnitIDUModal">Удалить связь с МДП</button>
               </div>
             </div>
-            <!-- Описание -->
-            <unit-field :fieldName="'description'" :fieldData="unit.description" :fieldEditing="fieldCurrent" 
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data"><div v-html="unit[data.field]"></div></template>
-              <template v-slot:edit="data"><field-textarea-edit v-model="editUnit[data.field]" /></template>
-            </unit-field>
-          </div>
-          <!-- МЕЖДИСЦИПЛИНАРНОСТЬ -->
-          <div v-if="checkInterdisciplinary" class="tab-pane fade" :class="getClassActive('interdisciplinary')" id="v-pills-interdisciplinary" role="tabpanel"
-            aria-labelledby="v-pills-interdisciplinary-tab" tabindex="0">
-            <!-- Формы интеграции -->
-            <unit-field :fieldName="'form_integration'" :fieldData="unit.inter.form_integration" :fieldEditing="fieldCurrent" 
-              @edit="editModeID" @save="submitEditID" @cancel="cancelEditID">
-              <template v-slot:read="data"><div v-html="unit.inter[data.field]"></div></template>
-              <template v-slot:edit="data"><field-textarea-edit v-model="editUnitID[data.field]" /></template>
-            </unit-field>
-            <!-- Цель интеграции -->
-            <unit-field :fieldName="'purpose_integration'" :fieldData="unit.inter.purpose_integration" :fieldEditing="fieldCurrent" 
-              @edit="editModeID" @save="submitEditID" @cancel="cancelEditID">
-              <template v-slot:read="data"><div v-html="unit.inter[data.field]"></div></template>
-              <template v-slot:edit="data"><field-textarea-edit v-model="editUnitID[data.field]" /></template>
-            </unit-field>
-            <!-- Междисциплинарные связи -->
-            <unit-field :fieldName="'interdisciplinary_links'" :fieldData="unit.inter.interdisciplinary_links" :fieldEditing="fieldCurrent" 
-              @edit="editModeID" @save="submitEditID" @cancel="cancelEditID">
-              <template v-slot:read="data"><div v-html="unit.inter[data.field]"></div></template>
-              <template v-slot:edit="data"><field-textarea-edit v-model="editUnitID[data.field]" /></template>
-            </unit-field>
-            <!-- Междисциплинарные цели -->
-            <unit-field :fieldName="'inter_aims'" :fieldData="unit.inter.inter_aims" :fieldEditing="fieldCurrent" :checkLoad="Boolean(aims_list.length)"
-              @edit="editModeID" @save="submitEditID" @cancel="cancelEditID">
-              <template v-slot:read="data"> 
-                <field-list-view :options="unit.inter[data.field]" v-slot="selectData">
-                  <span>{{ firstLetterBig(selectData.field.name_eng) }}</span>
-                </field-list-view>
+            <!-- ОСНОВНАЯ ИНФОРМАЦИЯ -->
+            <div id="myp-base" class="myp-header"><h2>Основная информация</h2></div>
+            <!-- Название юнита -->
+            <unit-field-string id="title" :fieldName="'title'" :fieldText="fieldText.title" :fieldData="unitMYP.title"
+              @save="unitFieldSave" />
+            <div class="row">
+              <div class="col-md-5">
+                <!-- Количество часов -->
+                <unit-field-string id="hours" :fieldName="'hours'" :fieldText="fieldText.hours" :fieldData="unitMYP.hours"
+                  @save="unitFieldSave" />
+              </div>
+              <div class="col-md">
+                <!-- Год обучения -->
+                <unit-field-select id="class_year" :fieldName="'class_year'" :fieldText="fieldText.class_year"
+                  :fieldData="unitMYP.class_year" :options="years" @save="unitFieldSave" @edit="unitFieldEdit">
+                  <template v-slot:show="field">{{ field.data.year_ib }} ({{ field.data.year_rus }} класс)</template>
+                  <template v-slot:edit="field">{{ field.data.year_ib }} ({{ field.data.year_rus }} класс)</template>
+                </unit-field-select>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md">
+                <!-- Предмет -->
+                <unit-field-select id="subject" :fieldName="'subject'" :fieldText="fieldText.subject"
+                  :fieldData="unitMYP.subject" :options="subjects" @save="unitFieldSave" @edit="unitFieldEdit">
+                  <template v-slot:show="field">{{ field.data.name_rus }} ({{ field.data.group_ib.name_eng }})</template>
+                  <template v-slot:edit="field">{{ field.data.name_rus }} ({{ field.data.group_ib.name_eng }})</template>
+                </unit-field-select>
+              </div>
+              <div class="col-md-6">
+                <!-- Уровень изучения предмета -->
+                <unit-field-select v-if="unitMYP.subject" id="level" :fieldName="'level'" :fieldText="fieldText.level"
+                  :fieldData="unitMYP.level" :options="levels" @save="unitFieldSave" @edit="unitFieldEdit">
+                  <template v-slot:show="field">{{ field.data.name_eng }}</template>
+                  <template v-slot:edit="field">{{ field.data.name_eng }}</template>
+                </unit-field-select>
+              </div>
+            </div>
+            <!-- Авторы юнита -->
+            <unit-field-checkbox-search id="authors" :fieldName="'authors'" :fieldText="fieldText.authors" :fieldSearch="'last_name'"
+              :fieldData="unitMYP.authors" :options="teachers" @save="unitFieldSave" @edit="unitFieldEdit">
+              <template v-slot:show="field">{{ field.data.last_name }} {{ field.data.first_name }} {{ field.data.middle_name }}</template>
+              <template v-slot:edit="field">{{ field.data.last_name }} {{ field.data.first_name }} {{ field.data.middle_name }}</template>
+            </unit-field-checkbox-search>
+            <!-- ИССЛЕДОВАНИЕ -->
+            <div id="myp-inquiry" class="myp-header"><h2>Исследование</h2></div>
+            <!-- Ключевые концепции -->
+            <unit-field-checkbox id="key_concepts" :fieldName="'key_concepts'" :fieldText="fieldText.key_concepts"
+              :fieldData="unitMYP.key_concepts" :options="keyConcepts" @save="unitFieldSave" @edit="unitFieldEdit">
+              <template v-slot:show="field"><b>{{ field.data.name_eng }}</b><br><small>
+                {{ field.data.description_eng }}</small></template>
+              <template v-slot:edit="field">
+                <div :class="{ 'kc-recomend': checkKeyConcept(field.data) }"> {{ field.data.name_eng }}
+                  (<span v-for="(rs, index) in field.data.recommended_subjects" :key="rs.id"><span v-if="index != 0">,
+                  </span>{{ rs.name_eng }}</span>)</div>
               </template>
-              <template v-slot:edit="data">
-                <field-checkbox-edit v-model="editUnitID[`${data.field}_ids`]" :options="aims_list"
-                  :fieldName="data.field" v-slot="selectData">
-                  <div>
-                    <div>{{ firstLetterBig(selectData.field.name_eng) }}</div>
-                  </div>
-                </field-checkbox-edit>
-              </template>
-            </unit-field>
-            <!-- Междисциплинарные критерии -->
-            <unit-field :fieldName="'inter_criteria'" :fieldData="unit.inter.inter_criteria" :fieldEditing="fieldCurrent" :checkLoad="Boolean(criteria_list.length)"
-              @edit="editModeID" @save="submitEditID" @cancel="cancelEditID">
-              <template v-slot:read="data"> 
-                <field-list-view :options="unit.inter[data.field]" v-slot="selectData">
-                  <b>{{ selectData.field.letter }}.</b> <span>{{ selectData.field.name_eng }}</span>
-                </field-list-view>
-              </template>
-              <template v-slot:edit="data">
-                <field-checkbox-edit v-model="editUnitID[`${data.field}_ids`]" :options="criteria_list"
-                  :fieldName="data.field" v-slot="selectData">
-                  <div>
-                    <b>{{ selectData.field.letter }}.</b> <span>{{ selectData.field.name_eng }}</span>
-                  </div>
-                </field-checkbox-edit>
-              </template>
-            </unit-field>
-            <!-- Междисциплинарные стрэнды -->
-            <unit-field :fieldName="'inter_strands'" :fieldData="unit.inter.inter_strands" :fieldEditing="fieldCurrent" :checkLoad="Boolean(strands_list.length)"
-              @edit="editModeID" @save="submitEditID" @cancel="cancelEditID">
-              <template v-slot:read="data"> 
-                <field-list-view :options="unit.inter[data.field]" v-slot="selectData">
-                  <span><b>{{ selectData.field.criterion.letter }}{{ selectData.field.letter }}:</b>
-                    {{ firstLetterBig(selectData.field.name_eng) }}</span>
-                </field-list-view>
-              </template>
-              <template v-slot:edit="data">
-                <field-checkbox-edit v-model="editUnitID[`${data.field}_ids`]" :options="strands_list"
-                  :fieldName="data.field" v-slot="selectData">
-                  <div>
-                    <span><b>{{ selectData.field.criterion.letter }}{{ selectData.field.letter }}:</b>
-                    {{ firstLetterBig(selectData.field.name_eng) }}</span>
-                  </div>
-                </field-checkbox-edit>
-              </template>
-            </unit-field>
-          </div>
-          <!-- ИССЛЕДОВАНИЕ -->
-          <div class="tab-pane fade" :class="getClassActive('inquiry')" id="v-pills-inquiry" role="tabpanel" aria-labelledby="v-pills-inquiry-tab"
-            tabindex="0">
-            <!-- Ключевой концепт -->
-            <unit-field :fieldName="'key_concepts'" :fieldData="unit.key_concepts" :fieldEditing="fieldCurrent" :checkLoad="Boolean(key_concepts_list.length)"
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data">
-                <field-list-view :options="unit[data.field]" v-slot="selectData">
-                  <span><b>{{ selectData.field.name_eng }}</b></span>:<br>
-                  <div class="ms-3"><small>{{ selectData.field.description_eng }}</small></div>
-                </field-list-view>
-              </template>
-              <template v-slot:edit="data">
-                <field-checkbox-edit v-model="editUnit[`${data.field}_ids`]" :options="this[`${data.field}_list`]"
-                  :fieldName="data.field" v-slot="selectData">
-                  <div>
-                    <div :title="selectData.field.description_eng" :class="{'kc-recomend': checkKeyConcept(selectData.field)}">
-                      {{ selectData.field.name_eng }} 
-                      (<span v-for="(rs, index) in selectData.field.recommended_subjects" :key="rs.id"><span v-if="index != 0">, </span>{{ rs.name_eng }}</span>)
-                    </div>
-                  </div>
-                </field-checkbox-edit>
-              </template>
-            </unit-field>
-            <!-- Сопутствующий концепт -->
-            <unit-field :fieldName="'related_concepts'" :fieldData="unit.related_concepts" :fieldEditing="fieldCurrent" :checkLoad="Boolean(related_concepts_list.length)"
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data">
-                <field-list-view :options="unit[data.field]" v-slot="selectData">
-                  <span><b>{{ selectData.field.name_eng }}</b></span>
-                  <span v-if="checkInterdisciplinary" >
-                    (<span v-for="(rs, index) in selectData.field.subject_directions" :key="rs.id"><span v-if="index != 0">, </span>{{ rs.name_eng }}</span>)
-                  </span><br>
-                  <div class="ms-3"><small>{{ selectData.field.description_eng }}</small></div>
-                </field-list-view>
-              </template>
-              <template v-slot:edit="data">
-                <field-checkbox-edit v-model="editUnit[`${data.field}_ids`]" :options="this[`${data.field}_list`]"
-                  :fieldName="data.field" v-slot="selectData">
-                  <div>
-                    <span data-bs-toggle="tooltip" :title="selectData.field.subject_directions.map(item => item.name_eng).join(', ')">{{ selectData.field.name_eng }}</span> 
-                    <!-- <b v-if="checkInterdisciplinary" > 
-                      (<span v-for="(rs, index) in selectData.field.subject_directions" :key="rs.id"><span v-if="index != 0">, </span>{{ rs.name_eng }}</span>)
-                    </b> -->
-                  </div>
-                </field-checkbox-edit>
-              </template>
-            </unit-field>
+            </unit-field-checkbox>
+            <!-- Предметные концепции -->
+            <unit-field-checkbox id="related_concepts" :fieldName="'related_concepts'" :fieldText="fieldText.related_concepts"
+              :checkLine="true" :fieldData="unitMYP.related_concepts" :options="relatedConcepts" @save="unitFieldSave" @edit="unitFieldEdit">
+              <template v-slot:show="field"><b>{{ field.data.name_eng }}</b><br><small>
+                {{ field.data.description_eng }}</small></template>
+              <template v-slot:edit="field">{{ field.data.name_eng }}</template>
+            </unit-field-checkbox>
             <!-- Концептуальное понимание -->
-            <unit-field :fieldName="'conceptual_understanding'" :fieldData="unit.conceptual_understanding" :fieldEditing="fieldCurrent" 
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data"><div v-html="unit[data.field]"></div></template>
-              <template v-slot:edit="data"><field-textarea-edit v-model="editUnit[data.field]" /></template>
-            </unit-field>
+            <unit-field-text id="conceptual_understanding" :fieldName="'conceptual_understanding'"
+              :fieldText="fieldText.conceptual_understanding" :fieldData="unitMYP.conceptual_understanding"
+              @save="unitFieldSave" />
             <!-- Глобальный контекст -->
-            <unit-field :fieldName="'global_context'" :fieldData="unit.global_context" :fieldEditing="fieldCurrent" :checkLoad="Boolean(global_context_list.length)"
-               @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-               <template v-slot:read="data">
-                  <div><b>{{ unit[data.field].name_eng }}</b>:</div>
-                  <div class="ms-3"><small>{{ unit[data.field].description_eng }}</small></div>
-              </template>
-              <template v-slot:edit="data">
-                <field-radio-edit v-model="editUnit[`${data.field}_id`]" :options="this[`${data.field}_list`]"
-                  :fieldName="data.field" v-slot="selectData">
-                  <span>{{ selectData.field.name_eng }}</span>:<br>
-                  <small>{{ selectData.field.description_eng }}</small>
-                </field-radio-edit>
-              </template>
-            </unit-field>
+            <unit-field-radio id="global_context" :fieldName="'global_context'" :fieldText="fieldText.global_context"
+              :fieldData="unitMYP.global_context" :options="globalContexts" @save="unitFieldSave" @edit="unitFieldEdit">
+              <template v-slot:show="field">{{ field.data.name_eng }}</template>
+              <template v-slot:edit="field">{{ field.data.name_eng }}<br>
+                <small>{{ field.data.description_eng }}</small></template>
+            </unit-field-radio>
             <!-- Линии исследования -->
-            <unit-field :fieldName="'explorations'" :fieldData="unit.explorations" :fieldEditing="fieldCurrent" :checkLoad="Boolean(explorations_list.length)"
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit" v-if="unit.global_context">
-              <template v-slot:read="data">
-                <field-list-view :options="unit[data.field]" v-slot="selectData">
-                  <span>- {{ selectData.field.name_eng }}</span>
-                </field-list-view>
-              </template>
-              <template v-slot:edit="data">
-                <field-checkbox-edit v-model="editUnit[`${data.field}_ids`]" :options="this[`${data.field}_list`]"
-                  :fieldName="data.field" v-slot="selectData">
-                  <div>
-                    <span>{{ selectData.field.name_eng }}</span>
-                  </div>
-                </field-checkbox-edit>
-              </template>
-            </unit-field>
+            <unit-field-checkbox v-if="unitMYP.global_context" id="explorations" :fieldName="'explorations'" :fieldText="fieldText.explorations"
+              :checkLine="true" :fieldData="unitMYP.explorations" :options="explorations" @save="unitFieldSave" @edit="unitFieldEdit">
+              <template v-slot:show="field">{{ field.data.name_eng }}</template>
+              <template v-slot:edit="field">{{ field.data.name_eng }}</template>
+            </unit-field-checkbox>
             <!-- Формулировка исследования -->
-            <unit-field :fieldName="'statement_inquiry'" :fieldData="unit.statement_inquiry" :fieldEditing="fieldCurrent" 
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data"><div v-html="unit[data.field]"></div></template>
-              <template v-slot:edit="data"><field-textarea-edit v-model="editUnit[data.field]" /></template>
-            </unit-field>
-            <div>Исследовательские вопросы</div>
-            <unit-myp-view-question :unit="unit" @update="getUnitData($route.params.id)" />
-          </div>
-          <!-- ОБРАЗОВАТЕЛЬНЫЕ ЦЕЛИ -->
-          <div class="tab-pane fade" :class="getClassActive('objectives')" id="v-pills-objectives" role="tabpanel" aria-labelledby="v-pills-objectives-tab"
-            tabindex="0">
-            <!-- Цели -->
-            <unit-field :fieldName="'aims'" :fieldData="unit.aims" :fieldEditing="fieldCurrent" :checkLoad="Boolean(aims_list.length)"
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data"> 
-                <div v-for="(value, field) in groupedField(unit[data.field], 'subject_group')" :key="field">
-                  <div v-if="checkInterdisciplinary" class="my-2"><b>{{ subjectGroupUnit.find(item => item.id == field).name_eng }}</b></div>
-                  <field-list-view :options="value" v-slot="selectData" class="">
-                    <span>- {{ firstLetterBig(selectData.field.name_eng) }}</span>
-                  </field-list-view>
+            <unit-field-text id="statement_inquiry" :fieldName="'statement_inquiry'" :fieldText="fieldText.statement_inquiry" 
+            :fieldData="unitMYP.statement_inquiry" @save="unitFieldSave" />
+            <!-- Исследовательские вопросы -->
+            <unit-field-blocks id="inquiry_questions" :fieldName="'inquiry_questions'" :fieldText="fieldText.inquiry_questions"
+            :defaultItem="defaultInQuestion" :fieldData="unitMYP.inquiry_questions" @save="unitFieldSave" @edit="unitFieldEdit">
+              <!-- Слот для блоков показа записей -->
+              <template v-slot:show="field">
+                <div class="blocks-wrapper">
+                  <div class="blocks-title"><span class="question-type">{{ field.data.type_text }}</span>{{ field.data.question }}</div>
+                  <div class="question-line">Линия исследования: {{ field.data.line }}</div>
                 </div>
               </template>
-              <template v-slot:edit="data">
-                <field-checkbox-edit v-model="editUnit[`${data.field}_ids`]" :options="this[`${data.field}_list`]"
-                  :fieldName="data.field" v-slot="selectData" :group="true">
-                  <div>
-                    <div>{{ firstLetterBig(selectData.field.name_eng) }}</div>
+              <!-- Слот для формы редактирования записей -->
+              <template v-slot:form="item">
+                <div class="my-2">
+                  <textarea class="form-control mb-2" type="text" v-model="item.data.question"
+                    placeholder="Исследовательский вопрос"></textarea>
+                </div>
+                <div class="row">
+                  <div class="col-md-4">
+                    <select id="subject" class="form-select mb-2" v-model="item.data.type">
+                      <option :value="null">Выберите тип</option>
+                      <option v-for="(op, i) in questionTypes" :key="i" :value="op.value">
+                        {{ op.name }}
+                      </option>
+                    </select>
                   </div>
-                </field-checkbox-edit>
+                  <div class="col-md">
+                    <textarea class="form-control mb-2" type="text" v-model="item.data.line" rows="1"
+                      placeholder="Линия исследования"></textarea>
+                  </div>
+                </div>
               </template>
-            </unit-field>
+            </unit-field-blocks>
+            <!-- ОБРАЗОВАТЕЛЬНЫЕ ЦЕЛИ -->
+            <div id="myp-objectives" class="myp-header"><h2>Образовательные цели</h2></div>
+            <!-- Общие цели -->
+            <unit-field-checkbox id="aims" :fieldName="'aims'" :fieldText="fieldText.aims"
+              :fieldData="unitMYP.aims" :options="aims" @save="unitFieldSave" @edit="unitFieldEdit">
+              <template v-slot:show="field">{{ field.data.name_eng }}</template>
+              <template v-slot:edit="field">{{ field.data.name_eng }}</template>
+            </unit-field-checkbox>
             <!-- Критерии оценки -->
-            <unit-field :fieldName="'criteria'" :fieldData="unit.criteria" :fieldEditing="fieldCurrent" :checkLoad="Boolean(criteria_list.length)"
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data">
-                <div v-for="(value, field) in groupedField(unit[data.field], 'subject_group')" :key="field">
-                  <div v-if="checkInterdisciplinary" class="my-2"><b>{{ subjectGroupUnit.find(item => item.id == field).name_eng }}</b></div>
-                  <field-list-view :options="value" v-slot="selectData" class="">
-                    <b>{{ selectData.field.letter }}.</b> {{ selectData.field.name_eng }}
-                  </field-list-view>
-                </div>
+            <unit-field-checkbox id="criteria" :fieldName="'criteria'" :fieldText="fieldText.criteria"
+              :fieldData="unitMYP.criteria" :options="criteriaMYP" @save="unitFieldSave" @edit="unitFieldEdit">
+              <template v-slot:show="field">{{ field.data.letter }}. {{ field.data.name_eng }}</template>
+              <template v-slot:edit="field">{{ field.data.letter }}. {{ field.data.name_eng }}</template>
+            </unit-field-checkbox>
+            <!-- Предметные цели -->
+            <unit-field-checkbox-grouped id="strands" :fieldName="'strands'" :fieldText="fieldText.strands" :fieldGroup="'criterion'"
+              :fieldData="unitMYP.strands" :options="strands" @save="unitFieldSave" @edit="unitFieldEdit">
+              <template v-slot:showGroup="field">
+                {{ getCriteriaByID(field.data).letter }}. {{ getCriteriaByID(field.data).name_eng }}
               </template>
-              <template v-slot:edit="data">
-                <field-checkbox-edit v-model="editUnit[`${data.field}_ids`]" :options="this[`${data.field}_list`]"
-                  :fieldName="data.field" v-slot="selectData" :group="true">
-                  <div><b>{{ selectData.field.letter }}.</b> {{ selectData.field.name_eng }}</div>
-                </field-checkbox-edit>
+              <template v-slot:show="field">{{ field.data.letter_i }}. {{ field.data.name_eng }}</template>
+              <template v-slot:editGroup="field">
+                {{ getCriteriaByID(field.data).letter }}. {{ getCriteriaByID(field.data).name_eng }}
               </template>
-            </unit-field>
-            <!-- Стрэнды -->
-            <unit-field :fieldName="'strands'" :fieldData="unit.strands" :fieldEditing="fieldCurrent" :checkLoad="Boolean(strands_list.length)"
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data">
-                <div v-for="(valueSG, fieldSG) in groupedField(unit[data.field], 'criterion', 'subject_group')" :key="fieldSG">
-                  <div v-if="checkInterdisciplinary" class="my-1"><b>{{ getFieldData(subjectGroupUnit, fieldSG).name_eng }}</b></div>
-                  <div v-for="(valueCR, fieldCR) in groupedField(valueSG, 'criterion')" :key="fieldCR">
-                    <div class="mt-1" ><b>{{ getFieldData(criteriaStrandsUnit, fieldCR).letter }}. {{ getFieldData(criteriaStrandsUnit, fieldCR).name_eng }}</b></div>
-                    <field-list-view :options="valueCR" v-slot="selectData" class="ms-3">
-                      <span><b>{{ selectData.field.letter }}:</b> {{ firstLetterBig(selectData.field.name_eng) }}</span>
-                    </field-list-view>
-                  </div>
-                </div>
-              </template>
-              <template v-slot:edit="data">
-                <field-checkbox-edit v-model="editUnit[`${data.field}_ids`]" :options="this[`${data.field}_list`]"
-                  :fieldName="data.field" v-slot="selectData">
-                  <div>
-                    <span><b>{{ selectData.field.letter }}:</b>
-                    {{ firstLetterBig(selectData.field.name_eng) }}</span>
-                  </div>
-                </field-checkbox-edit>
-              </template>
-            </unit-field>
+              <template v-slot:edit="field">{{ field.data.letter_i }}. {{ field.data.name_eng }}</template>
+            </unit-field-checkbox-grouped>
             <!-- Содержание -->
-            <unit-field :fieldName="'content'" :fieldData="unit.content" :fieldEditing="fieldCurrent" 
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data"><div v-html="unit[data.field]"></div></template>
-              <template v-slot:edit="data"><field-textarea-edit v-model="editUnit[data.field]" /></template>
-            </unit-field>
+            <unit-field-text id="content" :fieldName="'content'" :fieldText="fieldText.content" :fieldData="unitMYP.content"
+              @save="unitFieldSave" />
             <!-- Умения -->
-            <unit-field :fieldName="'skills'" :fieldData="unit.skills" :fieldEditing="fieldCurrent" 
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data"><div v-html="unit[data.field]"></div></template>
-              <template v-slot:edit="data"><field-textarea-edit v-model="editUnit[data.field]" /></template>
-            </unit-field>
-            <!-- ATL-навыки -->
-            <div>Карта ATL-навыков</div>
-            <unit-myp-view-atl :unit="unit" @update="getUnitData($route.params.id)" />
-          </div>
-          <!-- ПРОФИЛЬ СТУДЕНТА -->
-          <div class="tab-pane fade" :class="getClassActive('profile')" id="v-pills-learner-profile" role="tabpanel"
-            aria-labelledby="v-pills-learner-profile-tab" tabindex="0">
-            <!-- Выбор профилей студента для развития -->
-            <unit-field :fieldName="'learner_profile'" :fieldData="unit.learner_profile" :fieldEditing="fieldCurrent" :checkLoad="Boolean(learner_profile_list.length)"
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data">
-                <field-list-view :options="unit[data.field]" v-slot="selectData">
-                  <span>{{ selectData.field.name_eng }}</span>:<br>
-                  <small>{{ selectData.field.description_eng }}</small>
-                </field-list-view>
+            <unit-field-text id="skills" :fieldName="'skills'" :fieldText="fieldText.skills" :fieldData="unitMYP.skills"
+              @save="unitFieldSave" />
+            <!-- Карта развития ATL-навыков -->
+            <unit-field-blocks id="atl_mapping" :fieldName="'atl_mapping'" :fieldText="fieldText.atl_mapping"
+            :defaultItem="defaultATLSkill" :fieldData="unitMYP.atl_mapping" @save="unitFieldSave" @edit="unitFieldEdit">
+              <!-- Слот для блоков показа записей -->
+              <template v-slot:show="field">
+                <div class="blocks-wrapper">
+                  <div class="blocks-title">ATL: {{ field.data.atl.name_eng }}</div>
+                  <div>Objective: {{ field.data.strand.criterion.letter }} {{ field.data.strand.letter_i }}. {{ field.data.strand.name_eng }}</div>
+                  <div style="font-style: italic;">{{ field.data.action }}</div>
+                </div>
               </template>
-              <template v-slot:edit="data">
-                <field-checkbox-edit v-model="editUnit[`${data.field}_ids`]" :options="this[`${data.field}_list`]"
-                  :fieldName="data.field" v-slot="selectData">
-                  <div>
-                    <span>{{ selectData.field.name_eng }}</span>:<br>
-                    <small>{{ selectData.field.description_eng }}</small>
+              <!-- Слот для формы редактирования записей -->
+              <template v-slot:form="item">
+                <div class="row">
+                  <div class="col-md">
+                    <select id="subject" class="form-select mb-2" v-model="item.data.atl_id">
+                      <option :value="null">Выберите навык ATL</option>
+                      <option v-for="(op, i) in atlSkills" :key="i" :value="op.id">
+                        {{ op.name_eng }} ({{ op.cluster.name_eng }})
+                      </option>
+                    </select>
                   </div>
-                </field-checkbox-edit>
+                  <div class="col-md">
+                    <select id="subject" class="form-select mb-2" v-model="item.data.strand_id">
+                      <option :value="null">Выберите образовательную цель</option>
+                      <option v-for="(op, i) in unitMYP.strands" :key="i" :value="op.id">
+                        {{ op.criterion.letter }} {{ op.letter_i }}. {{ op.name_eng }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                <div class="my-2">
+                    <textarea class="form-control mb-2" type="text" v-model="item.data.action"
+                      placeholder="Действия"></textarea>
+                  </div>
               </template>
-            </unit-field>
-            <!-- Описание развития выбранных профилей -->
-            <unit-field :fieldName="'description_lp'" :fieldData="unit.description_lp" :fieldEditing="fieldCurrent" 
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data"><div v-html="unit[data.field]"></div></template>
-              <template v-slot:edit="data"><field-textarea-edit v-model="editUnit[data.field]" /></template>
-            </unit-field>
+            </unit-field-blocks>
+            <!-- Профиль студента -->
+            <div id="myp-profile" class="myp-header"><h2>Профиль студента</h2></div>
+            <!-- Таблица развития профиля студента IB -->
+            <unit-field-blocks id="learner_profile" :fieldName="'learner_profile'" :fieldText="fieldText.learner_profile"
+            :defaultItem="defaultProfile" :fieldData="unitMYP.learner_profile" @save="unitFieldSave" @edit="unitFieldEdit">
+              <!-- Слот для блоков показа записей -->
+              <template v-slot:show="field">
+                <div class="blocks-wrapper">
+                  <div class="blocks-title">{{ field.data.profile.name_eng }}</div>
+                  <div>{{ field.data.description }}</div>
+                </div>
+              </template>
+              <!-- Слот для формы редактирования записей -->
+              <template v-slot:form="item">
+                <div class="row">
+                  <div class="col-md">
+                    <select id="subject" class="form-select mb-2" v-model="item.data.profile_id">
+                      <option :value="null">Выберите IB Profile</option>
+                      <option v-for="(op, i) in ibProfiles" :key="i" :value="op.id">
+                        {{ op.name_eng }} 
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                <div class="my-2">
+                    <textarea class="form-control mb-2" type="text" v-model="item.data.description"
+                      placeholder="Описание развития профиля"></textarea>
+                  </div>
+              </template>
+            </unit-field-blocks>
             <!-- Межкультурное понимание -->
-            <unit-field :fieldName="'international_mindedness'" :fieldData="unit.international_mindedness" :fieldEditing="fieldCurrent" 
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data"><div v-html="unit[data.field]"></div></template>
-              <template v-slot:edit="data"><field-textarea-edit v-model="editUnit[data.field]" /></template>
-            </unit-field>
+            <unit-field-text id="international_mindedness" :fieldName="'international_mindedness'" :fieldText="fieldText.international_mindedness" :fieldData="unitMYP.international_mindedness"
+              @save="unitFieldSave" />
             <!-- Академическая честность -->
-            <unit-field :fieldName="'academic_integrity'" :fieldData="unit.academic_integrity" :fieldEditing="fieldCurrent" 
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data"><div v-html="unit[data.field]"></div></template>
-              <template v-slot:edit="data"><field-textarea-edit v-model="editUnit[data.field]" /></template>
-            </unit-field>
+            <unit-field-text id="academic_integrity" :fieldName="'academic_integrity'" :fieldText="fieldText.academic_integrity" :fieldData="unitMYP.academic_integrity"
+              @save="unitFieldSave" />
             <!-- Языковое развитие -->
-            <unit-field :fieldName="'language_development'" :fieldData="unit.language_development" :fieldEditing="fieldCurrent" 
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data"><div v-html="unit[data.field]"></div></template>
-              <template v-slot:edit="data"><field-textarea-edit v-model="editUnit[data.field]" /></template>
-            </unit-field>
+            <unit-field-text id="language_development" :fieldName="'language_development'" :fieldText="fieldText.language_development" :fieldData="unitMYP.language_development"
+              @save="unitFieldSave" />
             <!-- Использование средств ИКТ -->
-            <unit-field :fieldName="'infocom_technology'" :fieldData="unit.infocom_technology" :fieldEditing="fieldCurrent" 
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data"><div v-html="unit[data.field]"></div></template>
-              <template v-slot:edit="data"><field-textarea-edit v-model="editUnit[data.field]" /></template>
-            </unit-field>
+            <unit-field-text id="infocom_technology" :fieldName="'infocom_technology'" :fieldText="fieldText.infocom_technology" :fieldData="unitMYP.infocom_technology"
+              @save="unitFieldSave" />
             <!-- Служение как действие -->
-            <unit-field :fieldName="'service_as_action'" :fieldData="unit.service_as_action" :fieldEditing="fieldCurrent" 
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data"><div v-html="unit[data.field]"></div></template>
-              <template v-slot:edit="data"><field-textarea-edit v-model="editUnit[data.field]" /></template>
-            </unit-field>
-          </div>
-          <!-- ОЦЕНИВАНИЕ -->
-          <div class="tab-pane fade" :class="getClassActive('assessment')" id="v-pills-assessment" role="tabpanel" aria-labelledby="v-pills-assessment-tab"
-            tabindex="0">
+            <unit-field-text id="service_as_action" :fieldName="'service_as_action'" :fieldText="fieldText.service_as_action" :fieldData="unitMYP.service_as_action"
+              @save="unitFieldSave" />
+            <!-- ОЦЕНИВАНИЕ -->
+            <div id="myp-assessment" class="myp-header"><h2>Оценивание</h2></div>
             <!-- Текущее оценивание -->
-            <unit-field :fieldName="'formative_assessment'" :fieldData="unit.formative_assessment" :fieldEditing="fieldCurrent" 
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data"><div v-html="unit[data.field]"></div></template>
-              <template v-slot:edit="data"><field-textarea-edit v-model="editUnit[data.field]" /></template>
-            </unit-field>
+            <unit-field-text id="formative_assessment" :fieldName="'formative_assessment'" :fieldText="fieldText.formative_assessment" :fieldData="unitMYP.formative_assessment"
+              @save="unitFieldSave" />
             <!-- Итоговое оценивание (задания) -->
-            <unit-field :fieldName="'summative_assessment_task'" :fieldData="unit.summative_assessment_task" :fieldEditing="fieldCurrent" 
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data"><div v-html="unit[data.field]"></div></template>
-              <template v-slot:edit="data"><field-textarea-edit v-model="editUnit[data.field]" /></template>
-            </unit-field>
+            <unit-field-text id="summative_assessment_task" :fieldName="'summative_assessment_task'" :fieldText="fieldText.summative_assessment_task" :fieldData="unitMYP.summative_assessment_task"
+              @save="unitFieldSave" />
             <!-- Итоговое оценивание (взаимосвязь с исследовательским утверждением) -->
-            <unit-field :fieldName="'summative_assessment_soi'" :fieldData="unit.summative_assessment_soi" :fieldEditing="fieldCurrent" 
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data"><div v-html="unit[data.field]"></div></template>
-              <template v-slot:edit="data"><field-textarea-edit v-model="editUnit[data.field]" /></template>
-            </unit-field>
+            <unit-field-text id="summative_assessment_soi" :fieldName="'summative_assessment_soi'" :fieldText="fieldText.summative_assessment_soi" :fieldData="unitMYP.summative_assessment_soi"
+              @save="unitFieldSave" />
             <!-- Взаимное и самооценивание -->
-            <unit-field :fieldName="'peer_self_assessment'" :fieldData="unit.peer_self_assessment" :fieldEditing="fieldCurrent" 
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data"><div v-html="unit[data.field]"></div></template>
-              <template v-slot:edit="data"><field-textarea-edit v-model="editUnit[data.field]" /></template>
-            </unit-field>
+            <unit-field-text id="peer_self_assessment" :fieldName="'peer_self_assessment'" :fieldText="fieldText.peer_self_assessment" :fieldData="unitMYP.peer_self_assessment"
+              @save="unitFieldSave" />
             <!-- Стандартизация и модерация -->
-            <unit-field :fieldName="'standardization_moderation'" :fieldData="unit.standardization_moderation" :fieldEditing="fieldCurrent" 
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data"><div v-html="unit[data.field]"></div></template>
-              <template v-slot:edit="data"><field-textarea-edit v-model="editUnit[data.field]" /></template>
-            </unit-field>
-          </div>
-          <!-- СТРАТЕГИИ ПРЕПОДАВАНИЯ -->
-          <div class="tab-pane fade" :class="getClassActive('teaching')" id="v-pills-teaching" role="tabpanel" aria-labelledby="v-pills-teaching-tab"
-            tabindex="0">
+            <unit-field-text id="standardization_moderation" :fieldName="'standardization_moderation'" :fieldText="fieldText.standardization_moderation" :fieldData="unitMYP.standardization_moderation"
+              @save="unitFieldSave" />
+            <!-- СТРАТЕГИИ ПРЕПОДАВАНИЯ -->
+            <div id="myp-teaching" class="myp-header"><h2>Стратегии преподавания</h2></div>
             <!-- Предыдущий опыт обучения -->
-            <unit-field :fieldName="'prior_experiences'" :fieldData="unit.prior_experiences" :fieldEditing="fieldCurrent" 
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data"><div v-html="unit[data.field]"></div></template>
-              <template v-slot:edit="data"><field-textarea-edit v-model="editUnit[data.field]" /></template>
-            </unit-field>
+            <unit-field-text id="prior_experiences" :fieldName="'prior_experiences'" :fieldText="fieldText.prior_experiences" :fieldData="unitMYP.prior_experiences"
+              @save="unitFieldSave" />
             <!-- Учебная деятельность -->
-            <unit-field :fieldName="'learning_experiences'" :fieldData="unit.learning_experiences" :fieldEditing="fieldCurrent" 
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data"><div v-html="unit[data.field]"></div></template>
-              <template v-slot:edit="data"><field-textarea-edit v-model="editUnit[data.field]" /></template>
-            </unit-field>
+            <unit-field-text id="learning_experiences" :fieldName="'learning_experiences'" :fieldText="fieldText.learning_experiences" :fieldData="unitMYP.learning_experiences"
+              @save="unitFieldSave" />
             <!-- Стратегии преподавания -->
-            <unit-field :fieldName="'teaching_strategies'" :fieldData="unit.teaching_strategies" :fieldEditing="fieldCurrent" 
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data"><div v-html="unit[data.field]"></div></template>
-              <template v-slot:edit="data"><field-textarea-edit v-model="editUnit[data.field]" /></template>
-            </unit-field>
+            <unit-field-text id="teaching_strategies" :fieldName="'teaching_strategies'" :fieldText="fieldText.teaching_strategies" :fieldData="unitMYP.teaching_strategies"
+              @save="unitFieldSave" />
             <!-- Ожидания студентов -->
-            <unit-field :fieldName="'student_expectations'" :fieldData="unit.student_expectations" :fieldEditing="fieldCurrent" 
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data"><div v-html="unit[data.field]"></div></template>
-              <template v-slot:edit="data"><field-textarea-edit v-model="editUnit[data.field]" /></template>
-            </unit-field>
+            <unit-field-text id="student_expectations" :fieldName="'student_expectations'" :fieldText="fieldText.student_expectations" :fieldData="unitMYP.student_expectations"
+              @save="unitFieldSave" />
             <!-- Обратная связь -->
-            <unit-field :fieldName="'feedback'" :fieldData="unit.feedback" :fieldEditing="fieldCurrent" 
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data"><div v-html="unit[data.field]"></div></template>
-              <template v-slot:edit="data"><field-textarea-edit v-model="editUnit[data.field]" /></template>
-            </unit-field>
+            <unit-field-text id="feedback" :fieldName="'feedback'" :fieldText="fieldText.feedback" :fieldData="unitMYP.feedback"
+              @save="unitFieldSave" />
             <!-- Дифференциация -->
-            <unit-field :fieldName="'differentiation'" :fieldData="unit.differentiation" :fieldEditing="fieldCurrent" 
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data"><div v-html="unit[data.field]"></div></template>
-              <template v-slot:edit="data"><field-textarea-edit v-model="editUnit[data.field]" /></template>
-            </unit-field>
+            <unit-field-text id="differentiation" :fieldName="'differentiation'" :fieldText="fieldText.differentiation" :fieldData="unitMYP.differentiation"
+              @save="unitFieldSave" />
             <!-- Ресурсы -->
-            <unit-field :fieldName="'resources'" :fieldData="unit.resources" :fieldEditing="fieldCurrent" 
-              @edit="editMode" @save="submitEdit" @cancel="cancelEdit">
-              <template v-slot:read="data"><div v-html="unit[data.field]"></div></template>
-              <template v-slot:edit="data"><field-textarea-edit v-model="editUnit[data.field]" /></template>
-            </unit-field>
-          </div>
-          <!-- РЕФЛЕКСИЯ -->
-          <div class="tab-pane fade" :class="getClassActive('reflection')" id="v-pills-reflection" role="tabpanel" aria-labelledby="v-pills-reflection-tab"
-            tabindex="0">
-            <unit-myp-view-reflection :unit="unit" :categoryValue="'Prior'" :categoryText="reflectionPriorText" @update="getUnitData($route.params.id)" />
-            <unit-myp-view-reflection :unit="unit" :categoryValue="'During'" :categoryText="reflectionDuringText" @update="getUnitData($route.params.id)" />
-            <unit-myp-view-reflection :unit="unit" :categoryValue="'After'" :categoryText="reflectionAfterText" @update="getUnitData($route.params.id)" />
+            <unit-field-text id="resources" :fieldName="'resources'" :fieldText="fieldText.resources" :fieldData="unitMYP.resources"
+              @save="unitFieldSave" />
+            <!-- РЕФЛЕКСИЯ -->
+            <div id="myp-reflections" class="myp-header"><h2>Рефлексия</h2></div>
+            <!-- Посты рефлексии перед началом юнита -->
+            <unit-field-blocks id="reflections_prior" :fieldName="'reflections_prior'" :fieldText="fieldText.reflection_prior"
+              :fieldData="unitMYP.reflections.filter(item => item.type == 'Prior')"
+              :defaultItem="this.defaultReflection['postPrior']" @save="unitFieldSave" @edit="unitFieldEdit">
+              <!-- Слот для блоков показа записей -->
+              <template v-slot:show="field">
+                <div class="blocks-wrapper">
+                  <div class="post-text">{{ field.data.post }}</div>
+                  <div>{{ field.data.author.first_name }} {{ field.data.author.middle_name }} {{ field.data.author.last_name }}</div>
+                </div>
+              </template>
+              <!-- Слот для формы редактирования записей -->
+              <template v-slot:form="item">
+                <div class="my-2">
+                  <textarea class="form-control mb-2" type="text" v-model="item.data.post"
+                    placeholder="Напишите обратную связь"></textarea>
+                </div>
+              </template>
+            </unit-field-blocks>
+            <!-- Посты рефлексии во время юнита -->
+            <unit-field-blocks id="reflections_during" :fieldName="'reflections_during'" :fieldText="fieldText.reflection_during"
+              :fieldData="unitMYP.reflections.filter(item => item.type == 'During')"
+              :defaultItem="this.defaultReflection['postDuring']" @save="unitFieldSave" @edit="unitFieldEdit">
+              <!-- Слот для блоков показа записей -->
+              <template v-slot:show="field">
+                <div class="blocks-wrapper">
+                  <div class="post-text">{{ field.data.post }}</div>
+                  <div>{{ field.data.author.first_name }} {{ field.data.author.middle_name }} {{ field.data.author.last_name }}</div>
+                </div>
+              </template>
+              <!-- Слот для формы редактирования записей -->
+              <template v-slot:form="item">
+                <div class="my-2">
+                  <textarea class="form-control mb-2" type="text" v-model="item.data.post"
+                    placeholder="Напишите обратную связь"></textarea>
+                </div>
+              </template>
+            </unit-field-blocks>
+            <!-- Посты рефлексии после юнита -->
+            <unit-field-blocks id="reflections_after" :fieldName="'reflections_after'" :fieldText="fieldText.reflection_after"
+              :fieldData="unitMYP.reflections.filter(item => item.type == 'After')"
+              :defaultItem="this.defaultReflection['postAfter']" @save="unitFieldSave" @edit="unitFieldEdit">
+              <!-- Слот для блоков показа записей -->
+              <template v-slot:show="field">
+                <div class="blocks-wrapper">
+                  <div class="post-text">{{ field.data.post }}</div>
+                  <div>{{ field.data.author.first_name }} {{ field.data.author.middle_name }} {{ field.data.author.last_name }}</div>
+                </div>
+              </template>
+              <!-- Слот для формы редактирования записей -->
+              <template v-slot:form="item">
+                <div class="my-2">
+                  <textarea class="form-control mb-2" type="text" v-model="item.data.post"
+                    placeholder="Напишите обратную связь"></textarea>
+                </div>
+              </template>
+            </unit-field-blocks>
           </div>
         </div>
+        <div class="d-flex border-top mt-3">
+          <button type="button" class="btn btn-danger ms-auto my-3" @click="showUnitModal">
+            Удалить этот юнит
+          </button>
+        </div>
       </div>
-      <div class="d-flex border-top mt-3">
-        <button type="button" class="btn btn-danger ms-auto my-3" @click="showModalDelete()">
-          Удалить этот юнит
-        </button>
-      </div>
+      </transition>
+      <!-- Модальное окно с формой удаления юнита -->
+      <modal-unit :modalId="'modalUnitDelete'" :modalTitle="modalTitle" :flagUnit="flagUnit" 
+      @cancel="hideUnitModal" @delete="unitDelete">
+        <div v-if="flagUnit.delete">
+          <div>Вы действительно хотите удалить этот юнит?</div>
+          <div class="border mt-2 p-2">
+            <div class="idu-header"><h4>{{ unitMYP.title }}</h4></div>
+            <div>Год обучения: {{ unitMYP.class_year.year_ib }} ({{ unitMYP.class_year.year_rus }} класс)</div>
+            <div>Предмет: {{ unitMYP.subject.name_rus }}</div>
+            <div>Учителя: 
+              <span v-for="(teacher, index) in unitMYP.authors" :key="teacher.id">
+              {{ teacher.first_name }} {{ teacher.middle_name }} {{ teacher.last_name }}<span v-if="++index !== unitMYP.authors.length">,&nbsp;</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </modal-unit>
+      <!-- Модальное окно с формой удаления МДП -->
+      <modal-unit :modalId="'modalUnitIDUDelete'" :modalTitle="modalTitle" :flagUnit="flagUnitIDU" 
+      @cancel="hideUnitIDUModal" @delete="deleteIDURelation">
+        <div v-if="flagUnitIDU.delete">
+          <div>Вы действительно хотите удалить связь с междисциплинарным юнитом?</div>
+          <div class="border mt-2 p-2">
+            <div class="idu-header"><h4>{{ unitMYP.interdisciplinary.title }}</h4></div>
+            <div>Предметы: 
+              <span v-for="(un, index) in unitMYP.interdisciplinary.unitplan_myp" :key="un.id">
+              {{ un.subject.name_rus }}<span v-if="++index !== unitMYP.interdisciplinary.unitplan_myp.length">,&nbsp;</span>
+            </span></div>
+          </div>
+        </div>
+      </modal-unit>
     </div>
-    </transition>
-    <modal-delete :idName="idNameModal" :del="true" @cancel="hideModalDelete" @delete="deleteUnit">
-      <div>Вы действитель хотите удалить этот юнит?</div>
-    </modal-delete>
-  </div>
 </template>
 
 <script>
 import { Modal } from 'bootstrap';
-// импорт компонента для работы с исследовательскими вопросами
-import UnitMypViewQuestion from "@/components/UnitMYPViewQuestion.vue";
-// импорт компонента для работы с картой навыков юнита
-import UnitMypViewAtl from "@/components/UnitMYPViewATL.vue";
-// импорт компонента для работы с постами рефлексии
-import UnitMypViewReflection from "@/components/UnitMYPViewReflection.vue";
-
-import { getSubjectsMYP, getTeachers, getGrades, getLevels } from "@/hooks/unit/getUnitMYPList"
-import { getUnitView, getCriteria, getAims,
-  getStrands, getKeyConcepts, getRelatedConcepts, 
-  getGlobalContext, getExplorations, getIBLearnerProfile } from "@/hooks/unit/getUnitMYPEdit"
+import { mapGetters } from 'vuex'
+import Editor from '@tinymce/tinymce-vue';
+import fieldText from '@/assets/fieldstext.json'
+import { getUnitMYP, updateUnitMYP, deleteUnitMYP } from "@/hooks/unit/useUnitMYP";
+import { getSubjects } from "@/hooks/curriculum/useSubject";
+import { getLevels } from "@/hooks/unit/useLevel";
+import { getClassYears } from "@/hooks/unit/useClassYear";
+import { getTeachers } from "@/hooks/user/useUser";
+import { getKeyConcepts } from "@/hooks/unit/useKeyConcept";
+import { getRelatedConcepts } from "@/hooks/unit/useRelatedConcept";
+import { getGlobalContext } from "@/hooks/unit/useGlobalContext";
+import { getExplorations } from "@/hooks/unit/useExploration";
+import { getStrands } from "@/hooks/unit/useStrand";
+import { getATLSkills } from "@/hooks/unit/useATLSkills";
+import { getAims } from "@/hooks/unit/useAim";
+import { getIBProfiles } from "@/hooks/unit/useIBProfile";
+import { getCriteriaMYP } from "@/hooks/unit/useCriterionMYP";
+import { getInterdisciplinaryUnits } from "@/hooks/unit/useInterdisciplinaryUnit";
 
 export default {
-  name: 'UnitPlansView',
+  name: 'UnitMYPView',
   components: {
-    UnitMypViewQuestion, UnitMypViewAtl, UnitMypViewReflection
+    'editor': Editor
   },
   setup(props) {
-    // Получение функции запроса данных юнита
-    const { unit, getUnitData } = getUnitView();
-    // Получение функции запроса списка предметов в MYP
-    const { subjects, getSubjectsData } = getSubjectsMYP();
-    // Получение функции запроса списка учителей
-    const { teachers, getTeachersData } = getTeachers();
-    // Получение функции запроса списка годов обучения в MYP
-    const { grades, getGradesData } = getGrades();
-    // Получение функции запроса списка уровней в MYP
-    const { levels, getLevelsData } = getLevels();
-    // Получение функции запроса списка критериев оценки MYP
-    const { criteria_list, getCriteriaData } = getCriteria();
-    // Получение функции запроса целей предметных групп
-    const { aims_list, getAimsData } = getAims();
-    // Получение функции запроса стрендов
-    const { strands_list, getStrandsData } = getStrands();
-    // Получение функции запроса ключевых концептов
-    const { key_concepts_list, getKeyConceptsData } = getKeyConcepts();
-    // Получение функции запроса связанных концептов
-    const { related_concepts_list, getRelatedConceptsData } = getRelatedConcepts();
-    // Получение функции запроса глобальных контекстов
-    const { global_context_list, getGlobalContextData } = getGlobalContext();
-    // Получение функции запроса линий исследования по глобальным контекстам
-    const { explorations_list, getExplorationsData } = getExplorations();
-    // Получение функции запроса профиля студента
-    const { learner_profile_list, getIBLPData } = getIBLearnerProfile();
-    // Переименование переменных для полей редактирования
-    let subjects_list = subjects;
-    let authors_list = teachers;
-    let class_year_list = grades;
-    let level_list = levels;
+    const { unitMYP, isUnitLoading, fetchGetUnitMYP } = getUnitMYP();
+    const { updatedUnitMYP, fetchUpdateUnitMYP } = updateUnitMYP();
+    const { fetchDeleteUnitMYP } = deleteUnitMYP();
+    const { subjects, fetchGetSubjects } = getSubjects();
+    const { levels, fetchGetLevels } = getLevels();
+    const { years, fetchGetClassYears } = getClassYears();
+    const { teachers, isTeacherLoading, fetchGetTeachers } = getTeachers();
+    const { keyConcepts, fetchGetKeyConcepts } = getKeyConcepts();
+    const { relatedConcepts, fetchGetRelatedConcepts } = getRelatedConcepts();
+    const { globalContexts, fetchGetGlobalContexts } = getGlobalContext();
+    const { explorations, fetchGetExplorations } = getExplorations();
+    const { aims, fetchGetAims } = getAims();
+    const { criteriaMYP, fetchGetCriteriaMYP } = getCriteriaMYP();
+    const { strands, fetchGetStrands } = getStrands();
+    const { atlSkills, fetchGetATLSkills } = getATLSkills();
+    const { ibProfiles, fetchGetIBProfiles } = getIBProfiles();
+    const { interdisciplinaryUnits, fetchGetInterdisciplinaryUnits } = getInterdisciplinaryUnits();
     return {
-      unit, getUnitData, 
-      subjects_list, getSubjectsData, 
-      authors_list, getTeachersData, 
-      class_year_list, getGradesData,
-      level_list, getLevelsData,
-      criteria_list, getCriteriaData, 
-      aims_list, getAimsData, 
-      strands_list, getStrandsData, 
-      key_concepts_list, getKeyConceptsData,
-      related_concepts_list, getRelatedConceptsData, 
-      global_context_list, getGlobalContextData, 
-      explorations_list, getExplorationsData,
-      learner_profile_list, getIBLPData,
+      unitMYP, isUnitLoading, fetchGetUnitMYP,
+      updatedUnitMYP, fetchUpdateUnitMYP, fetchDeleteUnitMYP,
+      years, fetchGetClassYears,
+      teachers, isTeacherLoading, fetchGetTeachers,
+      keyConcepts, fetchGetKeyConcepts,
+      relatedConcepts, fetchGetRelatedConcepts,
+      globalContexts, fetchGetGlobalContexts,
+      explorations, fetchGetExplorations,
+      aims, fetchGetAims,
+      strands, fetchGetStrands,
+      subjects, fetchGetSubjects,
+      levels, fetchGetLevels,
+      criteriaMYP, fetchGetCriteriaMYP,
+      atlSkills, fetchGetATLSkills,
+      ibProfiles, fetchGetIBProfiles,
+      interdisciplinaryUnits, fetchGetInterdisciplinaryUnits,
     }
   },
   data() {
     return {
-      idNameModal: 'Unit',
-      editUnit: {},
-      choisenSL: { subject: null, level: null },
-      editUnitID: {},
-      searchAuthors: '',
-      fieldCurrent: '',
-      reflectionPriorText: {
-        title: 'До начала изучения',
-        description: 'Вопросы, на которых следует сосредоточиться: Почему мы считаем, что юнит или выбор тем будут интересными? Что уже знают студенты и что они могут сделать? Что студенты изучали по данному предмету раньше? Что, по Вашему опыту, можно ожидать в этом юните? Какие качества профиля студента предлагает студентам для развития данный юнит? Какие потенциальные междисциплинарные связи мы можем выявить? Что мы знаем о предпочтениях студентов и моделях взаимодействия? Существуют ли какие-либо возможности для осмысленного изучения направления служение как действие? Что в данном юните может вдохновлять на социальные или персональные проекты? Можем ли мы создать возможности для обучения служению как действию? Как мы можем использовать многоязычие студентов в качестве ресурса для обучения?'
+      fieldText: fieldText,
+      questionTypes: [
+        { name: "Фактический", value: 'Factual' },
+        { name: "Концептуальный", value: 'Conceptual' },
+        { name: "Дискуссионный", value: 'Debatable' },
+      ],
+      defaultInQuestion: {
+        type: null,
       },
-      reflectionDuringText: {
-        title: 'В процессе изучения юнита',
-        description: 'Вопросы, на которых следует сосредоточиться: С какими трудностями мы столкнулись при изучении юнита или итоговых оценочных заданий? Какие ресурсы оказываются полезными и какие другие ресурсы нам нужны? Какие запросы возникают у студентов? Что мы можем скорректировать или изменить? Какие навыки нуждаются в дополнительной практике? Каков уровень вовлеченности студентов? Как мы можем улучшить обучение студентов, которые нуждаются в поддержке? Что происходит в мире прямо сейчас, с чем мы могли бы связать преподавание и обучение в данном юните? Насколько хорошо учебный опыт согласуется с целями юнита? Какие возможности можно использовать, чтобы помочь студентам получить новые знания, включая личные предпочтения, которые могут быть сохранены, пересмотрены или отвергнуты? (DP теория познания)'
+      defaultATLSkill: {
+        atl_id: null,
+        strand_id: null,
       },
-      reflectionAfterText: {
-        title: 'По окончании изучения юнита ',
-        description: 'Вопросы, на которых следует сосредоточиться: Каковы были результаты обучения в данном юните? Насколько хорошо задание итогового оценивания помогло охарактеризовать уровни достижений? Было ли задание достаточно сложным, чтобы позволить студентам достичь самых высоких уровней? Какие доказательства обучения мы можем выявить? Какие программы обучения мы должны документировать? Какие стратегии обучения были эффективными? Почему? Что было удивительного? Какие действия, инициированные студентами, мы заметили? Что мы сделаем по-другому в следующий раз? Как мы будем использовать наш опыт для планирования следующего юнита? Насколько эффективно мы дифференцировали обучение в данном юните? Что студенты могут вынести из данного юнита на следующий год / уровень обучения? С какими предметными группами мы могли бы поработать в следующий раз? Чему мы научились в результате стандартизации оценки?'
+      defaultProfile: {
+        profile_id: null,
       },
-      selectDataFields: ['global_context', 'class_year'],
-      multiseelectDataFields: ['criteria', 'learner_profile', 'strands', 'aims', 'explorations', 'key_concepts', 'related_concepts', 'authors', 'inter_aims', 'inter_criteria', 'inter_strands'],
+      defaultReflection: {
+        postPrior: {
+          type: 'Prior',
+        },
+        postDuring: {
+          type: 'During',
+        },
+        postAfter: {
+          type: 'After',
+        },
+      },
+      modalUnitDelete: null,
+      modalUnitIDUDelete: null,
+      flagUnit: {},
+      flagUnitIDU: {},
+      modalTitle: '',
     }
   },
   methods: {
-    // Добавление предмета и его уровня в список
-    addSubjectLevel() {
-      this.editUnit.subjects.push(this.choisenSL);
-      this.choisenSL = { subject: null, level: null };
-    },
-    // Удаление предмета и его уровня из списка
-    deleteSubjectLevel(i) {
-      this.editUnit.subjects.splice(i, 1); 
-    },
-    // Показать модальное окно подтверждения удаления юнита
-    showModalDelete() {
-      this.ModalDelete.show();
-    },
-    // Скрыть модальное окно подтверждения удаления юнита
-    hideModalDelete() {
-      this.ModalDelete.hide();
-    },
-    // Функция удаления текущего юнита
-    deleteUnit() {
-      this.axios.delete(`/unitplans/myp/${this.$route.params.id}`).then(() => {
-        this.ModalDelete.hide();
-        this.$router.push('/unit');
-      });
-    },
-    // Функция применения изменений в редактируемом поле юнита
-    submitEdit() {
-      if (this.editUnit.global_context_id && this.unit.global_context && (this.editUnit.global_context_id !== this.unit.global_context.id)) {
-        this.editUnit.explorations_ids = []
-      }
-      if (this.editUnit.criteria_ids && this.unit.criteria && (this.editUnit.criteria_ids !== this.unit.criteria.map(item => item.id))) {
-        this.editUnit.strands_ids = this.unit.strands.filter(item => this.editUnit.criteria_ids.includes(item.criterion.id)).map(item => item.id)
-      }
-      if (this.editUnit.subjects) {
-        const subjectGroups = this.editUnit.subjects.map(item => item.subject.group_ib.id);
-        this.editUnit.aims_ids = this.unit.aims.filter(item => subjectGroups.includes(item.subject_group.id)).map(item => item.id);
-        this.editUnit.criteria_ids = this.unit.criteria.filter(item => subjectGroups.includes(item.subject_group.id)).map(item => item.id);
-        this.editUnit.strands_ids = this.unit.strands.filter(item => subjectGroups.includes(item.criterion.subject_group.id)).map(item => item.id);
-        this.editUnit.related_concepts_ids = this.unit.related_concepts.filter(rc => rc.subject_directions.filter( sd => subjectGroups.includes(sd.subject_group.id)).length).map(item => item.id);
-        this.editUnit.subjects = [... this.editUnit.subjects.map(item => {  
-          return { subject_id: item.subject.id, level_id: item.level.id }
-        })]
-      }
-      this.axios.put(`/unitplans/myp/${this.$route.params.id}`, this.editUnit).then((response) => {
-        this.unit = response.data;
-        this.editUnit = {};
-      });
-    },
-    // Функция отмены изменений в редактируемом поле юнита
-    cancelEdit(field) {
-      if (field == 'subjects') {
-        this.choisenSL = { subject: null, level: null };
-      } else if (this.selectDataFields.includes(field)) {
-        delete this.editUnit[`${field}_id`];
-      } else if (this.multiseelectDataFields.includes(field)) {
-        delete this.editUnit[`${field}_ids`];
-      } else {
-        delete this.editUnit[field];
+    unitFieldEdit(field) {
+      switch(field) {
+        case 'subject':
+          this.fetchGetSubjects({ program: 'MYP' });
+          break;
+        case 'level':
+          this.fetchGetLevels({ subject: this.unitMYP.subject.id})
+          break;
+        case 'authors':
+          this.fetchGetTeachers();
+          break;
+        case 'class_year':
+          this.fetchGetClassYears({ program: 'MYP' });
+          break;
+        case 'key_concepts':
+          this.fetchGetKeyConcepts();
+          break;
+        case 'related_concepts':
+          this.fetchGetRelatedConcepts({ subject: this.unitMYP.subject.id });
+          break;
+        case 'global_context':
+         this.fetchGetGlobalContexts();
+          break;
+        case 'explorations':
+         this.fetchGetExplorations({ gcontext: this.unitMYP.global_context.id });
+          break;
+        case 'aims':
+          this.fetchGetAims({ subject: this.unitMYP.subject.id });
+          break;
+        case 'criteria':
+          this.fetchGetCriteriaMYP({ subject: this.unitMYP.subject.id })
+          break;
+        case 'strands':
+          this.fetchGetStrands({ subject: this.unitMYP.subject.id, criteria: this.unitMYP.criteria.map(item => item.id)});
+          break;
+        case 'atl_mapping':
+          this.fetchGetATLSkills();
+          break;
+        case 'learner_profile':
+          this.fetchGetIBProfiles();
+          break;
+        case 'reflections_prior':
+          this.defaultReflection.postPrior['author_id'] = this.authUser.teacher.id;
+          break;
+        case 'reflections_during':
+          this.defaultReflection.postDuring['author_id'] = this.authUser.teacher.id;
+          break;
+        case 'reflections_after':
+          this.defaultReflection.postAfter['author_id'] = this.authUser.teacher.id;
+          break;
+        case 'interdisciplinary':
+          this.fetchGetInterdisciplinaryUnits({ class_year: this.unitMYP.class_year.id });
+          break;
       }
     },
-    // Активация режима редактирования выбранного поля юнита
-    editMode(field) {
-      this.fieldCurrent = field;
-      // Получение дополнительных данных с сервера при редактировании конкретного поля
-      if (field == 'subjects') {
-        this.getSubjectsData('ooo', 'base');
-        this.getLevelsData();
-      } else if (field == 'class_year') {
-        this.getGradesData('MYP');
-      } else if (field == 'authors') {
-        this.getTeachersData();
-      } else if (field == 'key_concepts') {
-        this.getKeyConceptsData();
-      } else if (field == 'related_concepts') {
-        this.getRelatedConceptsData(this.unit.subjects.map(item => item.subject.id).toString());
-      } else if (field == 'global_context') {
-        this.getGlobalContextData();
-      } else if (field == 'explorations') {
-        this.getExplorationsData(this.unit.global_context.id);
-      } else if (field == 'aims') {
-        this.getAimsData(this.unit.subjects.map(item => item.subject.id).toString());
-      } else if (field == 'criteria') {
-        this.getCriteriaData(this.unit.subjects.map(item => item.subject.id).toString());
-      } else if (field == 'strands') {
-        this.getStrandsData(this.unit.subjects.map(item => item.subject.id).toString(), '', this.unit.criteria.map(item => item.id).toString());
-      } else if (field == 'learner_profile') {
-        this.getIBLPData();
-      }
-      // Запись текущих данных во временную переменную редактируемого поля
-      if (field == 'subjects') { 
-        this.editUnit[field] = [ ...this.unit.subjects ];
-      } else if (this.selectDataFields.includes(field)) {
-        this.unit[field] ? this.editUnit[`${field}_id`] = this.unit[field].id : this.editUnit[`${field}_id`] = '';
-      } else if (this.multiseelectDataFields.includes(field)) {
-        this.unit[field] ? this.editUnit[`${field}_ids`] = this.unit[field].map((item) => { return item.id }) : this.editUnit[`${field}_ids`] = [];
-      } else {
-        this.editUnit[field] = this.unit[field];
-      }
-    },
-    // Функция применения изменений в редактируемом поле МДП
-    submitEditID() {
-      if (this.editUnitID.inter_criteria_ids && this.unit.inter.inter_criteria && (this.editUnitID.inter_criteria_ids !== this.unit.inter.inter_criteria.map(item => item.id))) {
-        this.editUnitID.inter_strands_ids = this.unit.inter.inter_strands.filter(item => this.editUnitID.inter_criteria_ids.includes(item.criterion.id)).map(item => item.id)
-      }
-      this.axios.put(`/unitplans/myp/inter/${this.unit.inter.id}`, this.editUnitID).then((response) => {
-        this.getUnitData(this.$route.params.id);
-        this.editUnitID = {};
-        console.log('Update UnitID Success');
-      });
-    },
-    // Функция отмены изменений в редактируемом поле МДП
-    cancelEditID(field) {
-      if (this.selectDataFields.includes(field)) {
-        delete this.editUnitID[`${field}_id`];
-      } else if (this.multiseelectDataFields.includes(field)) {
-        delete this.editUnitID[`${field}_ids`];
-      } else {
-        delete this.editUnitID[field];
-      }
-    },
-    // Активация режима редактирования выбранного поля МДП
-    editModeID(field) {
-      this.fieldCurrent = field;
-      // Получение дополнительных данных с сервера при редактировании конкретного поля
-      if (field == 'inter_aims') {
-        this.getAimsData('', 10);
-      } else if (field == 'inter_criteria') {
-        this.getCriteriaData('', 10);
-      } else if (field == 'inter_strands') {
-        this.getStrandsData('', 10, this.unit.inter.inter_criteria.map(item => item.id).toString());
-      }
-      // Запись текущих данных во временную переменную редактируемого поля
-      if (this.selectDataFields.includes(field)) {
-        this.unit.inter[field] ? this.editUnitID[`${field}_id`] = this.unit.inter[field].id : this.editUnitID[`${field}_id`] = '';
-      } else if (this.multiseelectDataFields.includes(field)) {
-        this.unit.inter[field] ? this.editUnitID[`${field}_ids`] = this.unit.inter[field].map((item) => { return item.id }) : this.editUnitID[`${field}_ids`] = [];
-      } else {
-        this.editUnitID[field] = this.unit.inter[field];
-      }
+    unitFieldSave(unit) {
+      console.log('Сохранение юнита: ', unit);
+      this.fetchUpdateUnitMYP(this.$route.params.id, unit).finally(() => {
+        this.unitMYP = { ...this.updatedUnitMYP }
+      })
     },
     // Проверка ключевого концепта в качестве рекомендованного в предметной группе
     checkKeyConcept(field) {
-      return field.recommended_subjects.filter(item => this.unit.subjects.map(item => item.subject.group_ib.id).includes(item.id)).length;
+      return field.recommended_subjects.filter(item => this.unitMYP.subject.group_ib.id == item.id).length;
     },
-    // Функция делает первую букву заглавной в тексте
-    firstLetterBig(text) {
-      return text.charAt(0).toUpperCase() + text.slice(1);
+    // Получить критерий по ID из данных юнита
+    getCriteriaByID(id) {
+      return this.unitMYP.criteria.find(item => item.id == id)
     },
-    // Группировка списка объектов по выбранному полю
-    groupedField(field, name, additionName = '') {
-      let groupedObject = field.reduce((acc, obj) => {
-        if (additionName) {
-          const property = obj[name][additionName].id;
-          acc[property] = acc[property] || [];
-          acc[property].push(obj);
-          return acc;
-        } else {
-          const property = obj[name].id;
-          acc[property] = acc[property] || [];
-          acc[property].push(obj);
-          return acc;
+    checkField(field, type=null) {
+      if (Array.isArray(this.unitMYP[field])) {
+        if (type) {
+          return Boolean(this.unitMYP[field].filter(item => item.type == type).length) ? 'field-check' : null
         }
-      }, {});
-      return groupedObject;
-    },
-    getFieldData(value, field) {
-      return value.find(item => item.id == field);
-    },
-    getClassActive(value) {
-      return {
-        'show active': localStorage.getItem('currentTab') == value
-      }
-    },
-    rememberTab(value) {
-      if (value) {
-        localStorage.setItem('currentTab', value)
+        return Boolean(this.unitMYP[field].length) ? 'field-check' : null
       } else {
-        localStorage.removeItem('currentTab');
+        return Boolean(this.unitMYP[field]) ? 'field-check' : null
       }
-      
+    },
+    showUnitModal() {
+      this.modalTitle = 'Удаление текущего юнита';
+      this.flagUnit.delete = true;
+      this.modalUnitDelete.show()
+    },
+    hideUnitModal() {
+      this.flagUnit.delete = false;
+      this.modalUnitDelete.hide()
+    },
+    showUnitIDUModal() {
+      this.modalTitle = 'Удаление междисциплинарной связи';
+      this.flagUnitIDU.delete = true;
+      this.modalUnitIDUDelete.show()
+    },
+    hideUnitIDUModal() {
+      this.flagUnitIDU.delete = false;
+      this.modalUnitIDUDelete.hide()
+    },
+    unitDelete() {
+      console.log('Удаление юнита');
+      this.fetchDeleteUnitMYP(this.$route.params.id).finally(() => {
+        this.flagUnit.delete = false;
+        this.modalUnitDelete.hide();
+        this.$router.push(`/myp`);
+      })
+    },
+    deleteIDURelation() {
+      console.log('Удаление междисциплинарной связи');
+      let deleteIDU = { interdisciplinary_id: null }
+      this.fetchUpdateUnitMYP(this.$route.params.id, deleteIDU).finally(() => {
+        this.unitMYP = { ...this.updatedUnitMYP };
+        this.flagUnitIDU.delete = false;
+        this.modalUnitIDUDelete.hide();
+      })
     }
   },
   mounted() {
-    this.getUnitData(this.$route.params.id);
-    this.ModalDelete = new Modal(`#modalDelete${this.idNameModal}`, { backdrop: 'static' });
+    this.modalUnitDelete = new Modal('#modalUnitDelete', { backdrop: 'static' });
+    this.modalUnitIDUDelete = new Modal('#modalUnitIDUDelete', { backdrop: 'static' });
+    this.fetchGetUnitMYP(this.$route.params.id);
   },
   computed: {
-    // Переменная с данными отфильтрованных учителей по значению поля поиска по фамилии (searchAuthors)
-    searchTeachers() {
-      if (this.searchAuthors == '') {
-        return this.authors_list.filter(teacher => this.editUnit.authors_ids.includes(teacher.id))
-      }
-      return this.authors_list.filter((teacher) => {
-        if (teacher.user) {
-          return teacher.user.last_name.toLowerCase().includes(this.searchAuthors.toLowerCase()) || this.editUnit.authors_ids.includes(teacher.id)
-        } else {
-          return this.editUnit.authors_ids.includes(teacher.id)
-        }
-      })
-    },
-    // Переменная для выборки предменых групп из текущих предметов юнита
-    subjectGroupUnit() {
-      let objArray = this.unit.subjects.map(sb => sb.subject.group_ib)
-      return [...new Map(objArray.map((item) => [item["id"], item])).values()]
-    },
-    // Переменная для выборки критериев текущих предметов юнита
-    criteriaStrandsUnit() {
-      let objArray = this.unit.strands.map(item => item.criterion)
-      return [...new Map(objArray.map((item) => [item["id"], item])).values()]
-    },
-    // Переменная с меткой междисциплинарности создаваемого юнита
-    checkInterdisciplinary() {
-      return this.unit.inter && Object.keys(this.unit.inter).length != 0
-    },
-    // Переменная с данными отфильтрованных уровней по выбранному предмету
-    filteredLevels() {
-      let levels = []
-      if (this.choisenSL.subject) {
-        levels = [...this.level_list.filter(item => item.subject_groups.includes(this.choisenSL.subject.group_ib.id))]
-        console.log(levels)
-        if (this.unit.class_year.id == 5 || this.unit.class_year.id == 6) {
-          this.choisenSL.level = levels[0]
-        } else if (this.unit.class_year.id == 7 || this.unit.class_year.id== 8) {
-          this.choisenSL.level = levels[1]
-        } else {
-          this.choisenSL.level = levels[2]
-        }
-      } 
-      return levels
-    },
-    listDataField(field) {
-      // <span v-for="(rs, index) in selectData.field.subject_directions" :key="rs.id"><span v-if="index != 0">, </span>{{ rs.name_eng }}</span>
-      return field.subject_directions.map(item => item.name_eng).join(', ')
-    }
+    // подключение переменной авторизированного пользователя из store
+    ...mapGetters(['authUser', 'isAdmin']),
   },
 }
 </script>
 
 <style scoped>
-@import '@/assets/css/unitview.css';
+@import '@/assets/css/field.css';
+.link {
+  cursor: pointer;
+  padding: 5px;
+}
+.link:hover {
+  text-decoration: underline;
+}
 .text-block {
   white-space: pre-wrap;
 }
+.myp-sidebar {
+  max-width: 300px;
+}
+.navbar-myp {
+  font-size: 0.9em;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: scroll;
+  -ms-overflow-style: none;
+  scrollbar-width: none; 
+}
+@media (max-width: 576px) {
+  .myp-sidebar {
+    max-width: 100%;
+  }
+  .navbar-myp {
+    height: inherit;
+  }
+}
+
+.navbar-myp::-webkit-scrollbar {
+  display: none;
+}
+.myp-interdisciplinary {
+  border: 1px solid #CFCFCF;
+  border-radius: 5px;
+  padding: 10px;
+}
+.myp-interdisciplinary:hover {
+  background: #CFCFCF;
+  transition: 0.5s;
+  cursor: pointer;
+}
+.idu-header {
+  text-transform: uppercase;
+  font-size: 1.5em;
+}
+.idu-btn-delete {
+  border: none;
+  border-radius: 5px;
+  padding: 3px 8px;
+  font-size: 0.8em;
+  margin-top: 5px;
+  background: #e44545;
+  color: #fff;
+  margin-left: auto;
+}
+.myp-header {
+  margin-bottom: 20px;
+  margin-top: 10px;
+}
+.myp-header:not(:first-of-type) {
+  margin-top: 20px;
+}
+.kc-recomend {
+  color: rgb(6, 134, 27);
+  font-weight: bold;
+}
+.nav-link {
+  padding: 0;
+  margin: 0;
+  font-weight: 400;
+}
+.myp-group {
+  margin: 5px 0;
+  font-size: 1.2em;
+}
+.myp-field {
+  margin-left: 20px;
+  margin-right: 5px;
+  padding: 5px 0;
+  position: relative;
+}
+.myp-field:before {
+  content: "";
+  position: absolute;
+  left: -20px;
+  top: 8px;
+  float: left;
+  width: 15px;
+  height: 15px;
+  margin-right: 5px;
+  background: url('@/assets/img/check-no.png') no-repeat 50% / 100%;
+}
+.field-check:before {
+  background: url('@/assets/img/check-yes.png') no-repeat 50% / 100%;
+}
+.blocks-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%
+}
+.blocks-title {
+  font-weight: 700;
+  margin-right: 10px;
+  /* flex-basis: 100%; */
+}
+.question-type {
+  background-color: green;
+  padding: 1px 5px;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 0.8em;
+  order: -1;
+  margin-right: 5px;
+}
+.question-line {
+  flex-basis: 100%;
+}
+
+.post-text {
+  flex-basis: 100%;
+  font-style: italic;
+}
+
 </style>

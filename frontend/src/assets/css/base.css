@@ -1,18 +1,440 @@
-.btn-primary {
-    background-color: #33cccc;
-    color: white;
-    border: none;
-}
-    
-.btn-primary:hover,
-.btn-primary:focus,
-.btn-primary:visited {
-    background-color: #28a8a8;
-    color: white;
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;700&display=swap');
+
+
+body {
+  font-family: 'Roboto', sans-serif;
 }
 
-.btn-warning {
-    background-color: #ffbf40;
-    color: black;
-    border: none;
+h1,
+h2,
+h3,
+h4,
+h4 {
+  font-family: 'Fira Sans', sans-serif;
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+  font-weight: 500;
+}
+
+:root {
+  --bs-primary: #59C5C5;
+  --bs-secondary: #674A9E;
+  --my-focus: #DBEDEB;
+  --my-gymnasium: #5C0F8B;
+  --bs-accordion-btn-focus-border-color: #59C5C5 !important; 
+  --bs-accordion-btn-focus-box-shadow: 0 0 0 0.25rem rgba(#59C5C5, 0.25) !important;
+}
+
+.btn-primary {
+  min-width: 160px;
+  background: var(--bs-primary);
+  border: 0.5px solid var(--bs-primary);
+  color: #000;
+  font-family: 'Roboto', sans-serif;
+}
+
+.btn-primary:not(:last-of-type) {
+  margin-right: 10px;
+}
+
+.btn-primary:disabled,
+.btn-primary[disabled]{
+  border: 0.5px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
+}
+
+.btn-primary:hover {
+  border: 0.5px solid var(--bs-primary);
+  background: #fff;
+  color: #000;
+}
+
+.btn-primary:active:hover {
+  border: 0.5px solid var(--bs-primary);
+  background: var(--bs-primary);
+  color: #fff;
+}
+
+.area {
+  margin: 15px 0;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0px 5px 10px 2px rgba(34, 60, 80, 0.1);
+}
+
+.area:hover {
+  transition: 0.5s;
+  box-shadow: 0px 5px 10px 2px rgba(34, 60, 80, 0.4);
+}
+
+.selected {
+  transition: none !important;
+  background: var(--my-focus) !important;
+}
+.description {
+  font-size: 0.8em;
+  color: #646464;
+}
+.collapse-title {
+  background-color: var(--bs-primary);
+  display: flex;
+  align-items: center;
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 10px;
+}
+.collapse-title:after {
+  content: '\2796';
+  font-size: 13px;
+  color: white;
+  margin-left: auto;
+}
+.collapse-title.collapsed {
+  background-color: var(--my-focus);
+  transition: 0.3s ease-in-out;
+}
+.collapse-title.collapsed:after {
+  content: "\2795"; 
+  font-size: 13px;
+  color: white;
+  margin-left: auto;
+}
+.collapse-title.collapsed:hover {
+  background-color: var(--bs-primary);
+}
+
+.icon-admin {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  background: url('@/assets/img/admin.svg');
+}
+
+.icon-online-dnevnik, .icon-offline-dnevnik {
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  width: 20px;
+  height: 20px;
+  background-color: #37c200;
+}
+.icon-online-dnevnik {
+  background: url('@/assets/img/dnevnik_status_on.svg');
+}
+.icon-offline-dnevnik {
+  background: url('@/assets/img/dnevnik_status_off.svg');
+}
+
+/* Общий стиль кнопки-иконки */
+.icon {
+  border: none;
+  width: 25px;
+  height: 25px;
+}
+.icon:not(:last-of-type) {
+  margin-right: 10px;
+}
+.icon:hover {
+  transform: scale(1.1);
+  transition: transform 0.3s;
+  cursor: pointer;
+}
+/* Картинки на разные виды кнопок-иконок */
+.icon-photo {
+  background: url('@/assets/img/photo.svg') no-repeat 50% / 85%;
+}
+.icon-pass {
+  background: url('@/assets/img/photo.svg') no-repeat 50% / 85%;
+}
+.icon-add {
+  background: url('@/assets/img/add.svg') no-repeat 50% / 85%;
+}
+.icon-edit {
+  background: url('@/assets/img/edit.svg') no-repeat 50% / 85%;
+}
+.icon-del {
+  background: url('@/assets/img/delete.svg') no-repeat 50% / 75%;
+}
+.icon-logout {
+  background: url('@/assets/img/logout.svg') no-repeat 50% / 85%;
+  width: 30px;
+  height: 30px;
+}
+.icon-confirm {
+  background: url('@/assets/img/confirm.svg') no-repeat 50% / 95%;
+}
+.icon-cancel {
+  background: url('@/assets/img/cancel.svg') no-repeat 50% / 95%;
+}
+.icon-export-pdf {
+  background: url('@/assets/img/export_pdf.svg') no-repeat 50% / 95%;
+}
+.icon-export-doc {
+  background: url('@/assets/img/export_doc.svg') no-repeat 50% / 95%;
+  width: 45px;
+  height: 45px;
+}
+
+/* Критерии */
+
+.criterion-a, .criterion-b, .criterion-c, .criterion-d {
+  color: #000 !important;
+  background: #fff !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  max-width: 50px;
+  padding: 5px 5px;
+  border-radius: 5px;
+  font-weight: 700;
+}
+
+.criterion-a {
+  border: 1px solid #F26728;
+}
+.criterion-b {
+  border: 1px solid #CDDC29;
+}
+.criterion-c {
+  border: 1px solid #5C2D85;
+}
+.criterion-d {
+  border: 1px solid #FED107;
+}
+
+
+/* Таблицы */
+table .uneditable {
+  background-color: #f7f7f7;
+  vertical-align: middle;
+  text-align: center;
+  min-width: 20px;
+}
+table .editable {
+  background-color: #ffffff;
+  font-weight: 500;
+  text-align: center;
+  min-width: 20px;
+  cursor: pointer;
+}
+
+/* Состояние выполненного пункта */
+.cheking:before {
+  content: "";
+  position: absolute;
+  left: -20px;
+  top: 8px;
+  float: left;
+  width: 15px;
+  height: 15px;
+  margin-right: 5px;
+  background: url('@/assets/img/check-no.png') no-repeat 50% / 100%;
+}
+.check:before {
+  background: url('@/assets/img/check-yes.png') no-repeat 50% / 100%;
+}
+
+/* Стили логотипов */
+.logo-header {
+  width: 50px;
+  height: 50px;
+  background: url('@/assets/img/sk_report_logo_notext.svg') no-repeat 50% / 80%;
+  overflow: hidden;
+  -webkit-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+  margin-right: 5px;
+}
+.logo-header:hover {
+  -webkit-transform: rotate(360deg);
+  transform: rotate(360deg);
+}
+.logo-footer {
+  width: 200px;
+  height: 50px;
+  background: url('@/assets/img/sk_report_logo.png') no-repeat 50% / 100%;
+}
+
+/* Загрузчик */
+.loader {
+  display: flex;
+  height: calc(100vh - 200px);
+  align-items: center;
+  justify-content: center;
+}
+
+/* Переключатель */
+.toggle {
+	display: inline-block;
+	overflow: hidden;
+}
+.toggle-item {
+	float: left;
+	display: inline-block;
+}
+.toggle-item input[type=radio] {
+	display: none;
+}
+.toggle-item label {
+	display: inline-block;
+	padding: 0px 15px;   
+	line-height: 34px;    
+	border: 1px solid var(--bs-secondary);
+	border-right: none;
+	cursor: pointer;
+	user-select: none;   
+}
+ 
+.toggle .my label {
+	border-radius: 6px 0 0 6px;
+}
+.toggle .all label {
+	border-radius: 0 6px 6px 0;
+	border-right: 1px solid var(--bs-secondary);
+}
+
+.toggle .my input[type=radio]:checked + label {
+	background: var(--bs-secondary);
+  color: #fff;
+}
+.toggle .all input[type=radio]:checked + label {
+	background: var(--bs-secondary);
+  color: #fff;
+}
+
+/* Кнопки из радиокнопок */
+.radiobutton input[type=radio] {
+	display: none;
+}
+.radiobutton label {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  /* justify-content: space-between; */
+	cursor: pointer;
+	padding: 10px;
+	border: 1px solid #999;
+	border-radius: 6px;
+	user-select: none;
+  font-size: 0.8em;
+}
+ 
+.radiobutton input[type=radio]:checked + label {
+	background: var(--my-focus);
+  color: #000
+}
+
+.radiobutton label:hover {
+	color: #666;
+}
+
+/* Кнопки из радиокнопок */
+.checkbutton input[type=checkbox] {
+	display: none;
+}
+.checkbutton label {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  /* justify-content: space-between; */
+	cursor: pointer;
+	padding: 10px;
+	border: 1px solid #999;
+	border-radius: 6px;
+	user-select: none;
+  font-size: 0.8em;
+}
+ 
+.checkbutton input[type=checkbox]:checked + label {
+	background: var(--my-focus);
+  color: #000
+}
+
+.checkbutton label:hover {
+	color: #666;
+}
+
+/* Переопределения стилей аккордиона */
+.accordion-button:not(.collapsed) {
+  color: #000;
+  background-color: var(--my-focus);
+}
+
+.accordion-button:focus {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.25rem rgba(#59C5C5, 0.25);
+}
+
+.active>.page-link {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+.page-link {
+  color: var(--bs-primary);
+}
+
+.page-link:hover {
+  color: var(--bs-secondary);
+}
+
+.form-control:focus,
+.form-control:hover,
+.form-control:active {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.2rem #59C5C540;
+}
+
+.form-select:focus,
+.form-select:hover,
+.form-select:active {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.2rem #59C5C540;
+}
+
+.form-check {
+  margin-bottom: 0;
+}
+
+.form-check-input:checked[type=checkbox] {
+  background-image: url('@/assets/img/checkbox_on.svg');
+}
+
+.form-check-input:checked[type=radio] {
+  background-image: url('@/assets/img/radio_on.svg');
+}
+
+.form-check-input[type=checkbox] {
+  background-image: url('@/assets/img/checkbox_off.svg');
+}
+
+.form-check-input[type=radio] {
+  background-image: url('@/assets/img/radio_off.svg');
+}
+
+.form-check-input:checked {
+  background-color: inherit;
+  border-color: inherit;
+  border: none;
+}
+
+.form-check-input:focus {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.2rem #59C5C540;
+}
+
+/* Переопределениеи стиля прогрессбара */
+.progress-bar {
+  background-color: var(--bs-secondary);
 }

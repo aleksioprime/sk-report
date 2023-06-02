@@ -13,9 +13,9 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" @click="$emit('cancel')">Отмена</button>
-          <button v-if="flagUser.addUser" type="button" class="btn btn-primary" @click="$emit('create')">Добавить</button>
-          <button v-if="flagUser.editUser" type="button" class="btn btn-primary" @click="$emit('update')">Сохранить</button>
-          <button v-if="flagUser.deleteUser" type="button" class="btn btn-primary" @click="$emit('delete')">Удалить</button>
+          <button v-if="flagUser.add" type="button" class="btn btn-primary" @click="$emit('create')">Добавить</button>
+          <button v-if="flagUser.edit" type="button" class="btn btn-primary" @click="$emit('update')">Сохранить</button>
+          <button v-if="flagUser.delete" type="button" class="btn btn-primary" @click="$emit('delete')">Удалить</button>
           <button v-if="flagUser.import" type="button" class="btn btn-primary" @click="$emit('import')">Загрузить</button>
         </div>
       </div>
@@ -34,9 +34,9 @@ export default {
     flagUser: {
       type: Object,
       default: {
-        addUser: false,
-        editUser: false,
-        deleteUser: false,
+        add: false,
+        edit: false,
+        delete: false,
       }
     }
   },

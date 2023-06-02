@@ -20,13 +20,21 @@ router.beforeEach(async (to) => {
   if (!user && token) {
     console.log('Найден токен в localStorage: запрос данных пользователя');
     await store.dispatch('getUserData').then(() => {
+      if (to.hash) {
+        console.log('Сохранение токена')
+        store.dispatch('setTokenDnevnik', { route: to });
+      }
       return { name: to.name }
     });
   }
   if (to.name == 'login' && token) {
     console.log('Вы залогинены: перенаправление на главную страницу');
-    return { name: 'unitlist' }
+    return { name: 'dashboard' }
   }
+  if (to.meta.permissions && to.meta.permissions.length > 0) {
+    let isAllowed = to.meta.permissions == 'teacher' && store.state.authUser.teacher
+    if (! isAllowed) return { name: 'dashboard' }
+}
 })
 
 const app = createApp(App)

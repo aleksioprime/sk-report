@@ -1,0 +1,15 @@
+backend/assess/migrations/__pycache__/
+backend/curriculum/migrations/__pycache__/
+backend/igskolkovo/migrations/__pycache__/
+backend/member/migrations/__pycache__/
+backend/assess/__pycache__/
+backend/curriculum/__pycache__/
+backend/igskolkovo/__pycache__/
+backend/member/__pycache__/
+.DS_Store
+backend/assess/migrations/__pycache__/
+backend/curriculum/migrations/__pycache__/
+backend/igskolkovo/migrations/__pycache__/
+backend/member/migrations/__pycache__/
+
+

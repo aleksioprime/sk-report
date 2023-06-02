@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26.95 26.83">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #5c2d85;
+      }
+
+      .cls-2 {
+        fill: #f0f0ee;
+      }
+
+      .cls-3 {
+        fill: #231f20;
+        font-family: FiraSans-Medium, 'Fira Sans Medium';
+        font-size: 5.38px;
+      }
+    </style>
+  </defs>
+  <g id="Layer_1-2" data-name="Layer 1">
+    <path class="cls-2" d="M12.96,0H.83C.37,0,0,.37,0,.83V26c0,.46,.37,.83,.83,.83H19.08c.46,0,.83-.37,.83-.83V6.95c0-.37-.15-.73-.41-.99L13.95,.41c-.26-.26-.62-.41-.99-.41Z"/>
+    <path class="cls-1" d="M12.65,26.83h2.71c.08-3.98,2.34-7.43,5.64-9.18v-2.99c-4.84,1.95-8.27,6.65-8.36,12.16Z"/>
+    <polygon class="cls-1" points="26.95 16.47 21.01 13.03 21.01 19.9 26.95 16.47"/>
+    <text class="cls-3" transform="translate(1.76 5.05)"><tspan x="0" y="0">DOC</tspan></text>
+  </g>
+</svg>

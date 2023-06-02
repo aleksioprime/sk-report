@@ -11,6 +11,11 @@ axiosAPI.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.get
 axiosAPI.interceptors.response.use(resp => resp, async error => {
   const originalConfig = error.config;
   if (originalConfig.url != "/login" && error.response) {
+    if (error.response.status == 401 && error.response.data.code == 'user_not_found') {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      window.location.reload();
+    }
     if (error.response.status == 401 && !originalConfig._retry) {
       // console.log('Ошибка авториации. Возможно, токен устрарел');
       originalConfig._retry = true;

@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div style="min-width: 400px">
     <base-navbar v-if="isAuthenticated" />
-    <router-view :class="{ container: isAuthenticated }" class="main"/>
+    <router-view :class="{ 'container': isAuthenticated }" class="main"/>
     <base-footbar v-if="isAuthenticated"/>
   </div>
 </template>

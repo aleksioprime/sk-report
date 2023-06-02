@@ -37,7 +37,7 @@
 .unit-field-data ul {
   margin: 0px;
 }
-.unit-field-edit {
+/* .unit-field-edit {
   border: none;
   width: 20px;
   height: 20px;
@@ -45,7 +45,7 @@
   background-size: 100%;
   flex-shrink: 0;
   margin-left: auto;
-}
+} */
 .unit-field-input {
   margin-top: 5px;
 }
@@ -108,7 +108,7 @@
   cursor: pointer;
   margin: 5px;
 }
-.img-btn-add {
+/* .img-btn-add {
   background: url('@/assets/img/add-btn.png') no-repeat 50%;
   background-size: 100%;
 }
@@ -120,7 +120,7 @@
 .img-btn-del {
   background: url('@/assets/img/delete-btn.png') no-repeat 50%;
   background-size: 100%;
-}
+} */
 
 
 .fade-enter-active,
