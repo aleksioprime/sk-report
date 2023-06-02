@@ -7,7 +7,7 @@
 
 @echo on
 call "C:\venv\freshstream\Scripts\activate.bat"
-set POSTGRES_PORT=32770
+set POSTGRES_PORT=32771
 set POSTGRES_HOST=localhost
 set POSTGRES_DB=igskolkovo
 set POSTGRES_USER=igadmin
