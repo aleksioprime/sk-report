@@ -3,7 +3,9 @@ import { axiosAPI } from '@/axios'
 
 export function getStudyYears() {
 	const studyYears = ref([]);
-	const currentStudyYear = ref({});
+	const currentStudyYear = ref({
+		academic_plan: []
+	});
 	const fetchGetStudyYears = async () => {
 		await axiosAPI.get('/assessment/year').then((response) => {
 			studyYears.value = response.data;

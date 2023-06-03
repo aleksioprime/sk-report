@@ -888,7 +888,7 @@ class HoursSubjectInYearSerializer(serializers.ModelSerializer):
     years = ClassYearSerializer(many=True, read_only=True)
     class Meta:
         model = HoursSubjectInYear
-        fields = ['id', 'years', 'hours']
+        fields = ['id', 'years', 'hours', 'academic_plan']
 
 class WorkLoadSubjectSerializer(serializers.ModelSerializer):
     # workload = WorkLoadSerializer(many=True, read_only=True)

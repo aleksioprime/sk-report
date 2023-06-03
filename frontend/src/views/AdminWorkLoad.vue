@@ -23,49 +23,48 @@
         </option>
       </select>
     </div>
+    <!-- Выбор уровня образования -->
+    <div class="my-2">
+      <select id="levels" class="form-select me-3 mb-2" v-model="currentPlanId">
+        <option :value="null">Все учебные планы</option>
+        <option v-for="ap in currentStudyYear.academic_plan" :key="ap.id" :value="ap.id">
+          {{ ap.name_rus }}
+        </option>
+      </select>
+    </div>
+    <!-- Нагрузка учителей -->
+    <div class="my-2">
+      <div class="collapse-title collapsed" data-bs-toggle="collapse" :href="`#collapse-workload`" role="button" aria-expanded="false" :aria-controls="`#collapse-workload`">Общая нагрузка учителей кафедры</div>
+      <div class="collapse" :id="`collapse-workload`"> 
+        <div v-for="wlTeacher, index in workLoadTeachers" :key="index" class="mt-2">
+          <div><b>{{ wlTeacher.teacher.full_name }}</b> (Общая нагрузка: {{ getWordHour(wlTeacher.hours) }})</div>
+          <div v-for="wlSubject, iSub in wlTeacher.workload" :key="iSub">
+            <div class="workload-wrapper">
+              <div>{{ ++iSub }}. {{ wlSubject.subject }} ({{ getWordHour(wlSubject.hours) }}):&nbsp;</div>
+              <div v-for="sh, index in wlSubject.group_hours" :key="index">
+                <span v-for="group, i in sh.groups" :key="group">{{ group }}
+                  <span v-if="++i !== sh.groups.length">,&nbsp;</span></span> - <span>
+                    {{ getWordHour(sh.hours) }}<span v-if="++index !== wlSubject.group_hours.length">,&nbsp;</span></span>
+              </div>.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="subject-wrapper">
-      <div class="wrapper-title"><h2>Начальная школа</h2></div>
-      <div class="subject-noo-wrapper" v-if="nooSubjects.length">
-        <work-load-item v-for="subject in nooSubjects" :key="subject.id" :subject="subject" @deleteItem="showWorkLoadDelete">
-          <template v-slot:form>
-            <button class="icon icon-add mt-2" v-show="editableSubject != subject.id" @click="showWorkLoadAdd(subject)"></button>
-            <work-load-form v-if="editableSubject == subject.id" :groups="groups" :subjects="subjects" :teachers="teachers"
-              :editableData="editableData" :deletionMode="deletionMode" @apply="applyWorkLoad" @cancel="cancelWorkLoad"/>
-          </template>
-        </work-load-item>
+      <div v-for="ap in filteredAcademicPlans" :key="ap.id">
+        <div class="wrapper-title"><h2>{{ ap.name_rus }}</h2></div>
+        <div class="subject-noo-wrapper" v-if="filteredSubject(ap.id).length">
+          <work-load-item v-for="subject in filteredSubject(ap.id)" :key="subject.id" :subject="subject" @deleteItem="showWorkLoadDelete">
+            <template v-slot:form>
+              <button class="icon icon-add mt-2" v-show="editableSubject != subject.id" @click="showWorkLoadAdd(subject)"></button>
+              <work-load-form v-if="editableSubject == subject.id" :groups="groups" :subjects="subjects" :teachers="teachers"
+                :editableData="editableData" :deletionMode="deletionMode" @apply="applyWorkLoad" @cancel="cancelWorkLoad"/>
+            </template>
+          </work-load-item>
+        </div>
+        <div class="subject-wrapper area" v-else>Нет данных</div>
       </div>
-      <div class="subject-wrapper area" v-else>Нет данных</div>
-      <!-- <button v-show="!addWorkLoadSubjectNoo" class="btn btn-primary" @click="showWorkLoadSubjectAdd(level='noo')">Добавить нагрузку</button>
-        <work-load-form v-if="addWorkLoadSubjectNoo" :groups="groups" :subjects="subjects" :teachers="teachers"
-          :editableData="editableData" :deletionMode="deletionMode" @apply="applyWorkLoad" @cancel="cancelWorkLoad"/> -->
-      <div class="wrapper-title"><h2>Средняя школа</h2></div>
-      <div class="subject-ooo-wrapper" v-if="oooSubjects.length">
-        <work-load-item v-for="subject in oooSubjects" :key="subject.id" :subject="subject" @deleteItem="showWorkLoadDelete">
-          <template v-slot:form>
-            <button class="icon icon-add mt-2" v-show="editableSubject != subject.id" @click="showWorkLoadAdd(subject)"></button>
-            <work-load-form v-if="editableSubject == subject.id" :groups="groups" :subjects="subjects" :teachers="teachers"
-              :editableData="editableData" :deletionMode="deletionMode" @apply="applyWorkLoad" @cancel="cancelWorkLoad"/>
-          </template>
-        </work-load-item>
-      </div>
-      <div class="subject-wrapper area" v-else>Нет данных</div>
-      <!-- <button v-show="!addWorkLoadSubjectOoo" class="btn btn-primary" @click="showWorkLoadSubjectAdd(level='ooo')">Добавить нагрузку</button>
-        <work-load-form v-if="addWorkLoadSubjectOoo" :groups="groups" :subjects="subjects" :teachers="teachers"
-          :editableData="editableData" :deletionMode="deletionMode" @apply="applyWorkLoad" @cancel="cancelWorkLoad"/> -->
-      <div class="wrapper-title"><h2>Старшая школа</h2></div>
-      <div class="subject-soo-wrapper" v-if="sooSubjects.length">
-        <work-load-item v-for="subject in sooSubjects" :key="subject.id" :subject="subject" @deleteItem="showWorkLoadDelete">
-          <template v-slot:form>
-            <button class="icon icon-add mt-2" v-show="editableSubject != subject.id" @click="showWorkLoadAdd(subject)"></button>
-            <work-load-form v-if="editableSubject == subject.id" :groups="groups" :subjects="subjects" :teachers="teachers"
-              :editableData="editableData" :deletionMode="deletionMode" @apply="applyWorkLoad" @cancel="cancelWorkLoad"/>
-          </template>
-        </work-load-item>
-      </div>
-      <div class="subject-wrapper area" v-else>Нет данных</div>
-      <!-- <button v-show="!addWorkLoadSubjectSoo" class="btn btn-primary" @click="showWorkLoadSubjectAdd(level='soo')">Добавить нагрузку</button>
-        <work-load-form v-if="addWorkLoadSubjectSoo" :groups="groups" :subjects="subjects" :teachers="teachers"
-          :editableData="editableData" :deletionMode="deletionMode" @apply="applyWorkLoad" @cancel="cancelWorkLoad"/> -->
     </div>
   </div>
 </template>
@@ -121,25 +120,17 @@ export default {
       editableSubject: null,
       editableData: {},
       deletionMode: false,
-      addWorkLoadSubjectNoo: false,
-      addWorkLoadSubjectOoo: false,
-      addWorkLoadSubjectSoo: false,
+      currentPlanId: null,
     }
   },
   methods: {
-    showWorkLoadSubjectAdd(level) {
-      this.cancelWorkLoad();
-      if (level == 'noo') {
-        this.addWorkLoadSubjectNoo = true;
-      } else if (level == 'ooo') {
-        this.addWorkLoadSubjectOoo = true;
-      } else if (level == 'soo') {
-        this.addWorkLoadSubjectSoo = true;
-      }
-      this.fetchGetSubjects({ level: level });
-      this.fetchGetTeachers();
-      this.fetchGetGroups({ study_year: this.currentStudyYear.id, level: level });
-      this.editableData = { groups_ids: [], subject_id: null, teacher_id: null };
+    getWordHour(count) {
+      let value = Math.abs(count) % 100;
+      let number = value % 10;
+      if (value > 10 && value < 20) return `${count} часов`;
+      if (number > 1 && number < 5) return `${count} часа`;
+      if (number == 1) return `${count} час`;
+      return `${count} часов`;
     },
     showWorkLoadAdd(data) {
       this.cancelWorkLoad();
@@ -186,12 +177,12 @@ export default {
       this.editableSubject = null;
       this.deletionMode = false;
       this.editableData = {};
-      this.addWorkLoadSubjectNoo = false;
-      this.addWorkLoadSubjectOoo = false;
-      this.addWorkLoadSubjectSoo = false;
     },
     changeDepartment() {
       this.fetchGetWorkLoadSubjects({ department: this.currentDepartment, study_year: this.currentStudyYear.id }).finally(() => {});
+    },
+    filteredSubject(id) {
+      return this.workLoadSubjects.filter(item => item.syllabus.map(obj => obj.academic_plan).includes(id))
     }
   },
   mounted() {
@@ -201,19 +192,39 @@ export default {
       }
       this.fetchGetStudyYears().finally(() => {
         this.fetchGetWorkLoadSubjects({ department: this.currentDepartment, study_year: this.currentStudyYear.id }).finally(() => {});
+
       })
     });
   },
   computed: {
-    nooSubjects() {
-      return this.workLoadSubjects.filter(item => item.level == 'noo')
+    filteredAcademicPlans() {
+      if (this.currentPlanId) {
+        return this.currentStudyYear.academic_plan.filter(item => item.id == this.currentPlanId)
+      } else {
+        return this.currentStudyYear.academic_plan
+      }
     },
-    oooSubjects() {
-      return this.workLoadSubjects.filter(item => item.level == 'ooo')
-    },
-    sooSubjects() {
-      return this.workLoadSubjects.filter(item => item.level == 'soo')
-    },
+    workLoadTeachers() {
+      let wlTeachers = []
+      this.workLoadSubjects.forEach(subject => {
+        subject.workload.forEach(item => {
+          const indexTeacher = wlTeachers.findIndex(wl_teacher => wl_teacher.teacher.id == item.teacher.id)
+          if (indexTeacher != -1) {
+            wlTeachers[indexTeacher].hours += item.hours
+            const indexSubject = wlTeachers[indexTeacher].workload.findIndex(wl => wl.subject == item.subject_name)
+            if (indexSubject != -1) {
+              wlTeachers[indexTeacher].workload[indexSubject].hours += item.hours
+              wlTeachers[indexTeacher].workload[indexSubject].group_hours.push({ groups: item.groups.map(gr => gr.group_name), hours: item.hours })
+            } else {
+              wlTeachers[indexTeacher].workload.push({ subject: item.subject_name, hours: item.hours, group_hours: [{ groups: item.groups.map(gr => gr.group_name), hours: item.hours }] })
+            }            
+          } else {
+            wlTeachers.push({ teacher: item.teacher, hours: item.hours, workload: [{ subject: item.subject_name, hours: item.hours, group_hours: [{ groups: item.groups.map(gr => gr.group_name), hours: item.hours }] }] })
+          }
+        })
+      })
+      return wlTeachers
+    }
   },
 }
 </script>
@@ -229,5 +240,14 @@ export default {
 .wrapper-title {
   text-transform: uppercase;
   margin-top: 20px;
+}
+.workload-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+}
+.workload-item {
+  padding: 5px;
+  border: 1px solid #000;
+  border-radius: 5px;
 }
 </style>
