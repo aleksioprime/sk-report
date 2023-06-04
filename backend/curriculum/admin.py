@@ -20,7 +20,7 @@ class SubjectGroupIBAdmin(ImportExportModelAdmin):
     
 @admin.register(ClassYear)
 class ClassYearAdmin(ImportExportModelAdmin):
-    list_display = ("year_rus", "year_ib", "program", "level")
+    list_display = ("year_rus", "year_ib", "level")
     
 @admin.register(SubjectGroupFGOS)
 class SubjectGroupFGOSAdmin(ImportExportModelAdmin):

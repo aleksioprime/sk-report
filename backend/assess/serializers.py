@@ -64,7 +64,7 @@ class ClassGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassGroup
         fields = ['id', 'class_year', 'letter', 'id_dnevnik', 'count', 'study_year', 
-                  'mentor', 'psychologist']
+                  'mentor', 'psychologist', 'program']
     def update(self, instance, validated_data):
         print('Валидированные данные: ', validated_data)
         return super().update(instance, validated_data)
@@ -77,7 +77,7 @@ class ClassGroupStudentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassGroup
         fields = ['id', 'class_year', 'letter', 'id_dnevnik', 'count', 'study_year', 
-                  'mentor', 'psychologist', 'students']
+                  'mentor', 'psychologist', 'students', 'program']
     def update(self, instance, validated_data):
         print('Валидированные данные: ', validated_data)
         return super().update(instance, validated_data)
@@ -89,7 +89,7 @@ class ClassGroupExtraSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassGroup
         fields = ['id', 'class_year', 'letter', 'id_dnevnik', 'students', 'students_ids', 
-                  'mentor', 'mentor_id', 'psychologist', 'psychologist_id']
+                  'mentor', 'mentor_id', 'psychologist', 'psychologist_id', 'program']
         extra_kwargs = {
             'students_ids': {'source': 'students', 'write_only': True},
             'mentor_id': {'source': 'mentor', 'write_only': True},
@@ -123,7 +123,7 @@ class WorkGroupDateListSerializer(serializers.ModelSerializer):
     group = ClassGroupSerializer(read_only=True)
     class Meta:
         model = WorkGroupDate
-        fields = ['id', 'work', 'group', 'group_id', 'date', 'lesson']
+        fields = ['id', 'work', 'group', 'group_id', 'date', 'lesson', 'program']
         extra_kwargs = {
             'group_id': {'source': 'group', 'write_only': True},
             'id': {'read_only': False, 'required': False},
@@ -415,8 +415,7 @@ class ReportTeacherSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReportTeacher
         fields = ['id', 'student', 'student_id', 'period', 'period_id', 'subject', 'subject_id',
-                  'year', 'year_id', 'text', 'events', 'author', 'author_id', 'achievements', 'criteria',
-                  'criterion_a', 'criterion_b', 'criterion_c', 'criterion_d', 'criterion_rus',
+                  'year', 'year_id', 'text', 'events', 'author', 'author_id', 'achievements', 'criteria', 'criterion_rus',
                   'criterion_summ', 'criterion_count', 'final_grade', 'final_grade_ib', 'updated']
         extra_kwargs = {
             'student_id': {'source': 'student', 'write_only': True},
@@ -863,7 +862,7 @@ class ClassGroupWLSerializer(serializers.ModelSerializer):
     class_year = ClassYearSerializer(read_only=True)
     class Meta:
         model = ClassGroup
-        fields = ['id', 'group_name', 'class_year']
+        fields = ['id', 'group_name', 'class_year', 'program']
 
 class WorkLoadSerializer(serializers.ModelSerializer):
     study_year = StudyYearSerializer(read_only=True)

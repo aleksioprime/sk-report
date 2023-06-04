@@ -3,7 +3,7 @@ import { axiosAPI } from '@/axios'
 
 export function getSummativeWorks() {
 	const summativeWorks = ref([]);
-  const isSumWorkLoading = ref(true);
+  	const isSumWorkLoading = ref(true);
 	const fetchGetSummativeWorks = async (data) => {
 		const config = {
 			params: {

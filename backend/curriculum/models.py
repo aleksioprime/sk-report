@@ -19,7 +19,7 @@ class SubjectGroupIB(models.Model):
     name_eng = models.CharField(max_length=128, verbose_name=_("Название на англ. языке"))
     name_rus = models.CharField(max_length=128, verbose_name=_("Название на рус. языке"), null=True, blank=True)
     picture = models.ImageField(upload_to='subjectgroup_pic', blank=True, verbose_name=_("Картинка"), null=True)
-    program = models.CharField(choices=PROGRAM_IB_CHOICES, default=None, max_length=4)
+    program = models.CharField(choices=PROGRAM_IB_CHOICES, null=True, default=None, max_length=4)
     class Meta:
         verbose_name = 'IB: Предметная группа'
         verbose_name_plural = 'IB: Предметные группы'
@@ -31,7 +31,6 @@ class ClassYear(models.Model):
     """ Года обучения / учебная параллель """
     year_rus = models.PositiveIntegerField(verbose_name=_("Год обучения в РФ"), blank=False)
     year_ib = models.CharField(max_length=12, verbose_name=_("Год обучения в IB"), null=True, blank=True)
-    program = models.CharField(choices=PROGRAM_IB_CHOICES, verbose_name=_("IB-программа"), default=None, max_length=4)
     level = models.CharField(choices=LEVEL_NATION_CHOICES, verbose_name=_("Национальные уровни образования"), default='ooo', max_length=3)
     class Meta:
         verbose_name = 'Год обучения'
@@ -39,9 +38,9 @@ class ClassYear(models.Model):
         ordering = ['year_rus']
     def __str__(self):
         if self.year_ib is not None:
-            return f"{self.year_rus} класс ({self.year_ib} {self.program})"
+            return f"{self.year_rus} класс ({self.year_ib})"
         else:
-            return f"{self.year_rus} класс ({self.program})"
+            return f"{self.year_rus} класс"
 
 class SubjectGroupFGOS(models.Model):
     """ Предметная группа ФГОС """

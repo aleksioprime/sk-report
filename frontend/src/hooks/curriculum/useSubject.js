@@ -28,6 +28,7 @@ export function getSubjects() {
 
 export function getWorkLoadSubjects() {
   const workLoadSubjects = ref([]);
+  const isSubjectLoading = ref(false);
   const fetchGetWorkLoadSubjects = async (data) => {
     const config = {
       params: {
@@ -35,13 +36,16 @@ export function getWorkLoadSubjects() {
         study_year: data.study_year || null,
       }
     }
+    isSubjectLoading.value = true;
     await axiosAPI.get('workload/subjects', config).then((response) => {
         console.log('Получен список предметов с учебной нагрузкой: ', response.data)
         workLoadSubjects.value = response.data;
+    }).finally(() => {
+      isSubjectLoading.value = false;
     });
   };
   return {
-    workLoadSubjects, fetchGetWorkLoadSubjects
+    workLoadSubjects, isSubjectLoading, fetchGetWorkLoadSubjects
   }
 }
 

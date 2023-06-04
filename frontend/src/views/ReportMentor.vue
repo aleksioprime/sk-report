@@ -21,7 +21,7 @@
             </label>
           </div>
         </div>
-        <report-mentor-item :period="currentReportPeriod" v-if="currentStudent" class="student-item" :program="currentGroup.class_year.program"
+        <report-mentor-item :period="currentReportPeriod" v-if="currentStudent" class="student-item" :program="currentGroup.program"
         :student="currentStudent" :types="eventTypes" :levels="eventLevels" @updateReport="fetchUpdateReport" :editable="currentGroup.mentor.id == authUser.teacher.id"/>
         <div v-else>Выберите студента</div>
       </div>

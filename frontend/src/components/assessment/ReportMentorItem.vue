@@ -85,8 +85,8 @@
           <div :id="`panels-subject-${subject.id}`" class="accordion-collapse collapse">
             <div class="accordion-body">
               <div v-if="subject.text">
-              <div class="subject-criteria">
-                <div class="criteria-wrapper mb-3" v-if="program == 'myp'">
+              <div class="subject-criteria" v-if="program == 'myp'">
+                <div class="criteria-wrapper mb-3">
                   <div class="criteria-item" v-for="cr in subject.criteria" :key="cr.id">
                     <div class="criterion">{{ cr.criterion.letter }}. {{ cr.criterion.name_eng }}</div>
                     <div class="criteria-value">{{ cr.mark }}</div>
@@ -94,11 +94,11 @@
                 </div>
                 <div class="criteria-wrapper">
                   <div class="criteria-item">
-                    <div class="criteria-d">Сумма баллов: </div>
+                    <div class="criterion">Сумма баллов: </div>
                     <div class="criteria-value">{{ subject.criterion_summ || '-' }} / {{ subject.criterion_count * 8 || '-' }}</div>
                   </div>
                   <div class="criteria-item">
-                    <div class="criteria-d">Оценка РФ: </div>
+                    <div class="criterion">Оценка РФ: </div>
                     <div class="criteria-value">{{ subject.criterion_rus }}</div>
                   </div>
                 </div>
@@ -240,7 +240,6 @@ export default {
 }
 
 .grade-item {
-  flex-basis: 23%;
   display: flex;
   align-items: center;
   column-gap: 10px;
@@ -259,8 +258,7 @@ export default {
 .criteria-wrapper {
   display: flex;
   flex-wrap: wrap;
-  column-gap: 10px;
-  row-gap: 10px;
+  gap: 10px;
 }
 .report-item {
   padding: 10px;
@@ -388,6 +386,9 @@ export default {
   border: 1px solid #a7a7a78a;
   border-radius: 5px;
   padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 .criteria-item {
   display: flex;

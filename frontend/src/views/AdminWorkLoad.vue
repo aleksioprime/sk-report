@@ -35,7 +35,7 @@
     <!-- Нагрузка учителей -->
     <div class="my-2">
       <div class="collapse-title collapsed" data-bs-toggle="collapse" :href="`#collapse-workload`" role="button" aria-expanded="false" :aria-controls="`#collapse-workload`">Общая нагрузка учителей кафедры</div>
-      <div class="collapse" :id="`collapse-workload`"> 
+      <div class="p-2 collapse" :id="`collapse-workload`"> 
         <div v-for="wlTeacher, index in workLoadTeachers" :key="index" class="mt-2">
           <div><b>{{ wlTeacher.teacher.full_name }}</b> (Общая нагрузка: {{ getWordHour(wlTeacher.hours) }})</div>
           <div v-for="wlSubject, iSub in wlTeacher.workload" :key="iSub">
@@ -51,7 +51,7 @@
         </div>
       </div>
     </div>
-    <div class="subject-wrapper">
+    <div class="subject-wrapper" v-if="!isSubjectLoading">
       <div v-for="ap in filteredAcademicPlans" :key="ap.id">
         <div class="wrapper-title"><h2>{{ ap.name_rus }}</h2></div>
         <div class="subject-noo-wrapper" v-if="filteredSubject(ap.id).length">
@@ -64,6 +64,22 @@
           </work-load-item>
         </div>
         <div class="subject-wrapper area" v-else>Нет данных</div>
+      </div>
+    </div>
+    <div v-else class="loader">
+      <div class="lds-spinner">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
       </div>
     </div>
   </div>
@@ -90,7 +106,7 @@ export default {
   },
   setup(props) {
     const { departments, fetchGetDepartments } = getDepartments();
-    const { workLoadSubjects, fetchGetWorkLoadSubjects } = getWorkLoadSubjects();
+    const { workLoadSubjects, isSubjectLoading, fetchGetWorkLoadSubjects } = getWorkLoadSubjects();
     const { workLoadSubject, fetchGetWorkLoadSubject } = getWorkLoadSubject();
     const { createdWorkLoad, fetchCreateWorkLoad } = createWorkLoad();
     const { fetchDeleteWorkLoad } = deleteWorkLoad();
@@ -103,7 +119,7 @@ export default {
 
     return {
       departments, fetchGetDepartments,
-      workLoadSubjects, fetchGetWorkLoadSubjects,
+      workLoadSubjects, isSubjectLoading, fetchGetWorkLoadSubjects,
       workLoadSubject, fetchGetWorkLoadSubject,
       createdWorkLoad, fetchCreateWorkLoad,
       fetchDeleteWorkLoad,

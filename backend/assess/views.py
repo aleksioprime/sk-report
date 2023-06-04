@@ -583,72 +583,130 @@ class ExportReportMentorDOCXAPIView(APIView):
         response["Content-Encoding"] = 'UTF-8'
         return response
     def build_document(self, mentor_report, teacher_reports, psycho_report):
-        document = Document(os.path.join(settings.BASE_DIR, 'reports', 'temp_report_myp.docx'))
-        print(document._body._body.xml)
+        # document = Document(os.path.join(settings.BASE_DIR, 'reports', 'temp_report_myp.docx'))
+        document = Document()
+        section = document.sections[0]
+        section.header_distance = Pt(10)
+        section.footer_distance = Pt(10)
+        # print(document._body._body.xml)
         document.styles['Normal'].paragraph_format.space_after = Pt(0)
         parser = HtmlToDocx()
         if mentor_report:
             heading_document = document.add_heading(f"Academic year report {mentor_report.period.study_year.name}", level=1)
             heading_document.alignment = 1
             document.add_paragraph(f"\nStudent name: {mentor_report.student.user.last_name} {mentor_report.student.user.first_name}").paragraph_format.space_after = None
-            document.add_paragraph(f"Grade: {mentor_report.year.year_ib}")
+            group = mentor_report.year.group.filter(study_year=mentor_report.period.study_year, students=mentor_report.student).first()
+            document.add_paragraph(f"Grade: {group.group_name} класс ({mentor_report.year.year_ib})")
             document.add_paragraph(f"Advisor: {mentor_report.author.user.last_name} {mentor_report.author.user.first_name} {mentor_report.author.user.middle_name}")
             document.add_heading(f"REFLECTIONS", level=2)
+            # Блок репорта наставника
             title_mentor = document.add_heading(f"Homeroom Advisor (Наставник)", level=3)
+            document.add_paragraph()
             for element in parser.parse_html_string(mentor_report.text)._element:
                 title_mentor._p.addnext(element)
+            # Блок участия в мероприятиях
+            title_mentor = document.add_heading(f"Участие в мероприятиях", level=3)
+            events_queryset = EventParticipation.objects.filter(Q(teacher_reports__student=mentor_report.student, 
+                                                            teacher_reports__period=mentor_report.period,
+                                                            teacher_reports__year=mentor_report.year) | 
+                                                            Q(psycho_reports__student=mentor_report.student,
+                                                              psycho_reports__period=mentor_report.period,
+                                                              psycho_reports__year=mentor_report.year) | 
+                                                            Q(mentor_reports__student=mentor_report.student,
+                                                              mentor_reports__period=mentor_report.period,
+                                                              mentor_reports__year=mentor_report.year))
+            for event in events_queryset:
+                document.add_paragraph(f"{event.title} ({event.get_level_display()}, {event.type.name}): {event.result}")
+            # Блок репорта психолога
             title_psychologist = document.add_heading(f"Psychologist (Психолог)", level=3)
             if psycho_report:
                 for element in parser.parse_html_string(psycho_report.text)._element:
                     title_psychologist._p.addnext(element)
-            # Предметный блок
-            title_teacher = document.add_heading(f"Teachers (Учителя)", level=3)
+            # Блок репортов учителей-предметников
+            document.add_heading(f"Teachers (Учителя)", level=3)
+            document.add_paragraph()
             departments = Department.objects.all()
             for department in departments:
                 reports = teacher_reports.filter(subject__department=department)
                 if reports:
-                    table = document.add_table(rows=1, cols=5, style="Table Grid")
+                    if group.program == 'myp':
+                        table = document.add_table(rows=1, cols=6, style="Table Grid")
+                    elif group.program == 'dp':
+                        table = document.add_table(rows=1, cols=3, style="Table Grid")
+                    else:
+                        table = document.add_table(rows=1, cols=2, style="Table Grid")
                     table.rows[0].cells[0].text = f"{department.name.upper()}"
                     table.rows[0].cells[0].paragraphs[0].runs[0].font.bold = True
                     table.rows[0].cells[0].paragraphs[0].runs[0].font.size = Pt(16)
-                    table.cell(0, 0).merge(table.cell(0, 4))
                     count = 1
                     for j, report in enumerate(reports):
-                        criteria = Criterion.objects.filter(subject_group__subject=report.subject)
                         table.add_row()
                         table.rows[j + count].cells[0].text = f"Предмет"
-                        table.rows[j + count].cells[1].text = f"Критерии оценивания"
-                        table.rows[j + count].cells[1].width = Inches(200.0)
-                        table.rows[j + count].cells[2].text = f"Баллы"
-                        table.rows[j + count].cells[3].text = f"Сумма баллов"
-                        table.rows[j + count].cells[4].text = f"Оценка"
+                        if group.program == 'myp':
+                            table.rows[j + count].cells[1].text = f"Критерии оценивания"
+                            table.rows[j + count].cells[1].width = Inches(200.0)
+                            table.rows[j + count].cells[2].text = f"Баллы"
+                            table.rows[j + count].cells[3].text = f"Сумма баллов"
+                            table.rows[j + count].cells[4].text = f"Оценка"
+                            table.rows[j + count].cells[5].text = f"Итог"
+                        elif group.program == 'dp':
+                            table.rows[j + count].cells[1].text = f"Final Grade\nNon-IB term grade"
+                            table.rows[j + count].cells[2].text = f"Final Grade\nIB term grade"
+                        else:
+                            table.rows[j + count].cells[1].text = f"Final Grade"
                         table.add_row()
                         count += 1
                         table.rows[j + count].cells[0].text = f"{report.subject.name_rus}"
-                        for i, criterion in enumerate(criteria):
-                            table.rows[j + i + count].cells[1].text = f"{criterion.letter}. {criterion.name_eng}"
-                            if criterion.letter.lower() == 'a':
-                                table.rows[j + i + count].cells[2].text = f"{report.criterion_a}"
-                            elif criterion.letter.lower() == 'b':
-                                table.rows[j + i + count].cells[2].text = f"{report.criterion_b}"
-                            elif criterion.letter.lower() == 'c':
-                                table.rows[j + i + count].cells[2].text = f"{report.criterion_c}"
-                            elif criterion.letter.lower() == 'd':
-                                table.rows[j + i + count].cells[2].text = f"{report.criterion_d}"
+                        if group.program == 'myp':
+                            criteria = report.report_criteria.all()
+                            for i, item in enumerate(criteria):
+                                table.rows[j + i + count].cells[1].text = f"{item.criterion.letter}. {item.criterion.name_eng}"
+                                table.rows[j + i + count].cells[2].text = f"{item.mark}"
+                                table.add_row()
+                            table.rows[j + count].cells[3].text = f"{report.criterion_summ}/{report.criterion_count * 8}"
+                            table.rows[j + count].cells[4].text = f"{report.criterion_rus}"
+                            table.rows[j + count].cells[5].text = f"{report.final_grade}"
+                            table.cell(j + count, 0).merge(table.cell(j + count + len(criteria) - 1, 0))
+                            table.cell(j + count, 3).merge(table.cell(j + count + len(criteria) - 1, 3))
+                            table.cell(j + count, 4).merge(table.cell(j + count + len(criteria) - 1, 4))
+                            table.cell(j + count, 5).merge(table.cell(j + count + len(criteria) - 1, 5))
+                            count += len(criteria)
+                        elif group.program == 'dp':
+                            table.rows[j + count].cells[1].text = f"{report.final_grade}"
+                            table.rows[j + count].cells[2].text = f"{report.final_grade_ib}"
                             table.add_row()
-                        table.rows[j + count].cells[3].text = f"{report.criterion_summ}/{report.criterion_count * 8}"
-                        table.rows[j + count].cells[4].text = f"{report.criterion_rus}"
-                        table.cell(j + count, 0).merge(table.cell(j + count + len(criteria) - 1, 0))
-                        table.cell(j + count, 3).merge(table.cell(j + count + len(criteria) - 1, 3))
-                        table.cell(j + count, 4).merge(table.cell(j + count + len(criteria) - 1, 4))
-                        count += len(criteria)
+                            count += 1
+                        else:
+                            table.rows[j + count].cells[1].text = f"{report.final_grade}"
+                            table.add_row()
+                            count += 1
                         report_cell = table.cell(j + count, 0).paragraphs[0]
                         report_cell.add_run(f'Комментарии учителя ({report.author.user.last_name} {report.author.user.first_name} {report.author.user.middle_name}):').bold = True
                         for element in parser.parse_html_string(report.text)._element:
                             report_cell._p.addnext(element)
                         # self.delete_paragraph(report_cell)
-                        table.cell(j + count, 0).merge(table.cell(j + count, 4))
-                    document.add_paragraph()     
+                        if group.program == 'myp':
+                            table.cell(0, 0).merge(table.cell(0, 5))
+                            table.cell(j + count, 0).merge(table.cell(j + count, 5))
+                        elif group.program == 'dp':
+                            table.cell(0, 0).merge(table.cell(0, 2))
+                            table.cell(j + count, 0).merge(table.cell(j + count, 2))
+                        else:
+                            table.cell(0, 0).merge(table.cell(0, 1))
+                            table.cell(j + count, 0).merge(table.cell(j + count, 1))
+                    document.add_paragraph()   
+        # Добавление в колонтитул изображения
+        header = section.header
+        paragraph = header.paragraphs[0]
+        paragraph.paragraph_format.left_indent = Pt(-30)
+        logo_run = paragraph.add_run()
+        logo_run.add_picture(os.path.join(settings.BASE_DIR, 'reports', 'header_report.png'))  
+        footer = section.footer
+        paragraph = footer.paragraphs[0]
+        paragraph.paragraph_format.left_indent = Pt(-80)
+        logo_run = paragraph.add_run()
+        logo_run.add_picture(os.path.join(settings.BASE_DIR, 'reports', 'footer_report.png'))
+            
         return document
     def delete_paragraph(self, paragraph):
         temp_ = paragraph._element

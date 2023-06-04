@@ -70,7 +70,6 @@ class DepartmentSerializer(serializers.ModelSerializer):
 
 class ClassYearSerializer(serializers.ModelSerializer):
     level_name = serializers.CharField(source='get_level_display', read_only=True)
-    program_name = serializers.CharField(source='get_program_display', read_only=True)
     class Meta:
         model = ClassYear
         fields = '__all__'
